@@ -1,0 +1,211 @@
+#   Copyright 2010 by Benjamin J. Land (a.k.a. BenLand100)
+# 
+#   This file is part of the Scar Minimizing Autoing Resource Thing (SMART)
+# 
+#   SMART is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+# 
+#   SMART is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#   GNU General Public License for more details.
+# 
+#   You should have received a copy of the GNU General Public License
+#   along with SMART. If not, see <http://www.gnu.org/licenses/>.
+
+WIN_GPP=i586-mingw32msvc-g++
+LIN_GPP=g++
+JAVAC=javac
+JAVA=java
+
+DIST=dist
+BUILD=build
+WIN_NAME=Public_SMART.dll
+LIN_NAME=libsmart.so
+
+WIN_COMPILE_ARGS=-DWINDOWS -Wall -O0 -s -c
+LIN_COMPILE_ARGS=-fPIC -DLINUX -Wall -O3 -s -c
+
+SRC_DIR=src
+LIN_BUILD_DIR=$(BUILD)/linux
+WIN_BUILD_DIR=$(BUILD)/windows
+JAVA_BUILD_DIR=$(BUILD)/java
+
+CPPSOURCEFILES= \
+	$(SRC_DIR)/Main.cpp \
+	$(SRC_DIR)/Color.cpp \
+	$(SRC_DIR)/ClassLoader.cpp \
+	$(SRC_DIR)/Input.cpp \
+	$(SRC_DIR)/Reflection.cpp \
+	$(SRC_DIR)/JVM.cpp \
+	$(SRC_DIR)/Smart.cpp
+	
+CPPHEADERFILES= \
+	$(SRC_DIR)/jni.h \
+	$(SRC_DIR)/jni_md.h \
+	$(SRC_DIR)/Main.h \
+	$(SRC_DIR)/Color.h \
+	$(SRC_DIR)/ClassLoader.h \
+	$(SRC_DIR)/Input.h \
+	$(SRC_DIR)/Reflection.h \
+	$(SRC_DIR)/JVM.h \
+	$(SRC_DIR)/Smart.h
+	
+WINOBJFILES= \
+	$(WIN_BUILD_DIR)/Main.o \
+	$(WIN_BUILD_DIR)/Color.o \
+	$(WIN_BUILD_DIR)/ClassLoader.o \
+	$(WIN_BUILD_DIR)/Input.o \
+	$(WIN_BUILD_DIR)/Reflection.o \
+	$(WIN_BUILD_DIR)/JVM.o \
+	$(WIN_BUILD_DIR)/Smart.o
+	
+LINOBJFILES= \
+	$(LIN_BUILD_DIR)/Main.o \
+	$(LIN_BUILD_DIR)/Color.o \
+	$(LIN_BUILD_DIR)/ClassLoader.o \
+	$(LIN_BUILD_DIR)/Input.o \
+	$(LIN_BUILD_DIR)/Reflection.o \
+	$(LIN_BUILD_DIR)/JVM.o \
+	$(LIN_BUILD_DIR)/Smart.o
+	
+SMARTSOURCES= \
+    $(SRC_DIR)/java/awt/Canvas.java \
+    $(SRC_DIR)/smart/BlockingEventQueue.java \
+    $(SRC_DIR)/smart/Client.java \
+    $(SRC_DIR)/smart/ClientStub.java \
+    $(SRC_DIR)/smart/EventNazi.java \
+    $(SRC_DIR)/smart/EventRedirect.java \
+    $(SRC_DIR)/smart/UnblockedEvent.java
+    
+SMARTCLASSES= \
+    $(JAVA_BUILD_DIR)/java/awt/Canvas.class \
+    $(JAVA_BUILD_DIR)/smart/BlockingEventQueue.class \
+    $(JAVA_BUILD_DIR)/smart/Client.class \
+    $(JAVA_BUILD_DIR)/smart/ClientStub.class \
+    $(JAVA_BUILD_DIR)/smart/EventNazi.class \
+    $(JAVA_BUILD_DIR)/smart/EventRedirect.class \
+    $(JAVA_BUILD_DIR)/smart/UnblockedEvent.class
+
+all:
+	@echo "Syntax for SMART makefile:\n    For Windows distributions: make windows\n    For Linux distributions: make linux\n    For Both distributions: make both\n    To clean build files: make clean"
+	
+both: linux windows
+
+linux: $(DIST)/$(LIN_NAME)
+	@echo "Finished Building the Linux SMART distribution"
+	
+windows: $(DIST)/$(WIN_NAME)
+	@echo "Finished Building the Windows SMART distribution"
+	
+test: test-apps/test-windows.cpp test-apps/test-linux.cpp
+	@$(WIN_GPP) -Wall -o $(DIST)/test-windows.exe test-apps/test-windows.cpp
+	@$(LIN_GPP) -Wall -fPIC -ldl -o $(DIST)/test-linux test-apps/test-linux.cpp
+	@echo "Finished building test programs" 
+	
+clean: 
+	@echo "Cleaning build files..."
+	@rm -rf $(BUILD) $(DIST)
+	
+#### LINUX BUILDING DIRECTIVES ####
+
+$(DIST)/$(LIN_NAME): $(LINOBJFILES)
+	@echo "Linking SMART object files..."
+	@mkdir -p $(DIST)
+	@$(LIN_GPP) -fPIC -shared -s -o $(DIST)/$(LIN_NAME) $(LINOBJFILES)
+
+$(LIN_BUILD_DIR)/Main.o: $(SRC_DIR)/Main.cpp $(CPPHEADERFILES)
+	@echo "Compiling Main.cpp"
+	@mkdir -p $(LIN_BUILD_DIR)
+	@$(LIN_GPP) $(LIN_COMPILE_ARGS) -o $(LIN_BUILD_DIR)/Main.o $(SRC_DIR)/Main.cpp
+
+${LIN_BUILD_DIR}/Color.o: $(SRC_DIR)/Color.cpp $(CPPHEADERFILES)
+	@echo "Compiling Color.cpp"
+	@mkdir -p $(LIN_BUILD_DIR)
+	@$(LIN_GPP) $(LIN_COMPILE_ARGS) -o $(LIN_BUILD_DIR)/Color.o $(SRC_DIR)/Color.cpp
+
+${LIN_BUILD_DIR}/ClassLoader.o: $(SRC_DIR)/ClassLoader.cpp $(SRC_DIR)/classes.data $(CPPHEADERFILES)
+	@echo "Compiling ClassLoader.cpp"
+	@mkdir -p $(LIN_BUILD_DIR)
+	@$(LIN_GPP) $(LIN_COMPILE_ARGS) -o $(LIN_BUILD_DIR)/ClassLoader.o $(SRC_DIR)/ClassLoader.cpp
+
+${LIN_BUILD_DIR}/Input.o: $(SRC_DIR)/Input.cpp $(CPPHEADERFILES)
+	@echo "Compiling Input.cpp"
+	@mkdir -p $(LIN_BUILD_DIR)
+	@$(LIN_GPP) $(LIN_COMPILE_ARGS) -o $(LIN_BUILD_DIR)/Input.o $(SRC_DIR)/Input.cpp
+
+${LIN_BUILD_DIR}/Reflection.o: $(SRC_DIR)/Reflection.cpp $(CPPHEADERFILES)
+	@echo "Compiling Reflection.cpp"
+	@mkdir -p $(LIN_BUILD_DIR)
+	@$(LIN_GPP) $(LIN_COMPILE_ARGS) -o $(LIN_BUILD_DIR)/Reflection.o $(SRC_DIR)/Reflection.cpp
+
+${LIN_BUILD_DIR}/JVM.o: $(SRC_DIR)/JVM.cpp $(CPPHEADERFILES)
+	@echo "Compiling JVM.cpp"
+	@mkdir -p $(LIN_BUILD_DIR)
+	@$(LIN_GPP) $(LIN_COMPILE_ARGS) -o $(LIN_BUILD_DIR)/JVM.o $(SRC_DIR)/JVM.cpp
+
+${LIN_BUILD_DIR}/Smart.o: $(SRC_DIR)/Smart.cpp $(CPPHEADERFILES)
+	@echo "Compiling Smart.cpp"
+	@mkdir -p $(LIN_BUILD_DIR)
+	@$(LIN_GPP) $(LIN_COMPILE_ARGS) -o $(LIN_BUILD_DIR)/Smart.o $(SRC_DIR)/Smart.cpp
+
+#### WINDOWS BUILDING DIRECTIVES ####
+
+$(DIST)/$(WIN_NAME): $(WINOBJFILES)
+	@echo "Linking object files..."
+	@mkdir -p $(DIST)
+	@$(WIN_GPP) -mwindows -shared -s -o $(DIST)/$(WIN_NAME) $(WINOBJFILES)
+
+$(WIN_BUILD_DIR)/Main.o: $(SRC_DIR)/Main.cpp $(CPPHEADERFILES)
+	@echo "Compiling Main.cpp"
+	@mkdir -p $(WIN_BUILD_DIR)
+	@$(WIN_GPP) $(WIN_COMPILE_ARGS) -o $(WIN_BUILD_DIR)/Main.o $(SRC_DIR)/Main.cpp
+
+${WIN_BUILD_DIR}/Color.o: $(SRC_DIR)/Color.cpp $(CPPHEADERFILES)
+	@echo "Compiling Color.cpp"
+	@mkdir -p $(WIN_BUILD_DIR)
+	@$(WIN_GPP) $(WIN_COMPILE_ARGS) -o $(WIN_BUILD_DIR)/Color.o $(SRC_DIR)/Color.cpp
+
+${WIN_BUILD_DIR}/ClassLoader.o: $(SRC_DIR)/ClassLoader.cpp $(SRC_DIR)/classes.data $(CPPHEADERFILES)
+	@echo "Compiling Classloader.cpp"
+	@mkdir -p $(WIN_BUILD_DIR)
+	@$(WIN_GPP) $(WIN_COMPILE_ARGS) -o $(WIN_BUILD_DIR)/ClassLoader.o $(SRC_DIR)/ClassLoader.cpp
+
+${WIN_BUILD_DIR}/Input.o: $(SRC_DIR)/Input.cpp $(CPPHEADERFILES)
+	@echo "Compiling Input.cpp"
+	@mkdir -p $(WIN_BUILD_DIR)
+	@$(WIN_GPP) $(WIN_COMPILE_ARGS) -o $(WIN_BUILD_DIR)/Input.o $(SRC_DIR)/Input.cpp
+
+${WIN_BUILD_DIR}/Reflection.o: $(SRC_DIR)/Reflection.cpp $(CPPHEADERFILES)
+	@echo "Compiling Reflection.cpp"
+	@mkdir -p $(WIN_BUILD_DIR)
+	@$(WIN_GPP) $(WIN_COMPILE_ARGS) -o $(WIN_BUILD_DIR)/Reflection.o $(SRC_DIR)/Reflection.cpp
+
+${WIN_BUILD_DIR}/JVM.o: $(SRC_DIR)/JVM.cpp $(CPPHEADERFILES)
+	@echo "Compiling JVM.cpp"
+	@mkdir -p $(WIN_BUILD_DIR)
+	@$(WIN_GPP) $(WIN_COMPILE_ARGS) -o $(WIN_BUILD_DIR)/JVM.o $(SRC_DIR)/JVM.cpp
+
+${WIN_BUILD_DIR}/Smart.o: $(SRC_DIR)/Smart.cpp $(CPPHEADERFILES)
+	@echo "Compiling Smart.cpp"
+	@mkdir -p $(WIN_BUILD_DIR)
+	@$(WIN_GPP) $(WIN_COMPILE_ARGS) -o $(WIN_BUILD_DIR)/Smart.o $(SRC_DIR)/Smart.cpp
+
+#### JAVA/Cypher BUILDING DIRECTIVES ####
+
+src/classes.data: $(SMARTCLASSES) $(BUILD)/cypher/Cypher.class 
+	@echo "Encoding Java classes..."
+	@$(JAVA) -classpath $(BUILD) cypher.Cypher $(JAVA_BUILD_DIR) ./src/classes.data
+
+$(BUILD)/cypher/Cypher.class: $(SRC_DIR)/cypher/Cypher.java
+	@echo "Compiling Class Cypher"
+	@mkdir -p $(JAVA_BUILD_DIR)
+	@$(JAVAC) -sourcepath $(SRC_DIR) -d $(BUILD) $(SRC_DIR)/cypher/Cypher.java
+
+$(SMARTCLASSES): $(SMARTSOURCES)
+	@echo "Compiling Java Classes..."
+	@mkdir -p $(JAVA_BUILD_DIR)
+	@$(JAVAC) -classpath $(JAVA_BUILD_DIR) -sourcepath $(SRC_DIR) -d $(JAVA_BUILD_DIR) $(SMARTSOURCES)
+
