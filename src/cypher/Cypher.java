@@ -1,7 +1,7 @@
 /**
  *  Copyright 2010 by Benjamin J. Land (a.k.a. BenLand100)
  *
- *  This file is part of the Scar Minimizing Autoing Resource Thing (SMART)
+ *  This file is part of the SMART Minimizing Autoing Resource Thing (SMART)
  *
  *  SMART is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -118,7 +118,7 @@ public class Cypher {
         out.writeBytes("/**\n");
         out.writeBytes(" *  Copyright 2010 by Benjamin J. Land (a.k.a. BenLand100)\n");
         out.writeBytes(" *\n");
-        out.writeBytes(" *  This file is part of the Scar Minimizing Autoing Resource Thing (SMART)\n");
+        out.writeBytes(" *  This file is part of the SMART Minimizing Autoing Resource Thing (SMART)\n");
         out.writeBytes(" *\n");
         out.writeBytes(" *  SMART is free software: you can redistribute it and/or modify\n");
         out.writeBytes(" *  it under the terms of the GNU General Public License as published by\n");
