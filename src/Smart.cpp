@@ -287,12 +287,15 @@ void internalConstructor() {
 }
 
 void internalDestructor() {
+    if (jre) vm->AttachCurrentThreadAsDaemon((void**)&jre, 0);
     clearOld();
     free(curserver);
     if (jre) {
         freeClasses();
-        vm->DestroyJavaVM();
+        //Would be nice... But this causes a MASSIVE hang.
+        //vm->DestroyJavaVM();
     }
+    cout << "Releasing SMART library...\n";
     #ifdef WINDOWS
     if (jvmdll) FreeLibrary((HMODULE)jvmdll);
     #endif
