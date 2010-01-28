@@ -68,7 +68,7 @@ import javax.swing.event.ChangeListener;
  */
 public class Client implements ActionListener, ChangeListener {
     
-    public static final String TITLE = "Public SMARTv5.0 - SMART Minimizing Autoing Resource Thing - By BenLand100";
+    public static final String TITLE = "Public SMARTv5.1 - SMART Minimizing Autoing Resource Thing - By BenLand100";
 
     private static Hashtable<String, Client> clients = new Hashtable<String, Client>();
 
@@ -89,7 +89,7 @@ public class Client implements ActionListener, ChangeListener {
         int h = 503;
         new Client(ByteBuffer.allocate(w * h * 4), ByteBuffer.allocate(w * h * 4), w, h, "http://world79.runescape.com/","plugin.js?param=o0,a0,s0");
     }
-
+    
     private int width = 825;
     private int height = 500;
     private URLClassLoader thisLoader;

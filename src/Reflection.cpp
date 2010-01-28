@@ -64,6 +64,19 @@ int stringFromString(jobject str, char* delphistr) {
     return 0;
 }
 
+int invokeIntMethod(jobject object, char* classname, char* methname, int a, int b) {
+    try {
+      jclass classref = jre->FindClass(classname);
+      if (classref) {
+        jre->DeleteLocalRef(classref);
+        jmethodID meth = jre->GetMethodID(classref, methname, "(II)I");
+        if (meth) {
+          return jre->CallIntMethod(object,meth,a,b);
+        }
+      }
+    } catch (...) { }
+    return -1;
+}
 
 void freeObject(jobject object) {
     try {
