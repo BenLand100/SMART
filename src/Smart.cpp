@@ -49,6 +49,7 @@ JPOINT _point;
 JSTRING _string;
 
 char* curserver = 0;
+char* curparams = 0;
 PRGB image = 0;
 PRGB debug = 0;
 
@@ -207,7 +208,7 @@ void freeClasses() {
 void setup(char* root, char* params, long width, long height) {
     cout << "SmartSetup Entered\n";
     if (jre) vm->AttachCurrentThreadAsDaemon((void**)&jre, 0);
-    if (strcmp(root, curserver) || width != client_width || height != client_height) {
+    if (strcmp(root, curserver) || strcmp(params, curparams) || width != client_width || height != client_height) {
         if (!jre) {
             if (!jvmdll) jvmdll = findJVM();
             if (!jvmdll) {
@@ -223,6 +224,9 @@ void setup(char* root, char* params, long width, long height) {
         free(curserver);
         curserver = (char*) malloc(strlen(root) + 1);
         strcpy(curserver, root);
+        free(curparams);
+        curparams = (char*) malloc(strlen(params) + 1);
+        strcpy(curparams, params);
         client_height = height;
         client_width = width;
         #ifdef WINDOWS
@@ -262,7 +266,7 @@ void setup(char* root, char* params, long width, long height) {
         jre->DeleteLocalRef(rootstr);
         jre->DeleteLocalRef(paramsstr);
     } else {
-        if (jre && !jre->GetBooleanField(smart, _client.active)) {
+        if (jre && (jre->GetBooleanField(smart, _client.active) == JNI_FALSE)) {
             jre->CallVoidMethod(smart, _client.destroy);
             jre->DeleteGlobalRef(smart);
             jobject imgBuffer = jre->NewDirectByteBuffer((void*)((char*)image), client_height*client_width*4);
@@ -284,12 +288,15 @@ void setup(char* root, char* params, long width, long height) {
 void internalConstructor() {
     curserver = (char*) malloc(1);
     *curserver = 0;
+    curparams = (char*) malloc(1);
+    *curparams = 0;
 }
 
 void internalDestructor() {
     if (jre) vm->AttachCurrentThreadAsDaemon((void**)&jre, 0);
     clearOld();
     free(curserver);
+    free(curparams);
     if (jre) {
         freeClasses();
         //Would be nice... But this causes a MASSIVE hang.
