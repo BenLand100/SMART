@@ -39,8 +39,8 @@ extern int client_height;
     return bmp;
 }*/
 
-int setTarget(PRGB newTarget, int w, int h) {
-    int last = (int) target;
+long setTarget(PRGB newTarget, int w, int h) {
+    long last = (long) target;
     if (newTarget == 0) {
         target = (PRGB) image;
         width = client_width;
