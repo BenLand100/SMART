@@ -112,6 +112,18 @@ long getFieldInt(jobject object, char* path) {
     return -1;
 }
 
+long getFieldByte(jobject object, char* path) {
+    try {
+        if (jre) {
+            jobject jpath = jre->NewStringUTF(path);
+            long i = jre->CallByteMethod(smart, _client.getfieldbyte, object == 0 ? NULL : object, jpath);
+            jre->DeleteLocalRef(jpath);
+            return i;
+        }
+    } catch (...) { }
+    return -1;
+}
+
 float getFieldFloat(jobject object, char* path) {
     try {
         if (jre) {

@@ -53,6 +53,7 @@ typedef struct {
 	jmethodID setrefresh;
 	jmethodID getfieldobject;
 	jmethodID getfieldint;
+	jmethodID getfieldbyte;
 	jmethodID getfieldfloat;
 	jmethodID getfielddouble;
 	jmethodID getfieldboolean;
