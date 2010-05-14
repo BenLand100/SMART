@@ -81,33 +81,33 @@ procedure UpdateRenderInfo(var Render : TRender; var RenderData : TRenderData);
 var
   tk, vp: Integer;
 begin
-  tk := SmartGetFieldObject(0, hook_static_Toolkit);
-  vp := SmartGetFieldObject(tk, hook_toolkit_Viewport);
+  tk := SmartGetFieldObject(0, hook_static_CurToolkit);
+  vp := SmartGetFieldObject(tk, hook_sdtoolkit_Viewport);
   with RenderData do
   begin
-    xOff := SmartGetFieldInt(vp,hook_viewport_xOff);
-    xX :=SmartGetFieldInt(vp,hook_viewport_xX);
-    xY := SmartGetFieldInt(vp,hook_viewport_xY);
-    xZ := SmartGetFieldInt(vp,hook_viewport_xZ);
-	yOff := SmartGetFieldInt(vp,hook_viewport_yOff);
-    yX := SmartGetFieldInt(vp,hook_viewport_yX);
-    yY := SmartGetFieldInt(vp,hook_viewport_yY);
-    yZ := SmartGetFieldInt(vp,hook_viewport_yZ);
-	zOff := SmartGetFieldInt(vp,hook_viewport_zoff);
-    zX := SmartGetFieldInt(vp,hook_viewport_zX);
-    zY := SmartGetFieldInt(vp,hook_viewport_zY);
-    zZ := SmartGetFieldInt(vp,hook_viewport_zZ);
+    xOff := SmartGetFieldInt(vp,hook_sdviewport_xOff);
+    xX :=SmartGetFieldInt(vp,hook_sdviewport_xX);
+    xY := SmartGetFieldInt(vp,hook_sdviewport_xY);
+    xZ := SmartGetFieldInt(vp,hook_sdviewport_xZ);
+	yOff := SmartGetFieldInt(vp,hook_sdviewport_yOff);
+    yX := SmartGetFieldInt(vp,hook_sdviewport_yX);
+    yY := SmartGetFieldInt(vp,hook_sdviewport_yY);
+    yZ := SmartGetFieldInt(vp,hook_sdviewport_yZ);
+	zOff := SmartGetFieldInt(vp,hook_sdviewport_zoff);
+    zX := SmartGetFieldInt(vp,hook_sdviewport_zX);
+    zY := SmartGetFieldInt(vp,hook_sdviewport_zY);
+    zZ := SmartGetFieldInt(vp,hook_sdviewport_zZ);
   end;
   with Render do
   begin
-	xScale := SmartGetFieldInt(tk, hook_toolkit_xScale);
-    yScale := SmartGetFieldInt(tk, hook_toolkit_yScale);
-	xMin := SmartGetFieldInt(tk, hook_toolkit_xMin);
-    xMax := SmartGetFieldInt(tk, hook_toolkit_xMax);
-	yMin := SmartGetFieldInt(tk, hook_toolkit_yMin);
-    yMax := SmartGetFieldInt(tk, hook_toolkit_yMax);
-	zMin := SmartGetFieldInt(tk, hook_toolkit_zMin);
-    zMax := SmartGetFieldInt(tk, hook_toolkit_zMax);
+	xScale := SmartGetFieldInt(tk, hook_sdtoolkit_xScale);
+    yScale := SmartGetFieldInt(tk, hook_sdtoolkit_yScale);
+	xMin := SmartGetFieldInt(tk, hook_sdtoolkit_xMin);
+    xMax := SmartGetFieldInt(tk, hook_sdtoolkit_xMax);
+	yMin := SmartGetFieldInt(tk, hook_sdtoolkit_yMin);
+    yMax := SmartGetFieldInt(tk, hook_sdtoolkit_yMax);
+	zMin := SmartGetFieldInt(tk, hook_sdtoolkit_zMin);
+    zMax := SmartGetFieldInt(tk, hook_sdtoolkit_zMax);
   end;
   SmartFreeObject(tk);
   SmartFreeObject(vp);
@@ -130,14 +130,14 @@ begin
     result := 0;
     exit;
   end;
-  CurPlane:= SmartGetFieldInt(0,hook_static_LoadedPlane);
-  if ((CurPlane < 3) and ((SmartGetFieldArray3DByte(0,hook_static_GroundSettingsArray,1,x,y) and 2) <> 0)) then
+  CurPlane:= SmartGetFieldInt(0,hook_static_CurPlaneIdx);
+  if ((CurPlane < 3) and ((SmartGetFieldArray3DByte(0,hook_static_GroundSettings,1,x,y) and 2) <> 0)) then
     CurPlane:= CurPlane + 1;
   PlaneInstance := SmartGetFieldArrayObject(0,hook_static_PlaneArray,CurPlane);
-  result:= (SmartGetFieldArray2DInt(PlaneInstance,hook_plane_TileHeights,x,y) +
-            SmartGetFieldArray2DInt(PlaneInstance,hook_plane_TileHeights,x + 1,y) +
-            SmartGetFieldArray2DInt(PlaneInstance,hook_plane_TileHeights,x,y + 1) +
-            SmartGetFieldArray2DInt(PlaneInstance,hook_plane_TileHeights,x + 1,y + 1)) / 4;
+  result:= (SmartGetFieldArray2DInt(PlaneInstance,hook_sdplane_GroundHeights,x,y) +
+            SmartGetFieldArray2DInt(PlaneInstance,hook_sdplane_GroundHeights,x + 1,y) +
+            SmartGetFieldArray2DInt(PlaneInstance,hook_sdplane_GroundHeights,x,y + 1) +
+            SmartGetFieldArray2DInt(PlaneInstance,hook_sdplane_GroundHeights,x + 1,y + 1)) / 4;
   writeln(inttostr(result));
 end;
 

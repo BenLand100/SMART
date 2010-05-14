@@ -73,34 +73,6 @@ begin
 end;
 
 {*******************************************************************************
-Function GetMyAnimation: integer;
-By: BenLand100
-Description: Returns your animation
-*******************************************************************************}
-function GetMyAnimation: integer;
-var
-  MyPlayer : integer;
-begin
-  MyPlayer := SmartGetFieldObject(0, hook_static_MyPlayer);
-  Result := SmartGetFieldInt(MyPlayer, hook_character_Animation);
-  SmartFreeObject(MyPlayer);
-end;
-
-{*******************************************************************************
-function GetMyMoving: boolean;
-By: BenLand100
-Description: Returns true if you are moving
-*******************************************************************************}
-function GetMyMoving: boolean;
-var
-  MyPlayer: Integer;
-begin
-  MyPlayer := SmartGetFieldObject(0, hook_static_MyPlayer);
-  result:= SmartGetFieldInt(MyPlayer, hook_character_Motion) > 0;
-  SmartFreeObject(MyPlayer);
-end;
-
-{*******************************************************************************
 function GetMinimapAngleDeg: extended;
 By: BenLand100
 Description: Returns the current Map angle in degrees. North: 0 deg, increases
