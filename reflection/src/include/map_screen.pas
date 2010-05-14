@@ -138,7 +138,6 @@ begin
             SmartGetFieldArray2DInt(PlaneInstance,hook_sdplane_GroundHeights,x + 1,y) +
             SmartGetFieldArray2DInt(PlaneInstance,hook_sdplane_GroundHeights,x,y + 1) +
             SmartGetFieldArray2DInt(PlaneInstance,hook_sdplane_GroundHeights,x + 1,y + 1)) / 4;
-  writeln(inttostr(result));
 end;
 
 
