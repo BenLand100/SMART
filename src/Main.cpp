@@ -28,7 +28,7 @@ using namespace std;
 
 #include <dlfcn.h>
 
-#define NumExports 69
+#define NumExports 70
 
 static char* exports[] = {
     (char*)"setup", (char*)"procedure SmartSetup(root, params: String; width, height: Integer);",
@@ -64,6 +64,7 @@ static char* exports[] = {
     (char*)"freeObject", (char*)"procedure SmartFreeObject(obj: integer);",
     (char*)"getFieldObject", (char*)"function SmartGetFieldObject(parent: integer; path: String): integer;",
     (char*)"getFieldInt", (char*)"function SmartGetFieldInt(parent: integer; path: String): integer;",
+    (char*)"getFieldShort", (char*)"function SmartGetFieldShort(parent: integer; path: String): integer;",
     (char*)"getFieldByte", (char*)"function SmartGetFieldByte(parent: integer; path: String): integer;",
     (char*)"getFieldFloat", (char*)"function SmartGetFieldFloat(parent: integer; path: String): extended;",
     (char*)"getFieldDouble", (char*)"function SmartGetFieldDouble(parent: integer; path: String): extended;",
@@ -137,7 +138,7 @@ void unload(void) {
 
 #include <windows.h>
 
-#define NumExports 71
+#define NumExports 72
 
 static char* exports[] = {
     (char*)"setup@16", (char*)"procedure SmartSetup(root, params: String; width, height: Integer);",
@@ -175,6 +176,7 @@ static char* exports[] = {
     (char*)"freeObject@4", (char*)"procedure SmartFreeObject(object: integer);",
     (char*)"getFieldObject@8", (char*)"function SmartGetFieldObject(parent: integer; path: String): integer;",
     (char*)"getFieldInt@8", (char*)"function SmartGetFieldInt(parent: integer; path: String): integer;",
+    (char*)"getFieldShort@8", (char*)"function SmartGetFieldShort(parent: integer; path: String): integer;",
     (char*)"getFieldByte@8", (char*)"function SmartGetFieldByte(parent: integer; path: String): integer;",
     (char*)"getFieldFloat@8", (char*)"function SmartGetFieldFloat(parent: integer; path: String): extended;",
     (char*)"getFieldDouble@8", (char*)"function SmartGetFieldDouble(parent: integer; path: String): extended;",

@@ -68,7 +68,7 @@ import javax.swing.event.ChangeListener;
  */
 public class Client implements ActionListener, ChangeListener {
     
-    public static final String TITLE = "Public SMARTv5.3 - SMART Minimizing Autoing Resource Thing - By BenLand100";
+    public static final String TITLE = "Public SMARTv5.4 - SMART Minimizing Autoing Resource Thing - By BenLand100";
 
     private static Hashtable<String, Client> clients = new Hashtable<String, Client>();
 
@@ -641,6 +641,14 @@ public class Client implements ActionListener, ChangeListener {
         o = getFieldObject(o, path);
         if (o != null && o instanceof Integer) {
             return ((Integer) o).intValue();
+        }
+        return -1;
+    }
+
+    public int getFieldShort(Object o, String path) {
+        o = getFieldObject(o, path);
+        if (o != null && o instanceof Short) {
+            return ((Short) o).intValue();
         }
         return -1;
     }

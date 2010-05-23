@@ -29,6 +29,7 @@ extern "C" int invokeIntMethod(jobject object, char* classname, char* methname, 
 extern "C" void freeObject(jobject) __attribute__((stdcall));
 extern "C" long getFieldObject(jobject, char*) __attribute__((stdcall));
 extern "C" long getFieldInt(jobject, char*) __attribute__((stdcall));
+extern "C" long getFieldShort(jobject, char*) __attribute__((stdcall));
 extern "C" long getFieldByte(jobject, char*) __attribute__((stdcall));
 extern "C" bool getFieldBool(jobject, char*) __attribute__((stdcall));
 extern "C" long getFieldLongH(jobject, char*) __attribute__((stdcall));
