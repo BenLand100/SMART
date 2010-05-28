@@ -187,7 +187,7 @@ void findClasses() {
     _client.getfieldarrayshort = jre->GetMethodID(_client.clazz, "getFieldArrayShort", "(Ljava/lang/Object;Ljava/lang/String;I)I");
     _client.getfieldarraychar = jre->GetMethodID(_client.clazz, "getFieldArrayChar", "(Ljava/lang/Object;Ljava/lang/String;I)I");
     _client.getfieldarrayobject = jre->GetMethodID(_client.clazz, "getFieldArrayObject", "(Ljava/lang/Object;Ljava/lang/String;I)Ljava/lang/Object;");
-    _client.getfieldarraysize = jre->GetMethodID(_client.clazz, "getFieldArraySize", "(Ljava/lang/Object;Ljava/lang/String;)I");
+    _client.getfieldarraysize = jre->GetMethodID(_client.clazz, "getFieldArraySize", "(Ljava/lang/Object;Ljava/lang/String;I)I");
     _client.setgraphics = jre->GetMethodID(_client.clazz, "setGraphics", "(Z)V");
     _client.setdebug = jre->GetMethodID(_client.clazz, "setDebug", "(Z)V");
     _client.transcolor = jre->GetFieldID(_client.clazz, "transColor", "I");

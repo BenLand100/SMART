@@ -573,11 +573,11 @@ long getFieldArray2DShort(jobject object, char* path, int x, int y) {
     return -1;
 }
 
-long getFieldArraySize(jobject object, char* path) {
+long getFieldArraySize(jobject object, char* path, int dim) {
     try {
         if (jre) {
             jobject jpath = jre->NewStringUTF(path);
-            long i = jre->CallIntMethod(smart, _client.getfieldarraysize, object == 0 ? NULL : object, jpath);
+            long i = jre->CallIntMethod(smart, _client.getfieldarraysize, object == 0 ? NULL : object, jpath, dim);
             jre->DeleteLocalRef(jpath);
             return i;
         }

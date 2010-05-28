@@ -28,7 +28,7 @@ using namespace std;
 
 #include <dlfcn.h>
 
-#define NumExports 70
+#define NumExports 71
 
 static char* exports[] = {
     (char*)"setup", (char*)"procedure SmartSetup(root, params: String; width, height: Integer);",
@@ -101,7 +101,7 @@ static char* exports[] = {
     (char*)"getFieldArray2DChar", (char*)"function SmartGetFieldArray2DChar(parent: integer; path: String; x ,y: integer): integer;",
     (char*)"getFieldArray2DObject", (char*)"function SmartGetFieldArray2DObject(parent: integer; path: String; x ,y: integer): integer;",
     (char*)"getFieldArrayObject", (char*)"function SmartGetFieldArrayObject(parent: integer; path: String; index: integer): integer;",
-    (char*)"getFieldArraySize", (char*)"function SmartGetFieldArraySize(parent: integer; path: String): integer;"
+    (char*)"getFieldArraySize", (char*)"function SmartGetFieldArraySize(parent: integer; path: String; dim: integer): integer;"
 };
 
 
@@ -138,7 +138,7 @@ void unload(void) {
 
 #include <windows.h>
 
-#define NumExports 72
+#define NumExports 73
 
 static char* exports[] = {
     (char*)"setup@16", (char*)"procedure SmartSetup(root, params: String; width, height: Integer);",
@@ -213,7 +213,7 @@ static char* exports[] = {
     (char*)"getFieldArray2DChar@16", (char*)"function SmartGetFieldArray2DChar(parent: integer; path: String; x ,y: integer): integer;",
     (char*)"getFieldArray2DObject@16", (char*)"function SmartGetFieldArray2DObject(parent: integer; path: String; x ,y: integer): integer;",
     (char*)"getFieldArrayObject@12", (char*)"function SmartGetFieldArrayObject(parent: integer; path: String; index: integer): integer;",
-    (char*)"getFieldArraySize@8", (char*)"function SmartGetFieldArraySize(parent: integer; path: String): integer;"
+    (char*)"getFieldArraySize@12", (char*)"function SmartGetFieldArraySize(parent: integer; path: String; dim: integer): integer;"
 };
 
 HMODULE dllinst;

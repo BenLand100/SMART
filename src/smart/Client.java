@@ -68,7 +68,7 @@ import javax.swing.event.ChangeListener;
  */
 public class Client implements ActionListener, ChangeListener {
     
-    public static final String TITLE = "Public SMARTv5.4 - SMART Minimizing Autoing Resource Thing - By BenLand100";
+    public static final String TITLE = "Public SMARTv5.5 - SMART Minimizing Autoing Resource Thing - By BenLand100";
 
     private static Hashtable<String, Client> clients = new Hashtable<String, Client>();
 
@@ -948,12 +948,14 @@ public class Client implements ActionListener, ChangeListener {
         }
     }
 
-    public int getFieldArraySize(Object o, String path) {
+    public int getFieldArraySize(Object o, String path, int dim) {
         o = getFieldObject(o, path);
         try {
+            if (dim < 1) return -2;
+            while (dim-- > 1) o = Array.get(o,0);
             return Array.getLength(o);
         } catch (Exception e) {
-            return -1;
+            return -3;
         }
     }
 }

@@ -66,7 +66,7 @@ extern "C" long getFieldArray2DLongL(jobject, char*, int, int) __attribute__((st
 extern "C" long getFieldArray2DByte(jobject, char*, int, int) __attribute__((stdcall));
 extern "C" long getFieldArray2DShort(jobject, char*, int, int) __attribute__((stdcall));
 extern "C" long getFieldArray2DChar(jobject, char*, int, int) __attribute__((stdcall));
-extern "C" long getFieldArraySize(jobject, char*) __attribute__((stdcall));
+extern "C" long getFieldArraySize(jobject, char*, int) __attribute__((stdcall));
 
 #endif	/* _REFLECTION_H */
 
