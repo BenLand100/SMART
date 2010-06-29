@@ -47,6 +47,7 @@ import java.net.URLClassLoader;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Hashtable;
 import java.util.Stack;
 import java.util.regex.Matcher;
@@ -68,7 +69,7 @@ import javax.swing.event.ChangeListener;
  */
 public class Client implements ActionListener, ChangeListener {
     
-    public static final String TITLE = "Public SMARTv5.6 - SMART Minimizing Autoing Resource Thing - By BenLand100";
+    public static final String TITLE = "Public SMARTv5.7 - SMART Minimizing Autoing Resource Thing - By BenLand100";
 
     private static Hashtable<String, Client> clients = new Hashtable<String, Client>();
 
@@ -355,6 +356,29 @@ public class Client implements ActionListener, ChangeListener {
     }
 
     /**
+     * Nasty horrible way of making the JVM shutdown and free all garbage
+     */
+    public static void cleanThreads(ThreadGroup group, int level) { 
+        int numThreads = group.activeCount(); 
+        Thread[] threads = new Thread[numThreads*2]; 
+        numThreads = group.enumerate(threads, false); 
+        for (int i=0; i<numThreads; i++) { 
+            Thread thread = threads[i];
+            if (thread != Thread.currentThread()) {
+                System.out.println("Other Thread: " + thread);
+            } else {
+                System.out.println("This  Thread: " + thread);
+            }
+        } 
+        int numGroups = group.activeGroupCount(); 
+        ThreadGroup[] groups = new ThreadGroup[numGroups*2]; 
+        numGroups = group.enumerate(groups, false); 
+        for (int i=0; i<numGroups; i++) { 
+            cleanThreads(groups[i], level+1); 
+        } 
+    } 
+
+    /**
      * Frees any remaining refrences and exits the client.
      */
     public void destroy() {
@@ -362,18 +386,32 @@ public class Client implements ActionListener, ChangeListener {
         if (active) {
             System.out.println("Destroying SMART");
             active = false;
+            for (Map.Entry<String,Client> entry : clients.entrySet()) {
+                if (entry.getValue() == this) {
+                    clients.remove(entry.getKey());
+                    break;
+                }
+            }
             BlockingEventQueue.removeComponent(canvas);
             clientFrame.setVisible(false);
             clientApplet.stop();
             clientApplet.destroy();
-            //clientFrame.removeAll();
-            //clientFrame.dispose();
             clientApplet = null;
             clientFrame = null;
         } else {
             System.out.println("SMART already destroyed");
         }
-        System.out.println("JVM Garbage Collection Invoked");
+        System.out.println("Current Threads");
+        ThreadGroup root = Thread.currentThread().getThreadGroup().getParent(); 
+        while (root.getParent() != null) {
+            root = root.getParent(); 
+        } 
+        cleanThreads(root, 0);
+        
+        System.out.println("Runtime Garbage Collection Invoked");
+        Runtime r = Runtime.getRuntime();
+        r.gc();
+        System.out.println("System Garbage Collection Invoked");
         System.gc();
     }
 
