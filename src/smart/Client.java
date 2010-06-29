@@ -68,7 +68,7 @@ import javax.swing.event.ChangeListener;
  */
 public class Client implements ActionListener, ChangeListener {
     
-    public static final String TITLE = "Public SMARTv5.5 - SMART Minimizing Autoing Resource Thing - By BenLand100";
+    public static final String TITLE = "Public SMARTv5.6 - SMART Minimizing Autoing Resource Thing - By BenLand100";
 
     private static Hashtable<String, Client> clients = new Hashtable<String, Client>();
 
@@ -569,6 +569,7 @@ public class Client implements ActionListener, ChangeListener {
     }
 
     public Object getFieldObject(Object o, String path) {
+	if (path == null) return o;
         try {
             String[] parts = path.split("\\.");
             Stack<String> stack = new Stack<String>();
