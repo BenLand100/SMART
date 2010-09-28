@@ -22,15 +22,18 @@ JAVA=java
 
 DIST=dist
 BUILD=build
+SCAR_NAME=BrokenSCAR_SMART.dll
 WIN_NAME=Public_SMART.dll
 LIN_NAME=libsmart.so
 
 WIN_COMPILE_ARGS=-DWINDOWS -Wall -O0 -s -c
+SCAR_COMPILE_ARGS=-DWINDOWS -DNEWSCAR -Wall -O0 -s -c
 LIN_COMPILE_ARGS=-fPIC -DLINUX -Wall -O3 -s -c
 
 SRC_DIR=src
 LIN_BUILD_DIR=$(BUILD)/linux
 WIN_BUILD_DIR=$(BUILD)/windows
+SCAR_BUILD_DIR=$(BUILD)/scar
 JAVA_BUILD_DIR=$(BUILD)/java
 
 CPPSOURCEFILES= \
@@ -61,6 +64,15 @@ WINOBJFILES= \
 	$(WIN_BUILD_DIR)/Reflection.o \
 	$(WIN_BUILD_DIR)/JVM.o \
 	$(WIN_BUILD_DIR)/Smart.o
+
+SCAROBJFILES= \
+	$(SCAR_BUILD_DIR)/Main.o \
+	$(SCAR_BUILD_DIR)/Color.o \
+	$(SCAR_BUILD_DIR)/ClassLoader.o \
+	$(SCAR_BUILD_DIR)/Input.o \
+	$(SCAR_BUILD_DIR)/Reflection.o \
+	$(SCAR_BUILD_DIR)/JVM.o \
+	$(SCAR_BUILD_DIR)/Smart.o
 	
 LINOBJFILES= \
 	$(LIN_BUILD_DIR)/Main.o \
@@ -90,13 +102,16 @@ SMARTCLASSES= \
     $(JAVA_BUILD_DIR)/smart/UnblockedEvent.class
 
 all:
-	@echo "Syntax for SMART makefile:\n    For Windows distributions: make windows\n    For Linux distributions: make linux\n    For Both distributions: make both\n    To clean build files: make clean"
+	@echo "Syntax for SMART makefile:\n    For Windows distributions: make windows\n    For Linux distributions: make linux\n    For new (broken) SCAR distributions: make scar\n    For All distributions: make everything\n    To clean build files: make clean"
 	
-both: linux windows
+everything: linux windows scar
 
 linux: $(DIST)/$(LIN_NAME)
 	@echo "Finished Building the Linux SMART distribution"
 	
+scar: $(DIST)/$(SCAR_NAME)
+	@echo "Finished Building the new (broken) SCAR SMART distribution"
+
 windows: $(DIST)/$(WIN_NAME)
 	@echo "Finished Building the Windows SMART distribution"
 	
@@ -192,6 +207,48 @@ ${WIN_BUILD_DIR}/Smart.o: $(SRC_DIR)/Smart.cpp $(CPPHEADERFILES)
 	@echo "Compiling Smart.cpp"
 	@mkdir -p $(WIN_BUILD_DIR)
 	@$(WIN_GPP) $(WIN_COMPILE_ARGS) -o $(WIN_BUILD_DIR)/Smart.o $(SRC_DIR)/Smart.cpp
+
+#### SCAR BUILDING DIRECTIVES ####
+
+$(DIST)/$(SCAR_NAME): $(SCAROBJFILES)
+	@echo "Linking object files..."
+	@mkdir -p $(DIST)
+	@$(WIN_GPP) -mwindows -shared -s -o $(DIST)/$(SCAR_NAME) $(SCAROBJFILES)
+
+$(SCAR_BUILD_DIR)/Main.o: $(SRC_DIR)/Main.cpp $(CPPHEADERFILES)
+	@echo "Compiling Main.cpp"
+	@mkdir -p $(SCAR_BUILD_DIR)
+	@$(WIN_GPP) $(SCAR_COMPILE_ARGS) -o $(SCAR_BUILD_DIR)/Main.o $(SRC_DIR)/Main.cpp
+
+${SCAR_BUILD_DIR}/Color.o: $(SRC_DIR)/Color.cpp $(CPPHEADERFILES)
+	@echo "Compiling Color.cpp"
+	@mkdir -p $(SCAR_BUILD_DIR)
+	@$(WIN_GPP) $(SCAR_COMPILE_ARGS) -o $(SCAR_BUILD_DIR)/Color.o $(SRC_DIR)/Color.cpp
+
+${SCAR_BUILD_DIR}/ClassLoader.o: $(SRC_DIR)/ClassLoader.cpp $(SRC_DIR)/classes.data $(CPPHEADERFILES)
+	@echo "Compiling Classloader.cpp"
+	@mkdir -p $(SCAR_BUILD_DIR)
+	@$(WIN_GPP) $(SCAR_COMPILE_ARGS) -o $(SCAR_BUILD_DIR)/ClassLoader.o $(SRC_DIR)/ClassLoader.cpp
+
+${SCAR_BUILD_DIR}/Input.o: $(SRC_DIR)/Input.cpp $(CPPHEADERFILES)
+	@echo "Compiling Input.cpp"
+	@mkdir -p $(SCAR_BUILD_DIR)
+	@$(WIN_GPP) $(SCAR_COMPILE_ARGS) -o $(SCAR_BUILD_DIR)/Input.o $(SRC_DIR)/Input.cpp
+
+${SCAR_BUILD_DIR}/Reflection.o: $(SRC_DIR)/Reflection.cpp $(CPPHEADERFILES)
+	@echo "Compiling Reflection.cpp"
+	@mkdir -p $(SCAR_BUILD_DIR)
+	@$(WIN_GPP) $(SCAR_COMPILE_ARGS) -o $(SCAR_BUILD_DIR)/Reflection.o $(SRC_DIR)/Reflection.cpp
+
+${SCAR_BUILD_DIR}/JVM.o: $(SRC_DIR)/JVM.cpp $(CPPHEADERFILES)
+	@echo "Compiling JVM.cpp"
+	@mkdir -p $(SCAR_BUILD_DIR)
+	@$(WIN_GPP) $(SCAR_COMPILE_ARGS) -o $(SCAR_BUILD_DIR)/JVM.o $(SRC_DIR)/JVM.cpp
+
+${SCAR_BUILD_DIR}/Smart.o: $(SRC_DIR)/Smart.cpp $(CPPHEADERFILES)
+	@echo "Compiling Smart.cpp"
+	@mkdir -p $(SCAR_BUILD_DIR)
+	@$(WIN_GPP) $(SCAR_COMPILE_ARGS) -o $(SCAR_BUILD_DIR)/Smart.o $(SRC_DIR)/Smart.cpp
 
 #### JAVA/Cypher BUILDING DIRECTIVES ####
 
