@@ -28,7 +28,7 @@ using namespace std;
 
 #include <dlfcn.h>
 
-#define NumExports 71
+#define NumExports 73
 
 static char* exports[] = {
     (char*)"setup", (char*)"procedure SmartSetup(root, params: String; width, height: Integer);",
@@ -101,7 +101,9 @@ static char* exports[] = {
     (char*)"getFieldArray2DChar", (char*)"function SmartGetFieldArray2DChar(parent: integer; path: String; x ,y: integer): integer;",
     (char*)"getFieldArray2DObject", (char*)"function SmartGetFieldArray2DObject(parent: integer; path: String; x ,y: integer): integer;",
     (char*)"getFieldArrayObject", (char*)"function SmartGetFieldArrayObject(parent: integer; path: String; index: integer): integer;",
-    (char*)"getFieldArraySize", (char*)"function SmartGetFieldArraySize(parent: integer; path: String; dim: integer): integer;"
+    (char*)"getFieldArraySize", (char*)"function SmartGetFieldArraySize(parent: integer; path: String; dim: integer): integer;",
+    (char*)"isEqual", (char*)"function SmartIsEqual(obja,objb: integer): boolean;",
+    (char*)"isNull", (char*)"function SmartIsNull(obj: integer): boolean;"
 };
 
 
@@ -138,7 +140,7 @@ void unload(void) {
 
 #include <windows.h>
 
-#define NumExports 73
+#define NumExports 75
 
 #ifndef NEWSCAR
 
@@ -175,7 +177,7 @@ static char* exports[] = {
     (char*)"stringFromChars@8", (char*)"function SmartStringFromChars(chars: integer; str: String): integer;",
     (char*)"stringFromString@8", (char*)"function SmartStringFromString(str: integer; str: String): integer;",
     (char*)"invokeIntMethod@20", (char*)"function SmartInvokeIntMethod(obj: integer; clazz, meth: String; a, b: integer): integer;",
-    (char*)"freeObject@4", (char*)"procedure SmartFreeObject(object: integer);",
+    (char*)"freeObject@4", (char*)"procedure SmartFreeObject(obj: integer);",
     (char*)"getFieldObject@8", (char*)"function SmartGetFieldObject(parent: integer; path: String): integer;",
     (char*)"getFieldInt@8", (char*)"function SmartGetFieldInt(parent: integer; path: String): integer;",
     (char*)"getFieldShort@8", (char*)"function SmartGetFieldShort(parent: integer; path: String): integer;",
@@ -215,7 +217,9 @@ static char* exports[] = {
     (char*)"getFieldArray2DChar@16", (char*)"function SmartGetFieldArray2DChar(parent: integer; path: String; x ,y: integer): integer;",
     (char*)"getFieldArray2DObject@16", (char*)"function SmartGetFieldArray2DObject(parent: integer; path: String; x ,y: integer): integer;",
     (char*)"getFieldArrayObject@12", (char*)"function SmartGetFieldArrayObject(parent: integer; path: String; index: integer): integer;",
-    (char*)"getFieldArraySize@12", (char*)"function SmartGetFieldArraySize(parent: integer; path: String; dim: integer): integer;"
+    (char*)"getFieldArraySize@12", (char*)"function SmartGetFieldArraySize(parent: integer; path: String; dim: integer): integer;",
+    (char*)"isEqual@8", (char*)"function SmartIsEqual(obja,objb: integer): boolean;",
+    (char*)"isNull@4", (char*)"function SmartIsNull(obj: integer): boolean;"
 };
 
 #else
@@ -253,7 +257,7 @@ static char* exports[] = {
     (char*)"stringFromChars@8", (char*)"function SmartStringFromChars(chars: integer; str: AnsiString): integer;",
     (char*)"stringFromString@8", (char*)"function SmartStringFromString(str: integer; str: AnsiString): integer;",
     (char*)"invokeIntMethod@20", (char*)"function SmartInvokeIntMethod(obj: integer; clazz, meth: AnsiString; a, b: integer): integer;",
-    (char*)"freeObject@4", (char*)"procedure SmartFreeObject(object: integer);",
+    (char*)"freeObject@4", (char*)"procedure SmartFreeObject(obj: integer);",
     (char*)"getFieldObject@8", (char*)"function SmartGetFieldObject(parent: integer; path: AnsiString): integer;",
     (char*)"getFieldInt@8", (char*)"function SmartGetFieldInt(parent: integer; path: AnsiString): integer;",
     (char*)"getFieldShort@8", (char*)"function SmartGetFieldShort(parent: integer; path: AnsiString): integer;",
@@ -293,7 +297,9 @@ static char* exports[] = {
     (char*)"getFieldArray2DChar@16", (char*)"function SmartGetFieldArray2DChar(parent: integer; path: AnsiString; x ,y: integer): integer;",
     (char*)"getFieldArray2DObject@16", (char*)"function SmartGetFieldArray2DObject(parent: integer; path: AnsiString; x ,y: integer): integer;",
     (char*)"getFieldArrayObject@12", (char*)"function SmartGetFieldArrayObject(parent: integer; path: AnsiString; index: integer): integer;",
-    (char*)"getFieldArraySize@12", (char*)"function SmartGetFieldArraySize(parent: integer; path: AnsiString; dim: integer): integer;"
+    (char*)"getFieldArraySize@12", (char*)"function SmartGetFieldArraySize(parent: integer; path: AnsiString; dim: integer): integer;",
+    (char*)"isEqual@8", (char*)"function SmartIsEqual(obja,objb: integer): boolean;",
+    (char*)"isNull@4", (char*)"function SmartIsNull(obj: integer): boolean;"
 };
 
 #endif

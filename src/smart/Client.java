@@ -69,7 +69,7 @@ import javax.swing.event.ChangeListener;
  */
 public class Client implements ActionListener, ChangeListener {
     
-    public static final String TITLE = "Public SMARTv5.81 - SMART Minimizing Autoing Resource Thing - By BenLand100";
+    public static final String TITLE = "Public SMARTv6 - SMART Minimizing Autoing Resource Thing - By BenLand100";
 
     private static Hashtable<String, Client> clients = new Hashtable<String, Client>();
 

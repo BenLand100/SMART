@@ -584,3 +584,21 @@ long getFieldArraySize(jobject object, char* path, int dim) {
     } catch (...) { }
     return -1;
 }
+
+bool isEqual(jobject a, jobject b) {
+    try {
+        if (jre) {
+            return jre->IsSameObject(a,b);
+        }
+    } catch (...) { }
+    return 0;
+}
+
+bool isNull(jobject a) {
+    try {
+        if (jre) {
+            return jre->IsSameObject(a,NULL);
+        }
+    } catch (...) { }
+    return 0;
+}
