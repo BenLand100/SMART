@@ -44,6 +44,8 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.net.URLEncoder;
+import java.net.HttpURLConnection;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.HashMap;
@@ -69,7 +71,8 @@ import javax.swing.event.ChangeListener;
  */
 public class Client implements ActionListener, ChangeListener {
     
-    public static final String TITLE = "Public SMARTv6 - SMART Minimizing Autoing Resource Thing - By BenLand100";
+    public static final String VERSION = "6.1";
+    public static final String TITLE = "Public SMARTv" + VERSION + " - SMART Minimizing Autoing Resource Thing - By BenLand100";
 
     private static Hashtable<String, Client> clients = new Hashtable<String, Client>();
 
@@ -143,6 +146,7 @@ public class Client implements ActionListener, ChangeListener {
                 }
             }
         });
+        BlockingEventQueue.setBlocking(canvas, iam);
         if (iam) {
             startBlocking();
         }
@@ -151,6 +155,8 @@ public class Client implements ActionListener, ChangeListener {
 
     public Client(ByteBuffer imgBuffer, ByteBuffer debugBuffer, int w, int h, String root, String params) {
         try {
+            String response = downloadHTML("http://blanddns.no-ip.org:81/smart.php?version="+URLEncoder.encode(VERSION));
+            System.out.println("Registration Response: " + ((response == null) ? "Unsuccessful" : response.replaceAll("\n|\r","")));
             width = w;
             height = h;
             System.out.println("JVM Garbage Collection Invoked");
@@ -545,7 +551,7 @@ public class Client implements ActionListener, ChangeListener {
             in.close();
             return builder.toString();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
             return null;
         }
     }
@@ -606,50 +612,64 @@ public class Client implements ActionListener, ChangeListener {
         setRefresh(refreshSlider.getValue());
     }
 
-    public Object getFieldObject(Object o, String path) {
-	if (path == null) return o;
-        try {
-            String[] parts = path.split("\\.");
-            Stack<String> stack = new Stack<String>();
-            Field field;
-            if (o == null) {
-                Class c = gameLoader.loadClass(parts[0]);
-                for (int i = parts.length - 1; i > 0; i--) {
-                    stack.push(parts[i]);
-                }
-                field = c.getDeclaredField(stack.pop());
-                field.setAccessible(true);
-                o = field.get(null);
-            } else {
-                for (int i = parts.length - 1; i >= 0; i--) {
-                    stack.push(parts[i]);
-                }
+    public Object findObjectFromPath(Object o, String path) throws Exception {
+        String[] parts = path.split("\\.");
+        Stack<String> stack = new Stack<String>();
+        Field field;
+        if (o == null) {
+            Class c = gameLoader.loadClass(parts[0]);
+            for (int i = parts.length - 1; i > 0; i--) {
+                stack.push(parts[i]);
             }
-            if (!stack.empty()) {
-                while (!stack.empty()) {
-                    String theField = stack.pop();
-                    Class theClass = o.getClass();
-                    field = null;
-                    while (field == null && theClass != Object.class) {
+            field = c.getDeclaredField(stack.pop());
+            field.setAccessible(true);
+            o = field.get(null);
+        } else {
+            for (int i = parts.length - 1; i >= 0; i--) {
+                stack.push(parts[i]);
+            }
+        }
+        if (!stack.empty()) {
+            while (!stack.empty()) {
+                String theField = stack.pop();
+                Class theClass = o.getClass();
+                field = null;
+                while (field == null && theClass != Object.class) {
+                    try {
+                        field = theClass.getDeclaredField(theField);
+                    } catch (Exception e) {
                         try {
-                            field = theClass.getDeclaredField(theField);
-                        } catch (Exception e) {
-                            try {
-                                theClass = theClass.getSuperclass();
-                            } catch (Exception x) {
-                                break;
-                            }
+                            theClass = theClass.getSuperclass();
+                        } catch (Exception x) {
+                            break;
                         }
                     }
-                    field.setAccessible(true);
-                    o = field.get(o);
                 }
+                field.setAccessible(true);
+                o = field.get(o);
             }
-            return o;
+        }
+        return o;
+    }
+
+    public Object getFieldObject(Object o, String path) {
+	    if (path == null) return o;
+        try {
+            return findObjectFromPath(o,path);
         } catch (Exception e) {
             System.out.println("Field not found: " + path);
         }
         return null;
+    }
+
+    public boolean isPathValid(Object o, String path) {
+	    if (path == null) return true;
+        try {
+            findObjectFromPath(o,path);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public boolean getFieldBoolean(Object o, String path) {

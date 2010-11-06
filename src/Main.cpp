@@ -28,7 +28,7 @@ using namespace std;
 
 #include <dlfcn.h>
 
-#define NumExports 73
+#define NumExports 74
 
 static char* exports[] = {
     (char*)"setup", (char*)"procedure SmartSetup(root, params: String; width, height: Integer);",
@@ -63,6 +63,7 @@ static char* exports[] = {
     (char*)"invokeIntMethod", (char*)"function SmartInvokeIntMethod(obj: integer; clazz, meth: String; a, b: integer): integer;",
     (char*)"freeObject", (char*)"procedure SmartFreeObject(obj: integer);",
     (char*)"getFieldObject", (char*)"function SmartGetFieldObject(parent: integer; path: String): integer;",
+    (char*)"isPathValid", (char*)"function SmartIsPathValid(parent: integer; path: String): boolean;",
     (char*)"getFieldInt", (char*)"function SmartGetFieldInt(parent: integer; path: String): integer;",
     (char*)"getFieldShort", (char*)"function SmartGetFieldShort(parent: integer; path: String): integer;",
     (char*)"getFieldByte", (char*)"function SmartGetFieldByte(parent: integer; path: String): integer;",
@@ -140,7 +141,7 @@ void unload(void) {
 
 #include <windows.h>
 
-#define NumExports 75
+#define NumExports 76
 
 #ifndef NEWSCAR
 
@@ -179,6 +180,7 @@ static char* exports[] = {
     (char*)"invokeIntMethod@20", (char*)"function SmartInvokeIntMethod(obj: integer; clazz, meth: String; a, b: integer): integer;",
     (char*)"freeObject@4", (char*)"procedure SmartFreeObject(obj: integer);",
     (char*)"getFieldObject@8", (char*)"function SmartGetFieldObject(parent: integer; path: String): integer;",
+    (char*)"isPathValid@8", (char*)"function SmartIsPathValid(parent: integer; path: String): boolean;",
     (char*)"getFieldInt@8", (char*)"function SmartGetFieldInt(parent: integer; path: String): integer;",
     (char*)"getFieldShort@8", (char*)"function SmartGetFieldShort(parent: integer; path: String): integer;",
     (char*)"getFieldByte@8", (char*)"function SmartGetFieldByte(parent: integer; path: String): integer;",
@@ -259,6 +261,7 @@ static char* exports[] = {
     (char*)"invokeIntMethod@20", (char*)"function SmartInvokeIntMethod(obj: integer; clazz, meth: AnsiString; a, b: integer): integer;",
     (char*)"freeObject@4", (char*)"procedure SmartFreeObject(obj: integer);",
     (char*)"getFieldObject@8", (char*)"function SmartGetFieldObject(parent: integer; path: AnsiString): integer;",
+    (char*)"isPathValid@8", (char*)"function SmartIsPathValid(parent: integer; path: String): boolean;",
     (char*)"getFieldInt@8", (char*)"function SmartGetFieldInt(parent: integer; path: AnsiString): integer;",
     (char*)"getFieldShort@8", (char*)"function SmartGetFieldShort(parent: integer; path: AnsiString): integer;",
     (char*)"getFieldByte@8", (char*)"function SmartGetFieldByte(parent: integer; path: AnsiString): integer;",

@@ -149,6 +149,7 @@ void findClasses() {
     _client.getrefresh = jre->GetMethodID(_client.clazz, "getRefresh", "()I");
     _client.setrefresh = jre->GetMethodID(_client.clazz, "setRefresh", "(I)V");
     _client.getfieldobject = jre->GetMethodID(_client.clazz, "getFieldObject", "(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;");
+    _client.ispathvalid = jre->GetMethodID(_client.clazz, "isPathValid", "(Ljava/lang/Object;Ljava/lang/String;)Z");
     _client.getfieldint = jre->GetMethodID(_client.clazz, "getFieldInt", "(Ljava/lang/Object;Ljava/lang/String;)I");
     _client.getfieldshort = jre->GetMethodID(_client.clazz, "getFieldShort", "(Ljava/lang/Object;Ljava/lang/String;)I");
     _client.getfieldbyte = jre->GetMethodID(_client.clazz, "getFieldByte", "(Ljava/lang/Object;Ljava/lang/String;)I");

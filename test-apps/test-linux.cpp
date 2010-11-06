@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
     }
 
     Setup setup = (Setup) dlsym(libsmart, "setup");
-    setup((char*) "http://world142.runescape.com/", (char*) "plugin.js?param=o0,a1,m0",765,503);
+    setup((char*)"http://world19.runescape.com/", (char*)"plugin.js?param=o0,a1,m0", 765, 503);
 
     time_t timer = time(0) + 500;
     while(timer >= time(0));

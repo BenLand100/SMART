@@ -22,8 +22,8 @@ JAVA=java
 
 DIST=dist
 BUILD=build
-SCAR_NAME=BrokenSCAR_SMART.dll
-WIN_NAME=Public_SMART.dll
+SCAR_NAME=Embedded_SMART.dll
+WIN_NAME=libsmart.dll
 LIN_NAME=libsmart.so
 
 WIN_COMPILE_ARGS=-DWINDOWS -Wall -O0 -s -c

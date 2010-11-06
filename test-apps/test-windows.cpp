@@ -27,7 +27,7 @@ typedef long (*GetFunctionInfo)(int, void*&, char*&) __attribute__((stdcall));
 typedef void (*Setup)(char*,char*,long,long) __attribute__((stdcall));
 
 int main(int argc, char** argv) {
-    HMODULE libsmart = LoadLibrary("./Public_SMART.dll");
+    HMODULE libsmart = LoadLibrary("./libsmart.dll");
     cout << "Library: " << libsmart << '\n';
     cout << "GetFunctionCount: " << (void*)GetProcAddress(libsmart, "GetFunctionCount") << '\n';
     cout << "GetFunctionInfo: " << (void*)GetProcAddress(libsmart, "GetFunctionInfo") << '\n';
@@ -45,7 +45,7 @@ int main(int argc, char** argv) {
     }
     cout << "Starting SMART...\n";
     Setup setup = (Setup) GetProcAddress(libsmart, "setup@16");
-    setup((char*)"http://world142.runescape.com/", (char*)"plugin.js?param=o0,a1,m0",765,503);
+    setup((char*)"http://world19.runescape.com/", (char*)"plugin.js?param=o0,a1,m0", 765, 503);
 
     time_t timer = time(0) + 500;
     while(timer >= time(0));

@@ -100,6 +100,18 @@ long getFieldObject(jobject object, char* path) {
     return 0;
 }
 
+bool isPathValid(jobject object, char* path) {
+    try {
+        if (jre) {
+            jobject jpath = jre->NewStringUTF(path);
+            jboolean b = jre->CallBooleanMethod(smart, _client.ispathvalid, object == 0 ? NULL : object, jpath);
+            jre->DeleteLocalRef(jpath);
+            return b;
+        }
+    } catch (...) { }
+    return 0;
+}
+
 long getFieldInt(jobject object, char* path) {
     try {
         if (jre) {

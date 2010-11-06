@@ -69,6 +69,7 @@ extern "C" long getFieldArray2DChar(jobject, char*, int, int) __attribute__((std
 extern "C" long getFieldArraySize(jobject, char*, int) __attribute__((stdcall));
 extern "C" bool isEqual(jobject, jobject) __attribute__((stdcall));
 extern "C" bool isNull(jobject) __attribute__((stdcall));
+extern "C" bool isPathValid(jobject, char*) __attribute__((stdcall));
 
 #endif	/* _REFLECTION_H */
 
