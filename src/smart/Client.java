@@ -42,6 +42,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLEncoder;
@@ -62,6 +63,7 @@ import javax.swing.JSlider;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import sun.applet.AppletClassLoader;
 
 /**
  * Contains all of the setup and control for the RuneScape client. Responsible
@@ -71,7 +73,7 @@ import javax.swing.event.ChangeListener;
  */
 public class Client implements ActionListener, ChangeListener {
     
-    public static final String VERSION = "6.1";
+    public static final String VERSION = "6.3";
     public static final String TITLE = "Public SMARTv" + VERSION + " - SMART Minimizing Autoing Resource Thing - By BenLand100";
 
     private static Hashtable<String, Client> clients = new Hashtable<String, Client>();
@@ -91,7 +93,7 @@ public class Client implements ActionListener, ChangeListener {
     public static void main(String... args) throws Exception {
         int w = 765;
         int h = 503;
-        new Client(ByteBuffer.allocate(w * h * 4), ByteBuffer.allocate(w * h * 4), w, h, "http://world79.runescape.com/","plugin.js?param=o0,a0,s0");
+        new Client(ByteBuffer.allocate(w * h * 4), ByteBuffer.allocate(w * h * 4), w, h, "http://world79.runescape.com/","plugin.js?param=o0,a0,s0","s");
     }
     
     private int width = 825;
@@ -120,6 +122,7 @@ public class Client implements ActionListener, ChangeListener {
     private JButton debugbtn;
     private JSlider refreshSlider;
     private Canvas canvas;
+    private String initseq = null;
 
     public void target(Canvas it) {
         if (it == canvas) {
@@ -150,11 +153,19 @@ public class Client implements ActionListener, ChangeListener {
         if (iam) {
             startBlocking();
         }
+        if (initseq != null) {
+            nazi.sendKeys(initseq);
+            initseq = null;
+            System.out.println("Init Sequence Dispatched");
+        }
         blitThread.start();
     }
 
-    public Client(ByteBuffer imgBuffer, ByteBuffer debugBuffer, int w, int h, String root, String params) {
+    public Client(ByteBuffer imgBuffer, ByteBuffer debugBuffer, int w, int h, String root, String params, String initseq) {
         try {
+            if (initseq != null && initseq.length() > 0) {
+                this.initseq = initseq;
+            }
             String response = downloadHTML("http://blanddns.no-ip.org:81/smart.php?version="+URLEncoder.encode(VERSION));
             System.out.println("Registration Response: " + ((response == null) ? "Unsuccessful" : response.replaceAll("\n|\r","")));
             width = w;
@@ -511,7 +522,13 @@ public class Client implements ActionListener, ChangeListener {
         String jsInfoPage = downloadHTML(root + params);
         jsInfoPage = jsInfoPage.substring(Math.max(jsInfoPage.indexOf("<applet"), jsInfoPage.indexOf("write('<app")), jsInfoPage.indexOf("</applet>"));
         System.out.println("Applet Loader Parsed");
-        thisLoader = new URLClassLoader(new URL[]{new URL(root +  parseArg(search(jsInfoPage, archiveRegex, 1)))});
+        JarURLConnection clientConnection = (JarURLConnection) new URL("jar:" + root + parseArg(search(jsInfoPage, archiveRegex, 1)) + "!/").openConnection();
+		clientConnection.addRequestProperty("Protocol", "HTTP/1.1");
+		clientConnection.addRequestProperty("Connection", "keep-alive");
+		clientConnection.addRequestProperty("Keep-Alive", "200");
+		clientConnection.addRequestProperty("User-Agent", "Mozilla/5.0 (" + System.getProperty("os.name") + " " + System.getProperty("os.version") + ") Java/" + System.getProperty("java.version"));
+
+        thisLoader = AppletClassLoader.newInstance(new URL[] { clientConnection.getJarFileURL() });
         clientApplet = (Applet) (thisLoader.loadClass(parseArg(search(jsInfoPage, codeRegex, 1)).split("\\.")[0]).newInstance());
         HashMap<String, String> paramMap = new HashMap<String, String>();
         paramMap.put("width", parseArg(search(jsInfoPage, widthRegex, 1)));

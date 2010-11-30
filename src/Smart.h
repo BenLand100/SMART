@@ -117,7 +117,7 @@ extern "C" bool isActive() __attribute__((stdcall));
 extern "C" bool isBlocking() __attribute__((stdcall));
 extern "C" long getRefresh() __attribute__((stdcall));
 extern "C" void setRefresh(long x) __attribute__((stdcall));
-extern "C" void setup(char*,char*,long,long) __attribute__((stdcall));
+extern "C" void setup(char*,char*,long,long,char*) __attribute__((stdcall));
 
 #endif	/* _SMART_H */
 

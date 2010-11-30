@@ -31,7 +31,7 @@ using namespace std;
 #define NumExports 74
 
 static char* exports[] = {
-    (char*)"setup", (char*)"procedure SmartSetup(root, params: String; width, height: Integer);",
+    (char*)"setup", (char*)"procedure SmartSetup(root, params: String; width, height: Integer; initseq: String);",
     (char*)"getImageArray", (char*)"function SmartImageArray(): Pointer;",
     (char*)"getDebugArray", (char*)"function SmartDebugArray(): Pointer;",
     (char*)"getRefresh", (char*)"function SmartGetRefresh: integer;",
@@ -146,7 +146,7 @@ void unload(void) {
 #ifndef NEWSCAR
 
 static char* exports[] = {
-    (char*)"setup@16", (char*)"procedure SmartSetup(root, params: String; width, height: Integer);",
+    (char*)"setup@20", (char*)"procedure SmartSetup(root, params: String; width, height: Integer; initseq: String);",
     (char*)"getImageHDC@0", (char*)"function SmartGetDC: integer;",
     (char*)"getDebugHDC@0", (char*)"function SmartGetDebugDC: integer;",
     (char*)"getImageArray@0", (char*)"function SmartImageArray(): integer;",
@@ -227,7 +227,7 @@ static char* exports[] = {
 #else
 
 static char* exports[] = {
-    (char*)"setup@16", (char*)"procedure SmartSetup(root, params: AnsiString; width, height: Integer);",
+    (char*)"setup@20", (char*)"procedure SmartSetup(root, params: AnsiString; width, height: Integer; initseq: AnsiString);",
     (char*)"getImageHDC@0", (char*)"function SmartGetDC: integer;",
     (char*)"getDebugHDC@0", (char*)"function SmartGetDebugDC: integer;",
     (char*)"getImageArray@0", (char*)"function SmartImageArray(): integer;",

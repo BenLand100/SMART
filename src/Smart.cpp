@@ -131,7 +131,7 @@ void clearOld(){
 void findClasses() {
     loadClasses();
     _client.clazz = (jclass) jre->NewGlobalRef(jre->FindClass("smart/Client"));
-    _client.init = jre->GetMethodID(_client.clazz, "<init>", "(Ljava/nio/ByteBuffer;Ljava/nio/ByteBuffer;IILjava/lang/String;Ljava/lang/String;)V");
+    _client.init = jre->GetMethodID(_client.clazz, "<init>", "(Ljava/nio/ByteBuffer;Ljava/nio/ByteBuffer;IILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
     _client.clickmouse = jre->GetMethodID(_client.clazz, "clickMouse", "(IIZ)V");
     _client.dragmouse = jre->GetMethodID(_client.clazz, "dragMouse", "(II)V");
     _client.getmousepos = jre->GetMethodID(_client.clazz, "getMousePos", "()Ljava/awt/Point;");
@@ -208,7 +208,7 @@ void freeClasses() {
     unloadClasses();
 }
 
-void setup(char* root, char* params, long width, long height) {
+void setup(char* root, char* params, long width, long height, char* initseq) {
     cout << "SmartSetup Entered\n";
     if (jre) vm->AttachCurrentThreadAsDaemon((void**)&jre, 0);
     if (strcmp(root, curserver) || strcmp(params, curparams) || width != client_width || height != client_height) {
@@ -261,13 +261,15 @@ void setup(char* root, char* params, long width, long height) {
         jobject debugBuffer = jre->NewDirectByteBuffer((void*)debug, client_height*client_width*4);
         jobject rootstr = jre->NewStringUTF(curserver);
         jobject paramsstr = jre->NewStringUTF(params);
-        jobject temp = jre->NewObject(_client.clazz, _client.init, imgBuffer, debugBuffer, client_width, client_height, rootstr, paramsstr);
+        jobject initseqstr = jre->NewStringUTF(initseq);
+        jobject temp = jre->NewObject(_client.clazz, _client.init, imgBuffer, debugBuffer, client_width, client_height, rootstr, paramsstr,initseqstr);
         smart = jre->NewGlobalRef(temp);
         jre->DeleteLocalRef(temp);
         jre->DeleteLocalRef(imgBuffer);
         jre->DeleteLocalRef(debugBuffer);
         jre->DeleteLocalRef(rootstr);
         jre->DeleteLocalRef(paramsstr);
+        jre->DeleteLocalRef(initseqstr);
     } else {
         if (jre && (jre->GetBooleanField(smart, _client.active) == JNI_FALSE)) {
             jre->CallVoidMethod(smart, _client.destroy);
@@ -276,13 +278,15 @@ void setup(char* root, char* params, long width, long height) {
             jobject debugBuffer = jre->NewDirectByteBuffer((void*)((char*)debug), client_height*client_width*4);
             jobject rootstr = jre->NewStringUTF(curserver);
             jobject paramsstr = jre->NewStringUTF(params);
-            jobject temp = jre->NewObject(_client.clazz, _client.init, imgBuffer, debugBuffer, client_width, client_height, rootstr, paramsstr);
+            jobject initseqstr = jre->NewStringUTF(initseq);
+            jobject temp = jre->NewObject(_client.clazz, _client.init, imgBuffer, debugBuffer, client_width, client_height, rootstr, paramsstr,initseqstr);
             smart = jre->NewGlobalRef(temp);
             jre->DeleteLocalRef(temp);
             jre->DeleteLocalRef(imgBuffer);
             jre->DeleteLocalRef(debugBuffer);
             jre->DeleteLocalRef(rootstr);
             jre->DeleteLocalRef(paramsstr);
+            jre->DeleteLocalRef(initseqstr);
             return;
         }
     }

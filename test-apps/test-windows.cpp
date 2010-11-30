@@ -24,7 +24,7 @@ using namespace std;
 
 typedef long (*GetFunctionCount) (void) __attribute__((stdcall));
 typedef long (*GetFunctionInfo)(int, void*&, char*&) __attribute__((stdcall));
-typedef void (*Setup)(char*,char*,long,long) __attribute__((stdcall));
+typedef void (*Setup)(char*,char*,long,long,char*) __attribute__((stdcall));
 
 int main(int argc, char** argv) {
     HMODULE libsmart = LoadLibrary("./libsmart.dll");
@@ -44,8 +44,8 @@ int main(int argc, char** argv) {
         delete def;
     }
     cout << "Starting SMART...\n";
-    Setup setup = (Setup) GetProcAddress(libsmart, "setup@16");
-    setup((char*)"http://world19.runescape.com/", (char*)"plugin.js?param=o0,a1,m0", 765, 503);
+    Setup setup = (Setup) GetProcAddress(libsmart, "setup@20");
+    setup((char*)"http://world19.runescape.com/", (char*)"plugin.js?param=o0,a1,m0", 765, 503,(char*)"s");
 
     time_t timer = time(0) + 500;
     while(timer >= time(0));
