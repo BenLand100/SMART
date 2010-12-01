@@ -182,7 +182,7 @@ public class Client implements ActionListener, ChangeListener {
             clientFrame.setVisible(true);
         } catch (Exception e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Error starting SMART, ensure the target page has an applet decleration", "SMART", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Error starting SMART, ensure the target page has an applet declaration", "SMART", JOptionPane.ERROR_MESSAGE);
         }
     }
 
