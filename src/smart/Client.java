@@ -526,7 +526,7 @@ public class Client implements ActionListener, ChangeListener {
 		clientConnection.addRequestProperty("Protocol", "HTTP/1.1");
 		clientConnection.addRequestProperty("Connection", "keep-alive");
 		clientConnection.addRequestProperty("Keep-Alive", "200");
-		clientConnection.addRequestProperty("User-Agent", "Mozilla/5.0 (" + System.getProperty("os.name") + " " + System.getProperty("os.version") + ") Java/" + System.getProperty("java.version"));
+		clientConnection.addRequestProperty("User-Agent", "Mozilla/4.0 (" + System.getProperty("os.name") + " " + System.getProperty("os.version") + ") Java/" + System.getProperty("java.version"));
 
         thisLoader = AppletClassLoader.newInstance(new URL[] { clientConnection.getJarFileURL() });
         clientApplet = (Applet) (thisLoader.loadClass(parseArg(search(jsInfoPage, codeRegex, 1)).split("\\.")[0]).newInstance());
