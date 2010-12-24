@@ -171,7 +171,7 @@ ${LIN_BUILD_DIR}/Smart.o: $(SRC_DIR)/Smart.cpp $(CPPHEADERFILES)
 $(DIST)/$(WIN_NAME): $(WINOBJFILES)
 	@echo "Linking object files..."
 	@mkdir -p $(DIST)
-	@$(WIN_GPP) -mwindows -shared -s -o $(DIST)/$(WIN_NAME) $(WINOBJFILES)
+	@$(WIN_GPP) -Wl,$(SRC_DIR)/libsmart.def -mwindows -shared -s -o $(DIST)/$(WIN_NAME) $(WINOBJFILES)
 
 $(WIN_BUILD_DIR)/Main.o: $(SRC_DIR)/Main.cpp $(CPPHEADERFILES)
 	@echo "Compiling Main.cpp"

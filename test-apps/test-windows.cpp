@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
         delete def;
     }
     cout << "Starting SMART...\n";
-    Setup setup = (Setup) GetProcAddress(libsmart, "setup@20");
+    Setup setup = (Setup) GetProcAddress(libsmart, "setup");
     setup((char*)"http://world19.runescape.com/", (char*)"plugin.js?param=o0,a1,m0", 765, 503,(char*)"s");
 
     time_t timer = time(0) + 500;
