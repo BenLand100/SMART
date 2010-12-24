@@ -1,6 +1,6 @@
 EXPORTS
-    GetFunctionCount=GetFunctionCount
-    GetFunctionInfo=GetFunctionInfo
+    GetFunctionCount=GetFunctionCount@0
+    GetFunctionInfo=GetFunctionInfo@12
     clickMouse=clickMouse@12
     dragMouse=dragMouse@8
     findColor=findColor@28
@@ -8,8 +8,6 @@ EXPORTS
     findColorSpiralTol=findColorSpiralTol@32
     findColorTol=findColorTol@32
     freeObject=freeObject@4
-    functionCount=functionCount@0
-    functionInfo=functionInfo@12
     getColor=getColor@8
     getDebugArray=getDebugArray@0
     getDebugHDC=getDebugHDC@0
@@ -57,7 +55,6 @@ EXPORTS
     getImageHDC=getImageHDC@0
     getMousePos=getMousePos@8
     getRefresh=getRefresh@0
-    height @118 DATA
     holdKey=holdKey@4
     holdMouse=holdMouse@12
     invokeIntMethod=invokeIntMethod@20
@@ -70,7 +67,6 @@ EXPORTS
     moveMouse=moveMouse@8
     releaseKey=releaseKey@4
     releaseMouse=releaseMouse@12
-    satmod @150 DATA
     sendKeys=sendKeys@4
     setDebug=setDebug@4
     setDebugColor=setDebugColor@4
