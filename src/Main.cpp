@@ -26,9 +26,9 @@ using namespace std;
 
 static char* exports[] = {
 #ifndef NEWSCAR
-    (char*)"setup", (char*)"procedure SmartSetup(root, params: String; width, height: Integer; initseq: AnsiString);",
-#else
     (char*)"setup", (char*)"procedure SmartSetup(root, params: String; width, height: Integer; initseq: String);",
+#else
+    (char*)"setup", (char*)"procedure SmartSetup(root, params: AnsiString; width, height: Integer; initseq: AnsiString);",
 #endif
 #ifdef WINDOWS
     (char*)"getImageHDC", (char*)"function SmartGetDC: integer;",
