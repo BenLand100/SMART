@@ -115,8 +115,9 @@ scar: $(DIST)/$(SCAR_NAME)
 windows: $(DIST)/$(WIN_NAME)
 	@echo "Finished Building the Windows SMART distribution"
 	
-test: test-apps/test-windows.cpp test-apps/test-linux.cpp
+test: test-apps/test-windows.cpp test-apps/test-linux.cpp test-apps/test-scar.cpp
 	@$(WIN_GPP) -Wall -o $(DIST)/test-windows.exe test-apps/test-windows.cpp
+	@$(WIN_GPP) -Wall -o $(DIST)/test-scar.exe test-apps/test-scar.cpp
 	@$(LIN_GPP) -Wall -fPIC -ldl -o $(DIST)/test-linux test-apps/test-linux.cpp
 	@echo "Finished building test programs" 
 	
@@ -213,7 +214,7 @@ ${WIN_BUILD_DIR}/Smart.o: $(SRC_DIR)/Smart.cpp $(CPPHEADERFILES)
 $(DIST)/$(SCAR_NAME): $(SCAROBJFILES)
 	@echo "Linking object files..."
 	@mkdir -p $(DIST)
-	@$(WIN_GPP) -mwindows -shared -s -o $(DIST)/$(SCAR_NAME) $(SCAROBJFILES)
+	@$(WIN_GPP) -Wl,$(SRC_DIR)/libsmart.def -mwindows -shared -s -o $(DIST)/$(SCAR_NAME) $(SCAROBJFILES)
 
 $(SCAR_BUILD_DIR)/Main.o: $(SRC_DIR)/Main.cpp $(CPPHEADERFILES)
 	@echo "Compiling Main.cpp"
