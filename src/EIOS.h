@@ -17,6 +17,8 @@
  *  along with EIOS. If not, see <http://www.gnu.org/licenses/>. 
  */ 
   
+//Sadly, I never actually implemented this. Maybe one day! Its a nice standard.
+  
 /** 
  *  This is the C++ header for the Extensible Input/Output System. 
  *  EIOS is designed as a plugable interface to allow easy routing of 

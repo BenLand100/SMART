@@ -43,7 +43,8 @@ CPPSOURCEFILES= \
 	$(SRC_DIR)/Input.cpp \
 	$(SRC_DIR)/Reflection.cpp \
 	$(SRC_DIR)/JVM.cpp \
-	$(SRC_DIR)/Smart.cpp
+	$(SRC_DIR)/Smart.cpp \
+	$(SRC_DIR)/STD_Wrapper.cpp
 	
 CPPHEADERFILES= \
 	$(SRC_DIR)/jni.h \
@@ -54,7 +55,8 @@ CPPHEADERFILES= \
 	$(SRC_DIR)/Input.h \
 	$(SRC_DIR)/Reflection.h \
 	$(SRC_DIR)/JVM.h \
-	$(SRC_DIR)/Smart.h
+	$(SRC_DIR)/Smart.h \
+	$(SRC_DIR)/STD_Wrapper.h
 	
 WINOBJFILES= \
 	$(WIN_BUILD_DIR)/Main.o \
@@ -63,7 +65,8 @@ WINOBJFILES= \
 	$(WIN_BUILD_DIR)/Input.o \
 	$(WIN_BUILD_DIR)/Reflection.o \
 	$(WIN_BUILD_DIR)/JVM.o \
-	$(WIN_BUILD_DIR)/Smart.o
+	$(WIN_BUILD_DIR)/Smart.o \
+	$(WIN_BUILD_DIR)/STD_Wrapper.o
 
 SCAROBJFILES= \
 	$(SCAR_BUILD_DIR)/Main.o \
@@ -72,7 +75,8 @@ SCAROBJFILES= \
 	$(SCAR_BUILD_DIR)/Input.o \
 	$(SCAR_BUILD_DIR)/Reflection.o \
 	$(SCAR_BUILD_DIR)/JVM.o \
-	$(SCAR_BUILD_DIR)/Smart.o
+	$(SCAR_BUILD_DIR)/Smart.o \
+	$(SCAR_BUILD_DIR)/STD_Wrapper.o
 	
 LINOBJFILES= \
 	$(LIN_BUILD_DIR)/Main.o \
@@ -81,7 +85,8 @@ LINOBJFILES= \
 	$(LIN_BUILD_DIR)/Input.o \
 	$(LIN_BUILD_DIR)/Reflection.o \
 	$(LIN_BUILD_DIR)/JVM.o \
-	$(LIN_BUILD_DIR)/Smart.o
+	$(LIN_BUILD_DIR)/Smart.o \
+	$(LIN_BUILD_DIR)/STD_Wrapper.o
 	
 SMARTSOURCES= \
     $(SRC_DIR)/java/awt/Canvas.java \
@@ -119,6 +124,7 @@ test: test-apps/test-windows.cpp test-apps/test-linux.cpp test-apps/test-scar.cp
 	@$(WIN_GPP) -Wall -o $(DIST)/test-windows.exe test-apps/test-windows.cpp
 	@$(WIN_GPP) -Wall -o $(DIST)/test-scar.exe test-apps/test-scar.cpp
 	@$(LIN_GPP) -Wall -fPIC -ldl -o $(DIST)/test-linux test-apps/test-linux.cpp
+	@cp test-apps/test-python.py $(DIST)/test-python
 	@echo "Finished building test programs" 
 	
 clean: 
@@ -167,6 +173,11 @@ ${LIN_BUILD_DIR}/Smart.o: $(SRC_DIR)/Smart.cpp $(CPPHEADERFILES)
 	@mkdir -p $(LIN_BUILD_DIR)
 	@$(LIN_GPP) $(LIN_COMPILE_ARGS) -o $(LIN_BUILD_DIR)/Smart.o $(SRC_DIR)/Smart.cpp
 
+${LIN_BUILD_DIR}/STD_Wrapper.o: $(SRC_DIR)/STD_Wrapper.cpp $(CPPHEADERFILES)
+	@echo "Compiling STD_Wrapper.cpp"
+	@mkdir -p $(LIN_BUILD_DIR)
+	@$(LIN_GPP) $(LIN_COMPILE_ARGS) -o $(LIN_BUILD_DIR)/STD_Wrapper.o $(SRC_DIR)/STD_Wrapper.cpp
+
 #### WINDOWS BUILDING DIRECTIVES ####
 
 $(DIST)/$(WIN_NAME): $(WINOBJFILES)
@@ -209,6 +220,11 @@ ${WIN_BUILD_DIR}/Smart.o: $(SRC_DIR)/Smart.cpp $(CPPHEADERFILES)
 	@mkdir -p $(WIN_BUILD_DIR)
 	@$(WIN_GPP) $(WIN_COMPILE_ARGS) -o $(WIN_BUILD_DIR)/Smart.o $(SRC_DIR)/Smart.cpp
 
+${WIN_BUILD_DIR}/STD_Wrapper.o: $(SRC_DIR)/STD_Wrapper.cpp $(CPPHEADERFILES)
+	@echo "Compiling STD_Wrapper.cpp"
+	@mkdir -p $(WIN_BUILD_DIR)
+	@$(WIN_GPP) $(WIN_COMPILE_ARGS) -o $(WIN_BUILD_DIR)/STD_Wrapper.o $(SRC_DIR)/STD_Wrapper.cpp
+
 #### SCAR BUILDING DIRECTIVES ####
 
 $(DIST)/$(SCAR_NAME): $(SCAROBJFILES)
@@ -250,6 +266,12 @@ ${SCAR_BUILD_DIR}/Smart.o: $(SRC_DIR)/Smart.cpp $(CPPHEADERFILES)
 	@echo "Compiling Smart.cpp"
 	@mkdir -p $(SCAR_BUILD_DIR)
 	@$(WIN_GPP) $(SCAR_COMPILE_ARGS) -o $(SCAR_BUILD_DIR)/Smart.o $(SRC_DIR)/Smart.cpp
+
+${SCAR_BUILD_DIR}/STD_Wrapper.o: $(SRC_DIR)/STD_Wrapper.cpp $(CPPHEADERFILES)
+	@echo "Compiling STD_Wrapper.cpp"
+	@mkdir -p $(SCAR_BUILD_DIR)
+	@$(WIN_GPP) $(SCAR_COMPILE_ARGS) -o $(SCAR_BUILD_DIR)/STD_Wrapper.o $(SRC_DIR)/STD_Wrapper.cpp
+
 
 #### JAVA/Cypher BUILDING DIRECTIVES ####
 

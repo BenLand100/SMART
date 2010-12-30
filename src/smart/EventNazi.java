@@ -459,6 +459,20 @@ public class EventNazi {
         }
     }
     
+    /**
+     * Allows KeyEvents to be easily and safely passed through the blocking 
+     * mechanism. Also ensures the target component is the target of this nazi
+     */
+    public void passKeyEvent(KeyEvent e) {
+		synchronized (this) {
+            if (canInteract()) {
+                if (!focused) getFocus();  
+                BlockingEventQueue.sendUnblocked(new KeyEvent(comp, e.getID(), e.getWhen(), e.getModifiers(), e.getKeyCode(), e.getKeyChar(), e.getKeyLocation()));
+            }
+        }  
+    }
+    
+    
     public boolean isKeyDown(int code) {
         int[] dat = new int[] {code};
         return isKeyHeld(dat);

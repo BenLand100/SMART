@@ -17,6 +17,8 @@
  *  along with SMART. If not, see <http://www.gnu.org/licenses/>.
  */
  
+//Handles Key/Mouse interaction, mostly through JNI to Java
+ 
 #include "Input.h"
 
 extern JNIEnv* jre;

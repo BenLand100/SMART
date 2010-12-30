@@ -22,6 +22,9 @@
 
 #include "jni.h"
 
+extern char* jvmpath;
+extern "C" void setJVMPath(char* path) __attribute__((cdecl));
+
 typedef jint (JNICALL *CreateJVM)(JavaVM**, void**, void*);
 typedef jint (JNICALL *GetJVMs)(JavaVM**,jsize,jsize*);
 

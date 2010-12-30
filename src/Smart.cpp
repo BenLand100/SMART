@@ -17,6 +17,8 @@
  *  along with SMART. If not, see <http://www.gnu.org/licenses/>.
  */
 
+//Core setup routines and most of the static data here
+
 #include "Smart.h"
 #include "JVM.h"
 #include "ClassLoader.h"
@@ -68,15 +70,15 @@ long getDebugHDC() {
 
 #endif
 
-long getImageArray() {
-    return (long) image;
+void* getImageArray() {
+    return (void*) image;
 }
 
-long getDebugArray() {
-    return (long) debug;
+void* getDebugArray() {
+    return (void*) debug;
 }
 
-void setDebugColor(jint color) {
+void setTransparentColor(jint color) {
     if (jre) jre->SetIntField(smart, _client.transcolor, color);
 }
 
@@ -297,9 +299,11 @@ void internalConstructor() {
     *curserver = 0;
     curparams = (char*) malloc(1);
     *curparams = 0;
+    jvmpath = 0;
 }
 
 void internalDestructor() {
+	if (jvmpath) free(jvmpath);
     if (jre) vm->AttachCurrentThreadAsDaemon((void**)&jre, 0);
     clearOld();
     free(curserver);

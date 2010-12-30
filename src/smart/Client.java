@@ -73,7 +73,7 @@ import sun.applet.AppletClassLoader;
  */
 public class Client implements ActionListener, ChangeListener {
     
-    public static final String VERSION = "6.4a";
+    public static final String VERSION = "6.5";
     public static final String TITLE = "Public SMARTv" + VERSION + " - SMART Minimizing Autoing Resource Thing - By BenLand100";
 
     private static Hashtable<String, Client> clients = new Hashtable<String, Client>();
@@ -461,16 +461,23 @@ public class Client implements ActionListener, ChangeListener {
         clientFrame.addKeyListener(new KeyAdapter() {
 
             @Override
+            public void keyTyped(KeyEvent e) {
+                if (nazi != null) {
+                    nazi.passKeyEvent(e);
+                }
+            }
+
+            @Override
             public void keyPressed(KeyEvent e) {
                 if (nazi != null) {
-                    nazi.holdKey(e.getKeyCode());
+                    nazi.passKeyEvent(e);
                 }
             }
 
             @Override
             public void keyReleased(KeyEvent e) {
                 if (nazi != null) {
-                    nazi.releaseKey(e.getKeyCode());
+                    nazi.passKeyEvent(e);
                 }
             }
         });

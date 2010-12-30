@@ -24,8 +24,8 @@
 
 #include <dlfcn.h>
 
-void load() __attribute__ ((constructor));
-void unload() __attribute__ ((destructor));
+void load() __attribute__((constructor));
+void unload() __attribute__((destructor));
 
 #endif
 
@@ -37,6 +37,7 @@ extern "C" bool DllMain(HINSTANCE, int, void*) __attribute__((stdcall));
 
 #endif
 
+//These are intended for use with the SCAR/Simba plugin loaders, and nothing else.
 extern "C" long GetFunctionCount() __attribute__((stdcall));
 extern "C" long GetFunctionInfo(int, void*&, char*&) __attribute__((stdcall));
 

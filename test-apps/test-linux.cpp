@@ -46,7 +46,7 @@ int main(int argc, char** argv) {
         delete def;
     }
 
-    Setup setup = (Setup) dlsym(libsmart, "setup");
+    Setup setup = (Setup) dlsym(libsmart, "std_setup");
     setup((char*)"http://world19.runescape.com/", (char*)"plugin.js?param=o0,a1,m0", 765, 503,(char*)"s");
 
     time_t timer = time(0) + 500;

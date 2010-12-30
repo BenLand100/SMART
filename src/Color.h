@@ -33,16 +33,18 @@ typedef union {
 
 inline HSL toHSL(RGB&);
 inline bool cmpColors(RGB&, RGB&, int);
+long setTarget(PRGB newTarget, int w, int h);
 
-long setTarget(PRGB newTarget, int w, int h) __attribute__((stdcall));
-extern "C" int  getColor(int, int) __attribute__((stdcall));
-extern "C" bool findColor(int&, int&, int, int, int, int, int) __attribute__((stdcall));
-extern "C" bool findColorTol(int&, int&, int, int, int, int, int, int) __attribute__((stdcall));
-extern "C" bool findColorSpiral(int&, int&, int, int, int, int, int) __attribute__((stdcall));
-extern "C" bool findColorSpiralTol(int&, int&, int, int, int, int, int, int) __attribute__((stdcall));
-extern "C" bool findBitmapTolIn(int, int&, int&, int, int, int, int, int) __attribute__((stdcall));
-extern "C" bool findBitmapTol(int, int&, int&, int, int, int, int) __attribute__((stdcall));
-extern "C" bool findBitmap(int, int&, int&) __attribute__((stdcall));
-
+extern "C" int  getColor(int, int) __attribute__((cdecl));
+extern "C" bool findColor(int&, int&, int, int, int, int, int) __attribute__((cdecl));
+extern "C" bool findColorTol(int&, int&, int, int, int, int, int, int) __attribute__((cdecl));
+extern "C" bool findColorSpiral(int&, int&, int, int, int, int, int) __attribute__((cdecl));
+extern "C" bool findColorSpiralTol(int&, int&, int, int, int, int, int, int) __attribute__((cdecl));
+/*
+Unused and thus no reason to make cross compatible --- but still faster than anything else so leave in
+extern "C" bool findBitmapTolIn(int, int&, int&, int, int, int, int, int) __attribute__((cdecl));
+extern "C" bool findBitmapTol(int, int&, int&, int, int, int, int) __attribute__((cdecl));
+extern "C" bool findBitmap(int, int&, int&) __attribute__((cdecl));
+*/
 #endif	/* _COLOR_H */
 

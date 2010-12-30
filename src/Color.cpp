@@ -17,6 +17,9 @@
  *  along with SMART. If not, see <http://www.gnu.org/licenses/>.
  */
 
+//Some exceptionally fast color routines, sadly mostly unused these days. Oddly
+//I never seem to have exported all the methods anyway... Nice algorithms though
+
 #include "Color.h"
 #include "Smart.h"
 

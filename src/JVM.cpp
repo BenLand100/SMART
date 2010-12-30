@@ -17,7 +17,30 @@
  *  along with SMART. If not, see <http://www.gnu.org/licenses/>.
  */
  
+//This file loads and initializes the JVM
+ 
 #include "JVM.h"
+#include <cstdlib>
+#include <cstring>
+#include <iostream>
+
+using namespace std;
+
+//initilized and free'd in Smart.cpp as well
+char *jvmpath = 0;
+
+void setJVMPath(char* path) {
+	if (path && strlen(path) > 0) {
+		if (jvmpath) free(jvmpath);
+		jvmpath = (char*)malloc(strlen(path)+1);
+		strcpy(jvmpath,path);
+		cout << "JVMPath set to " << jvmpath << '\n';
+	} else {
+		if (jvmpath) free(jvmpath);
+		jvmpath = 0;
+		cout << "JVMPath set to platform default\n";
+	}
+}
 
 #ifdef WINDOWS
 
@@ -60,9 +83,14 @@ void checkPath(char* javaBin) {
 }
 
 void* findJVM() {
+    HMODULE jvmdll;
+	if (jvmpath) {
+    	cout << "Attempting to load custom JVM\n";
+    	jvmdll = LoadLibrary(jvmpath);
+		if (jvmdll) return jvmdll;
+	}
     HKEY jrekey;
     HKEY curjrekey;
-    HMODULE jvmdll;
     char value[512], path[512];
     unsigned long size;
     RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\JavaSoft\\Java Runtime Environment", 0, KEY_QUERY_VALUE, &jrekey);
@@ -77,9 +105,11 @@ void* findJVM() {
     //checkPath(path);
     memset(path, 0, 512);
     sprintf(path, "%s\\bin\\server\\jvm.dll", value);
+    cout << "Attempting to load default server JVM\n";
     if (!(jvmdll = LoadLibrary(path))) {
         memset(path, 0, 512);
         sprintf(path, "%s\\bin\\client\\jvm.dll", value);
+    	cout << "Attempting to load default client JVM\n";
         if (!(jvmdll = LoadLibrary(path))) {
             return 0;
         }
@@ -117,8 +147,18 @@ bool initJVM(JNIEnv** env, JavaVM** vm, void* jvmdll) {
 }
 
 void* findJVM() {
-    void* libjvm = dlopen("/usr/lib/jvm/java-6-sun/jre/lib/i386/server/libjvm.so", RTLD_LAZY);
-    if (!libjvm) libjvm = dlopen("/usr/lib/jvm/java-6-sun/jre/lib/i386/client/libjvm.so", RTLD_LAZY);
+	void* libjvm;
+    if (jvmpath) {
+    	cout << "Attempting to load custom JVM\n";
+    	libjvm = dlopen(jvmpath, RTLD_LAZY);
+		if (libjvm) return libjvm;
+	}
+    libjvm = dlopen("/usr/lib/jvm/java-6-sun/jre/lib/i386/server/libjvm.so", RTLD_LAZY);
+    cout << "Attempting to load default server JVM\n";
+    if (!libjvm) {
+    	libjvm = dlopen("/usr/lib/jvm/java-6-sun/jre/lib/i386/client/libjvm.so", RTLD_LAZY);
+    	cout << "Attempting to load default client JVM\n";
+    }
     return libjvm;
 }
 
