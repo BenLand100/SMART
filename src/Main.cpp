@@ -28,13 +28,8 @@ using namespace std;
 
 //Export list for the SCAR/Simba plugin loaders
 static char* exports[] = {
-#ifndef NEWSCAR
     (char*)"std_setup", (char*)"procedure SmartSetup(root, params: String; width, height: Integer; initseq: String);",
     (char*)"std_setJVMPath", (char*)"procedure SmartSetJVMPath(path: String);",
-#else
-    (char*)"std_setup", (char*)"procedure SmartSetup(root, params: AnsiString; width, height: Integer; initseq: AnsiString);",
-    (char*)"std_setJVMPath", (char*)"procedure SmartSetJVMPath(path: AnsiString);",
-#endif
 #ifdef WINDOWS
     (char*)"std_getImageHDC", (char*)"function SmartGetDC: integer;",
     (char*)"std_getDebugHDC", (char*)"function SmartGetDebugDC: integer;",
@@ -55,11 +50,7 @@ static char* exports[] = {
     (char*)"std_windMouse", (char*)"procedure SmartWindMouse(x, y: integer);",
     (char*)"std_dragMouse", (char*)"procedure SmartDragMouse(x, y: integer);",
     (char*)"std_clickMouse", (char*)"procedure SmartClickMouse(x, y: integer; left: boolean);",
-#ifndef NEWSCAR
     (char*)"std_sendKeys", (char*)"procedure SmartSendKeys(Text: String);",
-#else
-    (char*)"std_sendKeys", (char*)"procedure SmartSendKeys(Text: AnsiString);",
-#endif
     (char*)"std_holdKey", (char*)"procedure SmartHoldKey(Code: Integer);",
     (char*)"std_releaseKey", (char*)"procedure SmartReleaseKey(Code: Integer);",
     (char*)"std_isKeyDown", (char*)"function SmartIsKeyDown(Code: Integer): Boolean;",
@@ -68,7 +59,6 @@ static char* exports[] = {
     (char*)"std_findColorTol", (char*)"function SmartFindColorTolerance(var x, y: integer; color, sx, sy, ex, ey, tol: integer): boolean;",
     (char*)"std_findColorSpiral", (char*)"function SmartFindColorSpiral(var x, y: integer; color, sx, sy, ex, ey: integer): boolean;",
     (char*)"std_findColorSpiralTol", (char*)"function SmartFindColorSpiralTolerance(var x, y: integer; color, sx, sy, ex, ey, tol: integer): boolean;",
-#ifndef NEWSCAR
     (char*)"std_stringFromBytes", (char*)"function SmartStringFromBytes(bytes: integer; str: String): integer;",
     (char*)"std_stringFromChars", (char*)"function SmartStringFromChars(chars: integer; str: String): integer;",
     (char*)"std_stringFromString", (char*)"function SmartStringFromString(jstr: integer; str: String): integer;",
@@ -114,53 +104,6 @@ static char* exports[] = {
     (char*)"std_getFieldArray2DObject", (char*)"function SmartGetFieldArray2DObject(parent: integer; path: String; x ,y: integer): integer;",
     (char*)"std_getFieldArrayObject", (char*)"function SmartGetFieldArrayObject(parent: integer; path: String; index: integer): integer;",
     (char*)"std_getFieldArraySize", (char*)"function SmartGetFieldArraySize(parent: integer; path: String; dim: integer): integer;",
-#else
-    (char*)"std_stringFromBytes", (char*)"function SmartStringFromBytes(bytes: integer; str: AnsiString): integer;",
-    (char*)"std_stringFromChars", (char*)"function SmartStringFromChars(chars: integer; str: AnsiString): integer;",
-    (char*)"std_stringFromString", (char*)"function SmartStringFromString(str: integer; str: AnsiString): integer;",
-    (char*)"std_invokeIntMethod", (char*)"function SmartInvokeIntMethod(obj: integer; clazz, meth: AnsiString; a, b: integer): integer;",
-    (char*)"std_getFieldObject", (char*)"function SmartGetFieldObject(parent: integer; path: AnsiString): integer;",
-    (char*)"std_isPathValid", (char*)"function SmartIsPathValid(parent: integer; path: String): boolean;",
-    (char*)"std_getFieldInt", (char*)"function SmartGetFieldInt(parent: integer; path: AnsiString): integer;",
-    (char*)"std_getFieldShort", (char*)"function SmartGetFieldShort(parent: integer; path: AnsiString): integer;",
-    (char*)"std_getFieldByte", (char*)"function SmartGetFieldByte(parent: integer; path: AnsiString): integer;",
-    (char*)"std_getFieldFloat", (char*)"function SmartGetFieldFloat(parent: integer; path: AnsiString): extended;",
-    (char*)"std_getFieldDouble", (char*)"function SmartGetFieldDouble(parent: integer; path: AnsiString): extended;",
-    (char*)"std_getFieldBool", (char*)"function SmartGetFieldBoolean(parent: integer; path: AnsiString): boolean;",
-    (char*)"std_getFieldLongH", (char*)"function SmartGetFieldLongH(parent: integer; path: AnsiString): integer;",
-    (char*)"std_getFieldLongL", (char*)"function SmartGetFieldLongL(parent: integer; path: AnsiString): integer;",
-    (char*)"std_getFieldArrayInt", (char*)"function SmartGetFieldArrayInt(parent: integer; path: AnsiString; index: integer): integer;",
-    (char*)"std_getFieldArrayFloat", (char*)"function SmartGetFieldArrayFloat(parent: integer; path: AnsiString; index: integer): extended;",
-    (char*)"std_getFieldArrayDouble", (char*)"function SmartGetFieldArrayDouble(parent: integer; path: AnsiString; index: integer): extended;",
-    (char*)"std_getFieldArrayLongH", (char*)"function SmartGetFieldArrayLongH(parent: integer; path: AnsiString; index: integer): integer;",
-    (char*)"std_getFieldArrayLongL", (char*)"function SmartGetFieldArrayLongL(parent: integer; path: AnsiString; index: integer): integer;",
-    (char*)"std_getFieldArrayBool", (char*)"function SmartGetFieldArrayBoolean(parent: integer; path: AnsiString; index: integer): boolean;",
-    (char*)"std_getFieldArrayByte", (char*)"function SmartGetFieldArrayByte(parent: integer; path: AnsiString; index: integer): integer;",
-    (char*)"std_getFieldArrayShort", (char*)"function SmartGetFieldArrayShort(parent: integer; path: AnsiString; index: integer): integer;",
-    (char*)"std_getFieldArrayChar", (char*)"function SmartGetFieldArrayChar(parent: integer; path: AnsiString; index: integer): integer;",
-    (char*)"std_getFieldArray3DInt", (char*)"function SmartGetFieldArray3DInt(parent: integer; path: AnsiString; x ,y, z: integer): integer;",
-    (char*)"std_getFieldArray3DFloat", (char*)"function SmartGetFieldArray3DFloat(parent: integer; path: AnsiString; x ,y, z: integer): extended;",
-    (char*)"std_getFieldArray3DDouble", (char*)"function SmartGetFieldArray3DDouble(parent: integer; path: AnsiString; x ,y, z: integer): extended;",
-    (char*)"std_getFieldArray3DBool", (char*)"function SmartGetFieldArray3DBoolean(parent: integer; path: AnsiString; x ,y, z: integer): boolean;",
-    (char*)"std_getFieldArray3DLongH", (char*)"function SmartGetFieldArray3DLongH(parent: integer; path: AnsiString; x ,y, z: integer): integer;",
-    (char*)"std_getFieldArray3DLongL", (char*)"function SmartGetFieldArray3DLongL(parent: integer; path: AnsiString; x ,y, z: integer): integer;",
-    (char*)"std_getFieldArray3DByte", (char*)"function SmartGetFieldArray3DByte(parent: integer; path: AnsiString; x ,y, z: integer): integer;",
-    (char*)"std_getFieldArray3DShort", (char*)"function SmartGetFieldArray3DShort(parent: integer; path: AnsiString; x ,y, z: integer): integer;",
-    (char*)"std_getFieldArray3DChar", (char*)"function SmartGetFieldArray3DChar(parent: integer; path: AnsiString; x ,y, z: integer): integer;",
-    (char*)"std_getFieldArray3DObject", (char*)"function SmartGetFieldArray3DObject(parent: integer; path: AnsiString; x ,y, z: integer): integer;",
-    (char*)"std_getFieldArray2DInt", (char*)"function SmartGetFieldArray2DInt(parent: integer; path: AnsiString; x ,y: integer): integer;",
-    (char*)"std_getFieldArray2DFloat", (char*)"function SmartGetFieldArray2DFloat(parent: integer; path: AnsiString; x ,y: integer): extended;",
-    (char*)"std_getFieldArray2DDouble", (char*)"function SmartGetFieldArray2DDouble(parent: integer; path: AnsiString; x ,y: integer): extended;",
-    (char*)"std_getFieldArray2DBool", (char*)"function SmartGetFieldArray2DBoolean(parent: integer; path: AnsiString; x ,yz: integer): boolean;",
-    (char*)"std_getFieldArray2DLongH", (char*)"function SmartGetFieldArray2DLongH(parent: integer; path: AnsiString; x ,y: integer): integer;",
-    (char*)"std_getFieldArray2DLongL", (char*)"function SmartGetFieldArray2DLongL(parent: integer; path: AnsiString; x ,y: integer): integer;",
-    (char*)"std_getFieldArray2DByte", (char*)"function SmartGetFieldArray2DByte(parent: integer; path: AnsiString; x ,y: integer): integer;",
-    (char*)"std_getFieldArray2DShort", (char*)"function SmartGetFieldArray2DShort(parent: integer; path: AnsiString; x ,y: integer): integer;",
-    (char*)"std_getFieldArray2DChar", (char*)"function SmartGetFieldArray2DChar(parent: integer; path: AnsiString; x ,y: integer): integer;",
-    (char*)"std_getFieldArray2DObject", (char*)"function SmartGetFieldArray2DObject(parent: integer; path: AnsiString; x ,y: integer): integer;",
-    (char*)"std_getFieldArrayObject", (char*)"function SmartGetFieldArrayObject(parent: integer; path: AnsiString; index: integer): integer;",
-    (char*)"std_getFieldArraySize", (char*)"function SmartGetFieldArraySize(parent: integer; path: AnsiString; dim: integer): integer;",
-#endif
     (char*)"std_isEqual", (char*)"function SmartIsEqual(obja,objb: integer): boolean;",
     (char*)"std_isNull", (char*)"function SmartIsNull(obj: integer): boolean;",
     (char*)"std_freeObject", (char*)"procedure SmartFreeObject(obj: integer);"
