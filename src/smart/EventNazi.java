@@ -27,6 +27,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
+import java.util.Collections;
 
 /**
  * The EventNazi is responsible for creating events to send to the client. It
@@ -93,7 +95,7 @@ public class EventNazi {
     private KeySender keySender;
     private boolean active;
     private int cx, cy;
-    private HashSet<int[]> keysHeld;
+    private Set<int[]> keysHeld;
     private boolean mousein;
     private boolean leftDown;
     private boolean rightDown;
@@ -125,7 +127,7 @@ public class EventNazi {
         rightDown = false;
         focused = false;
         shiftDown = false;
-        keysHeld = new HashSet<int[]>();
+        keysHeld = Collections.synchronizedSet(new HashSet<int[]>());
         keySender = new KeySender("java-key-thread");
         keySender.start();
     }
@@ -252,14 +254,12 @@ public class EventNazi {
      * @param y The y destination
      * @result The actual end point
      */
-    public Point windMouse(int x, int y) {
-        synchronized (this) {
-            if (canInteract()) {
-                double speed = (Math.random() * 15D + 15D) / 10D;
-                return windMouseImpl(cx,cy,x,y,9D,3D,5D/speed,10D/speed,10D*speed,8D*speed);
-            }
-            return null;
+    public synchronized Point windMouse(int x, int y) {
+        if (canInteract()) {
+            double speed = (Math.random() * 15D + 15D) / 10D;
+            return windMouseImpl(cx,cy,x,y,9D,3D,5D/speed,10D/speed,10D*speed,8D*speed);
         }
+        return null;
     }
     
     /**
@@ -270,13 +270,11 @@ public class EventNazi {
      * @param y The y destination
      * @result The actual end point
      */
-    public Point moveMouse(int x, int y) {
-        synchronized (this) {
-            if (canInteract()) {
-                return moveMouseImpl(x,y);
-            }
-            return null;
+    public synchronized Point moveMouse(int x, int y) {
+        if (canInteract()) {
+            return moveMouseImpl(x,y);
         }
+        return null;
     }
     
     /**
@@ -285,24 +283,22 @@ public class EventNazi {
      * @param y The y destination
      * @result The actual end point
      */
-    public Point dragMouse(int x, int y) {
-        synchronized (this) {
-            if (canHold(true)) {
-                leftDown = true;
-                int btnMask = MouseEvent.BUTTON1_DOWN_MASK | (rightDown ? (MouseEvent.BUTTON3_DOWN_MASK | MouseEvent.META_DOWN_MASK) : 0);
-                int btn = MouseEvent.BUTTON1;
-                if (!focused) getFocus();
-                BlockingEventQueue.sendUnblocked(new MouseEvent(comp,MouseEvent.MOUSE_PRESSED,System.currentTimeMillis(),btnMask,cx,cy,1,false,btn));
-                try { Thread.sleep((int)(Math.random() * 56 + 90)); } catch (Exception ex) { }
-                Point end = moveMouse(x,y);
-                try { Thread.sleep((int)(Math.random() * 56 + 90)); } catch (Exception ex) { }
-                BlockingEventQueue.sendUnblocked(new MouseEvent(comp,MouseEvent.MOUSE_RELEASED,System.currentTimeMillis(),btnMask,end.x,end.y,1,false,btn));
-                leftDown = false;
-                if (!mousein) looseFocus(false);
-                return end;
-            }
-            return null;
+    public synchronized Point dragMouse(int x, int y) {
+        if (canHold(true)) {
+            leftDown = true;
+            int btnMask = MouseEvent.BUTTON1_DOWN_MASK | (rightDown ? (MouseEvent.BUTTON3_DOWN_MASK | MouseEvent.META_DOWN_MASK) : 0);
+            int btn = MouseEvent.BUTTON1;
+            if (!focused) getFocus();
+            BlockingEventQueue.sendUnblocked(new MouseEvent(comp,MouseEvent.MOUSE_PRESSED,System.currentTimeMillis(),btnMask,cx,cy,1,false,btn));
+            try { Thread.sleep((int)(Math.random() * 56 + 90)); } catch (Exception ex) { }
+            Point end = moveMouse(x,y);
+            try { Thread.sleep((int)(Math.random() * 56 + 90)); } catch (Exception ex) { }
+            BlockingEventQueue.sendUnblocked(new MouseEvent(comp,MouseEvent.MOUSE_RELEASED,System.currentTimeMillis(),btnMask,end.x,end.y,1,false,btn));
+            leftDown = false;
+            if (!mousein) looseFocus(false);
+            return end;
         }
+        return null;
     }
     
     /**
@@ -312,24 +308,22 @@ public class EventNazi {
      * @param y The y destination
      * @result The actual end point
      */
-    public Point holdMouse(int x, int y, boolean left) {
-        synchronized (this) {
-            if (canHold(left)) {
-                int btnMask = ((leftDown || left) ? MouseEvent.BUTTON1_DOWN_MASK : 0) | ((rightDown || !left) ? (MouseEvent.BUTTON3_DOWN_MASK | MouseEvent.META_DOWN_MASK) : 0);
-                int btn = left ? MouseEvent.BUTTON1 : MouseEvent.BUTTON3;
-                Point end = moveMouse(x,y);
-                if (mousein) {
-                    BlockingEventQueue.sendUnblocked(new MouseEvent(comp,MouseEvent.MOUSE_PRESSED,System.currentTimeMillis(),btnMask,cx,cy,1,false,btn));
-                    if (!focused) {
-                        wait(25,50);
-                        getFocus();
-                    }
-                    if (left) leftDown = true; else rightDown = true;
+    public synchronized Point holdMouse(int x, int y, boolean left) {
+        if (canHold(left)) {
+            int btnMask = ((leftDown || left) ? MouseEvent.BUTTON1_DOWN_MASK : 0) | ((rightDown || !left) ? (MouseEvent.BUTTON3_DOWN_MASK | MouseEvent.META_DOWN_MASK) : 0);
+            int btn = left ? MouseEvent.BUTTON1 : MouseEvent.BUTTON3;
+            Point end = moveMouse(x,y);
+            if (mousein) {
+                BlockingEventQueue.sendUnblocked(new MouseEvent(comp,MouseEvent.MOUSE_PRESSED,System.currentTimeMillis(),btnMask,cx,cy,1,false,btn));
+                if (!focused) {
+                    wait(25,50);
+                    getFocus();
                 }
-                return end;
+                if (left) leftDown = true; else rightDown = true;
             }
-            return null;
+            return end;
         }
+        return null;
     }
     
     /**
@@ -339,24 +333,22 @@ public class EventNazi {
      * @param y The y destination
      * @result The actual end point
      */
-    public Point releaseMouse(int x, int y, boolean left) {
-        synchronized (this) {
-            if (canRelease(left)) {
-                int btnMask = ((leftDown || left) ? MouseEvent.BUTTON1_DOWN_MASK : 0) | ((rightDown || !left) ? (MouseEvent.BUTTON3_DOWN_MASK | MouseEvent.META_DOWN_MASK) : 0);
-                int btn = left ? MouseEvent.BUTTON1 : MouseEvent.BUTTON3;
-                Point end = moveMouse(x,y);
-                if (mousein) {
-                    long time = System.currentTimeMillis();
-                    BlockingEventQueue.sendUnblocked(new MouseEvent(comp,MouseEvent.MOUSE_RELEASED,time,btnMask,end.x,end.y,1,false,btn));
-                    BlockingEventQueue.sendUnblocked(new MouseEvent(comp,MouseEvent.MOUSE_CLICKED,time,btnMask,end.x,end.y,1,false,btn));
-                    if (left) leftDown = false; else rightDown = false;
-                } else {
-                    looseFocus(false);
-                }
-                return end;
+    public synchronized Point releaseMouse(int x, int y, boolean left) {
+        if (canRelease(left)) {
+            int btnMask = ((leftDown || left) ? MouseEvent.BUTTON1_DOWN_MASK : 0) | ((rightDown || !left) ? (MouseEvent.BUTTON3_DOWN_MASK | MouseEvent.META_DOWN_MASK) : 0);
+            int btn = left ? MouseEvent.BUTTON1 : MouseEvent.BUTTON3;
+            Point end = moveMouse(x,y);
+            if (mousein) {
+                long time = System.currentTimeMillis();
+                BlockingEventQueue.sendUnblocked(new MouseEvent(comp,MouseEvent.MOUSE_RELEASED,time,btnMask,end.x,end.y,1,false,btn));
+                BlockingEventQueue.sendUnblocked(new MouseEvent(comp,MouseEvent.MOUSE_CLICKED,time,btnMask,end.x,end.y,1,false,btn));
+                if (left) leftDown = false; else rightDown = false;
+            } else {
+                looseFocus(false);
             }
-            return null;
+            return end;
         }
+        return null;
     }
     
     /**
@@ -366,30 +358,28 @@ public class EventNazi {
      * @param y The y destination
      * @result The actual end point
      */
-    public Point clickMouse(int x, int y, boolean left) {
-        synchronized (this) {
-            if (canClick(left)) {
-                int btnMask = ((leftDown || left) ? MouseEvent.BUTTON1_DOWN_MASK : 0) | ((rightDown || !left) ? (MouseEvent.BUTTON3_DOWN_MASK | MouseEvent.META_DOWN_MASK) : 0);
-                int btn = left ? MouseEvent.BUTTON1 : MouseEvent.BUTTON3;
-                Point end = moveMouse(x,y);
-                if (mousein) {
-                    BlockingEventQueue.sendUnblocked(new MouseEvent(comp,MouseEvent.MOUSE_PRESSED,System.currentTimeMillis(),btnMask,cx,cy,1,false,btn));
-                    if (!focused) {
-                        wait(25,50);
-                        getFocus();
-                    }
-                    try { Thread.sleep((int)(Math.random() * 56 + 90)); } catch (Exception ex) { }
-                    long time = System.currentTimeMillis();
-                    BlockingEventQueue.sendUnblocked(new MouseEvent(comp,MouseEvent.MOUSE_RELEASED,time,btnMask,end.x,end.y,1,false,btn));
-                    BlockingEventQueue.sendUnblocked(new MouseEvent(comp,MouseEvent.MOUSE_CLICKED,time,btnMask,end.x,end.y,1,false,btn));
-                    leftDown = false;
-                } else {
-                    looseFocus(false);
+    public synchronized Point clickMouse(int x, int y, boolean left) {
+        if (canClick(left)) {
+            int btnMask = ((leftDown || left) ? MouseEvent.BUTTON1_DOWN_MASK : 0) | ((rightDown || !left) ? (MouseEvent.BUTTON3_DOWN_MASK | MouseEvent.META_DOWN_MASK) : 0);
+            int btn = left ? MouseEvent.BUTTON1 : MouseEvent.BUTTON3;
+            Point end = moveMouse(x,y);
+            if (mousein) {
+                BlockingEventQueue.sendUnblocked(new MouseEvent(comp,MouseEvent.MOUSE_PRESSED,System.currentTimeMillis(),btnMask,cx,cy,1,false,btn));
+                if (!focused) {
+                    wait(25,50);
+                    getFocus();
                 }
-                return end;
+                try { Thread.sleep((int)(Math.random() * 56 + 90)); } catch (Exception ex) { }
+                long time = System.currentTimeMillis();
+                BlockingEventQueue.sendUnblocked(new MouseEvent(comp,MouseEvent.MOUSE_RELEASED,time,btnMask,end.x,end.y,1,false,btn));
+                BlockingEventQueue.sendUnblocked(new MouseEvent(comp,MouseEvent.MOUSE_CLICKED,time,btnMask,end.x,end.y,1,false,btn));
+                leftDown = false;
+            } else {
+                looseFocus(false);
             }
-            return null;
+            return end;
         }
+        return null;
     }
     
     /**
@@ -402,8 +392,28 @@ public class EventNazi {
         return special.indexOf(c) != -1 || (c - 'A' >= 0 && c - 'A' <= 25);
     }
     
+    public static int[] typable_vk_keycode = new int[0xff];
+    static {
+    	typable_vk_keycode[32] = 32;
+    	for (int c = (int)'A'; c <= (int)'Z'; c++) typable_vk_keycode[c] = c;
+    	for (int c = (int)'0'; c <= (int)'9'; c++) typable_vk_keycode[c] = c;
+    	typable_vk_keycode[186] = ';'; //  ;:
+    	typable_vk_keycode[187] = '='; //  =+
+    	typable_vk_keycode[188] = ','; // hack: ,
+    	typable_vk_keycode[189] = '-'; //  -_
+    	typable_vk_keycode[190] = '.'; //  .>
+    	typable_vk_keycode[191] = '/'; //  /?
+    	typable_vk_keycode[192] = '`'; //  `~
+    	typable_vk_keycode[219] = '['; //  [{
+    	typable_vk_keycode[220] = '\\';//  \|
+    	typable_vk_keycode[221] = ']'; //  ]}
+    	typable_vk_keycode[222] = '\'';//  '"
+    	typable_vk_keycode[226] = ','; // hack: <
+    }
+    
+        
     /**
-     * Converts a char into a KeyCode value for MouseEvent
+     * Converts a char into a KeyCode value for KeyEvent
      * @param c Char to convert
      * @result c's KeyCode
      */
@@ -415,25 +425,47 @@ public class EventNazi {
     }
     
     /**
+     * Converts a vk code into a char
+     * @param code KeyCode to convert
+     * @result the char
+     */
+    private char toChar(int vk, boolean shift) {
+    	int code = typable_vk_keycode[vk];
+		final String special = "~!@#$%^&*()_+|{}:\"<>?";
+		final String normal = "`1234567890-=\\[];',./";
+		int index = normal.indexOf((char)code);
+    	if (index == -1) {
+    		return shift ? Character.toUpperCase((char)code) : Character.toLowerCase((char)code);
+    	} else {
+    		return shift ? special.charAt(index) : (char)code;
+    	}
+    }
+    
+    /**
+     * Returns true if the vk code is typable
+     */
+    private boolean isTypableCode(int vk) {
+    	return vk < 0xff && typable_vk_keycode[vk] != 0;
+    }
+    
+    /**
      * Holds a key. Should be used for any key that needs to be held, not
      * sending text.
      * @param code KeyCode for the key
-     * @param mills MS to send key for
      */
-    public void holdKey(int code) {
-        synchronized (this) {
-            if (canInteract()) {
-                if (!focused) getFocus();
-                long startTime = System.currentTimeMillis();
-                int[] dat = new int[] {code, (int) (startTime & 0xFFFFFFFF)};
-                if (!isKeyHeld(dat)) {
-                    if (KeyEvent.VK_SHIFT == code) shiftDown = true;
-                    BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_PRESSED, startTime, shiftDown ? KeyEvent.SHIFT_DOWN_MASK : 0, code, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD));
-                    char c = shiftDown ? Character.toUpperCase((char)code) : Character.toLowerCase((char)code);
-                    if (Character.isLetterOrDigit(c) || Character.isSpaceChar(c))
-                        BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_TYPED, startTime, shiftDown ? KeyEvent.SHIFT_DOWN_MASK : 0, 0, (char)c, KeyEvent.KEY_LOCATION_UNKNOWN));
-                    setKeyHeld(dat, true);
+    public synchronized void holdKey(int code) {
+        if (canInteract()) {
+            if (!focused) getFocus();
+            long startTime = System.currentTimeMillis();
+            int[] dat = new int[] {code, (int) (startTime & 0xFFFFFFFF)};
+            if (!isKeyHeld(dat)) {
+                if (KeyEvent.VK_SHIFT == code) shiftDown = true;
+                BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_PRESSED, startTime, shiftDown ? KeyEvent.SHIFT_DOWN_MASK : 0, code, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD));
+                if (isTypableCode(code)) {
+                	System.out.println("Trying to type " + code + " as '" + toChar(code,shiftDown) + "'");
+                    BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_TYPED, startTime, shiftDown ? KeyEvent.SHIFT_DOWN_MASK : 0, 0, toChar(code,shiftDown), KeyEvent.KEY_LOCATION_UNKNOWN));
                 }
+                setKeyHeld(dat, true);
             }
         }
     }
@@ -442,19 +474,16 @@ public class EventNazi {
      * Release a key. Should be used for any key that needs to be held, not
      * sending text. Will only release it if its already held.
      * @param code KeyCode for the key
-     * @param mills MS to send key for
      */
-    public void releaseKey(int code) {
-        synchronized (this) {
-            if (canInteract()) {
-                if (!focused) getFocus();
-                long startTime = System.currentTimeMillis();
-                int[] dat = new int[] {code};
-                if (isKeyHeld(dat)) {
-                    setKeyHeld(dat, false);
-                    BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_RELEASED, startTime, 0, code, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD));
-                    if (KeyEvent.VK_SHIFT == code) shiftDown = false;
-                }
+    public synchronized void releaseKey(int code) {
+        if (canInteract()) {
+            if (!focused) getFocus();
+            long startTime = System.currentTimeMillis();
+            int[] dat = new int[] {code};
+            if (isKeyHeld(dat)) {
+                setKeyHeld(dat, false);
+                BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_RELEASED, startTime, 0, code, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD));
+                if (KeyEvent.VK_SHIFT == code) shiftDown = false;
             }
         }
     }
@@ -463,13 +492,12 @@ public class EventNazi {
      * Allows KeyEvents to be easily and safely passed through the blocking 
      * mechanism. Also ensures the target component is the target of this nazi
      */
-    public void passKeyEvent(KeyEvent e) {
-		synchronized (this) {
-            if (canInteract()) {
-                if (!focused) getFocus();  
-                BlockingEventQueue.sendUnblocked(new KeyEvent(comp, e.getID(), e.getWhen(), e.getModifiers(), e.getKeyCode(), e.getKeyChar(), e.getKeyLocation()));
-            }
-        }  
+    public synchronized void passKeyEvent(KeyEvent e) {
+        if (canInteract()) {
+            if (!focused) getFocus();  
+           	System.out.println("Passing Event: " + e);
+            BlockingEventQueue.sendUnblocked(new KeyEvent(comp, e.getID(), e.getWhen(), e.getModifiers(), e.getKeyCode(), e.getKeyChar(), e.getKeyLocation()));
+        }
     }
     
     
@@ -484,32 +512,30 @@ public class EventNazi {
      * Not to be used for arrow keys, but can be used with F keys or the like
      * @param text String to send to the client
      */
-    public void sendKeys(String text) {
-        synchronized (this) {
-            if (canInteract()) {
-                char[] chars = text.toCharArray();
-                if (!focused) getFocus();
-                for (char c : chars) {
-                    int code = toKeyCode(c);
-                    int keyLoc = Character.isDigit(c) ? Math.random() > 0.5D ? KeyEvent.KEY_LOCATION_NUMPAD : KeyEvent.KEY_LOCATION_STANDARD : KeyEvent.KEY_LOCATION_STANDARD;
-                    if (isShiftChar(c)) {
-                        int shiftLoc = Math.random() > 0.5D ? KeyEvent.KEY_LOCATION_RIGHT : KeyEvent.KEY_LOCATION_LEFT;
-                        BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), KeyEvent.SHIFT_MASK, KeyEvent.VK_SHIFT, KeyEvent.CHAR_UNDEFINED, shiftLoc));
-                        try { Thread.sleep((int)(Math.random() * 20 + 60)); } catch (Exception e) { e.printStackTrace(); }
-                        long time = System.currentTimeMillis();
-                        BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_PRESSED, time, KeyEvent.SHIFT_MASK, code, c, keyLoc));
-                        BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_TYPED, time, KeyEvent.SHIFT_MASK, 0, c, KeyEvent.KEY_LOCATION_UNKNOWN));
-                        try { Thread.sleep((int)(Math.random() * 20 + 90)); } catch (Exception e) { e.printStackTrace(); }
-                        BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_RELEASED, System.currentTimeMillis(), KeyEvent.SHIFT_MASK, code, c, keyLoc));
-                        try { Thread.sleep((int)(Math.random() * 20 + 60)); } catch (Exception e) { e.printStackTrace(); }
-                        BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_RELEASED, System.currentTimeMillis(), 0, KeyEvent.VK_SHIFT, KeyEvent.CHAR_UNDEFINED, shiftLoc));
-                    } else {
-                        long time = System.currentTimeMillis();
-                        BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_PRESSED, time, 0, code, c, keyLoc));
-                        BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_TYPED, time, 0, 0, c, KeyEvent.KEY_LOCATION_UNKNOWN));
-                        try { Thread.sleep((int)(Math.random() * 20 + 90)); } catch (Exception e) { e.printStackTrace(); }
-                        BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_RELEASED, System.currentTimeMillis(), 0, code, c, keyLoc));
-                    }
+    public synchronized void sendKeys(String text) {
+        if (canInteract()) {
+            char[] chars = text.toCharArray();
+            if (!focused) getFocus();
+            for (char c : chars) {
+                int code = toKeyCode(c);
+                int keyLoc = Character.isDigit(c) ? Math.random() > 0.5D ? KeyEvent.KEY_LOCATION_NUMPAD : KeyEvent.KEY_LOCATION_STANDARD : KeyEvent.KEY_LOCATION_STANDARD;
+                if (isShiftChar(c)) {
+                    int shiftLoc = Math.random() > 0.5D ? KeyEvent.KEY_LOCATION_RIGHT : KeyEvent.KEY_LOCATION_LEFT;
+                    BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), KeyEvent.SHIFT_MASK, KeyEvent.VK_SHIFT, KeyEvent.CHAR_UNDEFINED, shiftLoc));
+                    try { Thread.sleep((int)(Math.random() * 20 + 60)); } catch (Exception e) { e.printStackTrace(); }
+                    long time = System.currentTimeMillis();
+                    BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_PRESSED, time, KeyEvent.SHIFT_MASK, code, c, keyLoc));
+                    BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_TYPED, time, KeyEvent.SHIFT_MASK, 0, c, KeyEvent.KEY_LOCATION_UNKNOWN));
+                    try { Thread.sleep((int)(Math.random() * 20 + 90)); } catch (Exception e) { e.printStackTrace(); }
+                    BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_RELEASED, System.currentTimeMillis(), KeyEvent.SHIFT_MASK, code, c, keyLoc));
+                    try { Thread.sleep((int)(Math.random() * 20 + 60)); } catch (Exception e) { e.printStackTrace(); }
+                    BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_RELEASED, System.currentTimeMillis(), 0, KeyEvent.VK_SHIFT, KeyEvent.CHAR_UNDEFINED, shiftLoc));
+                } else {
+                    long time = System.currentTimeMillis();
+                    BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_PRESSED, time, 0, code, c, keyLoc));
+                    BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_TYPED, time, 0, 0, c, KeyEvent.KEY_LOCATION_UNKNOWN));
+                    try { Thread.sleep((int)(Math.random() * 20 + 90)); } catch (Exception e) { e.printStackTrace(); }
+                    BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_RELEASED, System.currentTimeMillis(), 0, code, c, keyLoc));
                 }
             }
         }
@@ -518,69 +544,74 @@ public class EventNazi {
     /**
      * Sends an event that emulates a user alt+tabbing into RuneScape.
      */
-    private void getFocus() {
-        synchronized (this) {
-            if (!focused) {
-                BlockingEventQueue.sendUnblocked(new FocusEvent(comp, FocusEvent.FOCUS_GAINED, false, null));
-                focused = true;
-                wait(100,200);
-            }
+
+    private synchronized void getFocus() {
+        if (!focused) {
+            BlockingEventQueue.sendUnblocked(new FocusEvent(comp, FocusEvent.FOCUS_GAINED, false, null));
+            focused = true;
+            wait(100,200);
         }
     }
     
     /**
      * Sends an event that emulates a user alt+tabbing out of RuneScape.
      */
-    private void looseFocus(boolean tabbed) {
-        synchronized (this) {
-            if (focused) {
-                if (tabbed) {
-                    BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_PRESSED,System.currentTimeMillis(),KeyEvent.ALT_DOWN_MASK,KeyEvent.VK_ALT,KeyEvent.CHAR_UNDEFINED,KeyEvent.KEY_LOCATION_LEFT));
-                    wait(100,200);
-                    BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_PRESSED,System.currentTimeMillis(),KeyEvent.ALT_DOWN_MASK,KeyEvent.VK_TAB,'\t',KeyEvent.KEY_LOCATION_STANDARD));
-                    wait(100,200);
-                    BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_RELEASED,System.currentTimeMillis(),0,KeyEvent.VK_ALT,KeyEvent.CHAR_UNDEFINED,KeyEvent.KEY_LOCATION_LEFT));
-                    wait(10,50);
-                }
-                BlockingEventQueue.sendUnblocked(new FocusEvent(comp, FocusEvent.FOCUS_LOST, false, null));
-                BlockingEventQueue.sendUnblocked(new FocusEvent(comp, FocusEvent.FOCUS_LOST, false, null));
-                focused = false;
+    private synchronized void looseFocus(boolean tabbed) {
+        if (focused) {
+            if (tabbed) {
+                BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_PRESSED,System.currentTimeMillis(),KeyEvent.ALT_DOWN_MASK,KeyEvent.VK_ALT,KeyEvent.CHAR_UNDEFINED,KeyEvent.KEY_LOCATION_LEFT));
                 wait(100,200);
+                BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_PRESSED,System.currentTimeMillis(),KeyEvent.ALT_DOWN_MASK,KeyEvent.VK_TAB,'\t',KeyEvent.KEY_LOCATION_STANDARD));
+                wait(100,200);
+                BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_RELEASED,System.currentTimeMillis(),0,KeyEvent.VK_ALT,KeyEvent.CHAR_UNDEFINED,KeyEvent.KEY_LOCATION_LEFT));
+                wait(10,50);
             }
+            BlockingEventQueue.sendUnblocked(new FocusEvent(comp, FocusEvent.FOCUS_LOST, false, null));
+            BlockingEventQueue.sendUnblocked(new FocusEvent(comp, FocusEvent.FOCUS_LOST, false, null));
+            focused = false;
+            wait(100,200);
         }
     }
     
-    private void setKeyHeld(int[] dat, boolean held) {
-        if (held) {
-            keysHeld.add(dat);
-        } else {
-            for (int[] entry : keysHeld) {
-                if (entry[0] == dat[0]) {
-                    keysHeld.remove(entry);
-                }
-            }
-        }
+    private synchronized void setKeyHeld(int[] dat, boolean held) {
+    	synchronized (keysHeld) {
+		    if (held) {
+		        keysHeld.add(dat);
+		    } else {
+		    	HashSet<int[]> remove = new HashSet<int[]>();
+		        for (int[] entry : keysHeld) {
+		            if (entry[0] == dat[0]) {
+		                remove.add(entry);
+		            }
+		        }
+		        keysHeld.removeAll(remove);
+		    }
+		}
     }
     
-    private boolean isKeyHeld(int[] dat) {
-        for (int[] entry : keysHeld) {
-            if (entry[0] == dat[0]) {
-                return true;
-            }
-        }
-        return false;
+    private synchronized boolean isKeyHeld(int[] dat) {
+    	synchronized (keysHeld) {
+		    for (int[] entry : keysHeld) {
+		        if (entry[0] == dat[0]) {
+		            return true;
+		        }
+		    }
+		    return false;
+		}
     }
     
     /**
      * Kills this EvetNazi without making bad events possible.
      */
-    public void destroy() {
+    public synchronized void destroy() {
         //Scratch
         /*frame.dispose();*/
         keySender.stop();
-        for (int[] dat : keysHeld) {
-            releaseKey(dat[1]);
-        }
+       	synchronized (keysHeld) {
+		    for (int[] dat : keysHeld) {
+		        releaseKey(dat[1]);
+		    }
+		}
         Point pos;
         if ((pos = comp.getMousePosition()) != null && !mousein) {
             moveMouse(pos.x,pos.y);
@@ -599,36 +630,36 @@ public class EventNazi {
         active = false;
     }
     
-    public boolean isActive() {
+    public synchronized boolean isActive() {
         if (!BlockingEventQueue.isBlocking(comp)) destroy();
         return active;
     }
     
-    public boolean isFocused() {
+    public synchronized boolean isFocused() {
         return focused;
     }
     
-    public boolean isDragging() {
+    public synchronized boolean isDragging() {
         return leftDown || rightDown;
     }
     
-    public boolean isDown(boolean left) {
+    public synchronized boolean isDown(boolean left) {
         return left ? leftDown : rightDown;
     }
     
-    public boolean canInteract() {
+    public synchronized boolean canInteract() {
         return active;
     }
     
-    public boolean canClick(boolean left) {
+    public synchronized boolean canClick(boolean left) {
         return canInteract() && (left ? !leftDown : !rightDown);
     }
     
-    public boolean canHold(boolean left) {
+    public synchronized boolean canHold(boolean left) {
         return canInteract() && (left ? !leftDown : !rightDown);
     }
     
-    public boolean canRelease(boolean left) {
+    public synchronized boolean canRelease(boolean left) {
         return canInteract() && (left ? leftDown : rightDown);
     }
     
@@ -642,14 +673,16 @@ public class EventNazi {
             while (true) {
                 try { Thread.sleep(30 + (int)(Math.random()*5)); } catch (InterruptedException ex) { }
                 int minTime = (int) (System.currentTimeMillis() & 0xFFFFFFFF) - 1000;
-                for (int[] dat : keysHeld)  {
-                    if (dat[1] < minTime) {
-                        BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), shiftDown ? KeyEvent.SHIFT_DOWN_MASK : 0, dat[0], KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD));
-                        char c = shiftDown ? Character.toUpperCase((char)dat[0]) : Character.toLowerCase((char)dat[0]);
-                        if (Character.isLetterOrDigit(c) || Character.isSpaceChar(c))
-                            BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_TYPED, System.currentTimeMillis(), shiftDown ? KeyEvent.SHIFT_DOWN_MASK : 0, 0, (char)c, KeyEvent.KEY_LOCATION_UNKNOWN));
-                    }
-                }
+                synchronized (keysHeld) {
+		            for (int[] dat : keysHeld)  {
+		                if (dat[1] < minTime) {
+		                    BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), shiftDown ? KeyEvent.SHIFT_DOWN_MASK : 0, dat[0], KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD));
+		                    if (isTypableCode(dat[0]))
+		                        BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_TYPED, System.currentTimeMillis(), shiftDown ? KeyEvent.SHIFT_DOWN_MASK : 0, 0, toChar(dat[0],shiftDown), KeyEvent.KEY_LOCATION_UNKNOWN));
+		                }
+		            }
+		        }
+		        yield();
             }
         }
         

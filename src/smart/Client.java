@@ -44,6 +44,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.net.JarURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLClassLoader;
 import java.net.URLEncoder;
 import java.net.HttpURLConnection;
@@ -73,7 +74,7 @@ import sun.applet.AppletClassLoader;
  */
 public class Client implements ActionListener, ChangeListener {
     
-    public static final String VERSION = "6.5";
+    public static final String VERSION = "6.5b";
     public static final String TITLE = "Public SMARTv" + VERSION + " - SMART Minimizing Autoing Resource Thing - By BenLand100";
 
     private static Hashtable<String, Client> clients = new Hashtable<String, Client>();
@@ -242,8 +243,6 @@ public class Client implements ActionListener, ChangeListener {
     }
 
     public boolean isKeyDown(int keycode) {
-
-
         return nazi != null ? nazi.isKeyDown(keycode) : false;
     }
 
@@ -295,7 +294,6 @@ public class Client implements ActionListener, ChangeListener {
             final Graphics debugGraphics = debug.getGraphics();
             final int[] debugData = ((DataBufferInt) debugRaster.getDataBuffer()).getData();
             return new Thread("Smart_Image_Transfer") {
-
                 @Override
                 public void run() {
                     int[] temp = new int[384795];
@@ -442,38 +440,32 @@ public class Client implements ActionListener, ChangeListener {
         clientFrame = new JFrame(TITLE);
         clientFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         clientFrame.addWindowListener(new WindowAdapter() {
-
             @Override
             public void windowDeiconified(WindowEvent e) {
                 minimized = false;
             }
-
             @Override
             public void windowIconified(WindowEvent e) {
                 minimized = true;
             }
-
             @Override
             public void windowClosing(WindowEvent e) {
                 destroy();
             }
         });
         clientFrame.addKeyListener(new KeyAdapter() {
-
             @Override
             public void keyTyped(KeyEvent e) {
                 if (nazi != null) {
                     nazi.passKeyEvent(e);
                 }
             }
-
             @Override
             public void keyPressed(KeyEvent e) {
                 if (nazi != null) {
                     nazi.passKeyEvent(e);
                 }
             }
-
             @Override
             public void keyReleased(KeyEvent e) {
                 if (nazi != null) {
@@ -532,11 +524,11 @@ public class Client implements ActionListener, ChangeListener {
         jsInfoPage = jsInfoPage.substring(Math.max(jsInfoPage.indexOf("<applet"), jsInfoPage.indexOf("write('<app")), jsInfoPage.indexOf("</applet>"));
         System.out.println("Applet Loader Parsed");
         JarURLConnection clientConnection = (JarURLConnection) new URL("jar:" + root + parseArg(search(jsInfoPage, archiveRegex, 1)) + "!/").openConnection();
+        //This might need some work, I didn't write it and I'm not sure how accurate it is
 		clientConnection.addRequestProperty("Protocol", "HTTP/1.1");
 		clientConnection.addRequestProperty("Connection", "keep-alive");
 		clientConnection.addRequestProperty("Keep-Alive", "200");
 		clientConnection.addRequestProperty("User-Agent", "Mozilla/4.0 (" + System.getProperty("os.name") + " " + System.getProperty("os.version") + ") Java/" + System.getProperty("java.version"));
-
         thisLoader = AppletClassLoader.newInstance(new URL[] { clientConnection.getJarFileURL() });
         clientApplet = (Applet) (thisLoader.loadClass(parseArg(search(jsInfoPage, codeRegex, 1)).split("\\.")[0]).newInstance());
         HashMap<String, String> paramMap = new HashMap<String, String>();
@@ -568,7 +560,15 @@ public class Client implements ActionListener, ChangeListener {
     private static String downloadHTML(String address) {
         try {
             URL url = new URL(address);
-            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+            URLConnection conn = url.openConnection();
+            //Firefox didn't set anything important that java didn't set by default, besides the useragent
+			String osname = System.getProperty("os.name");
+		    String windowing = "X11";
+		    if (osname.contains("Windows")) windowing = "Windows";
+		    else if (osname.contains("Mac")) windowing = "Macintosh";
+		    conn.addRequestProperty("User-Agent","Mozilla/5.0 (" + windowing + "; U; " + osname + " " + System.getProperty("os.version") + "; " + Locale.getDefault().getLanguage()+"-"+Locale.getDefault().getCountry()+"; rv:1.9.0.10) Gecko/2009042316 Firefox/3.0.10");
+		    conn.connect();
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             StringBuilder builder = new StringBuilder();
             String inputLine;
             while ((inputLine = in.readLine()) != null) {

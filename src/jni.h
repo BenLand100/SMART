@@ -17,6 +17,14 @@
  *  along with SMART. If not, see <http://www.gnu.org/licenses/>.
  */
  
+#define checkexception(env) \
+	if (env->ExceptionOccurred()) { \
+		std::cout << "Exception thrown from java, attempting to ignore:\n"; \
+		env->ExceptionDescribe(); \
+		env->ExceptionClear(); \
+	} \
+ 
+ 
  /*
  * @(#)jni.h	1.62 06/02/02
  *

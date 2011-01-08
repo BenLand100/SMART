@@ -20,6 +20,7 @@
 //Handles Key/Mouse interaction, mostly through JNI to Java
  
 #include "Input.h"
+#include <iostream>
 
 extern JNIEnv* jre;
 extern jobject smart;
@@ -31,7 +32,8 @@ void sendKeys(char* text) {
         jobject string_ = jre->NewStringUTF(text);
         jre->CallVoidMethod(smart, _client.sendkeys, string_);
         jre->DeleteLocalRef(string_);
-    }
+		checkexception(jre);
+	}
 }
 
 bool isKeyDown(long code) {
@@ -39,11 +41,17 @@ bool isKeyDown(long code) {
 }
 
 void holdKey(long code) {
-    if (jre) jre->CallVoidMethod(smart, _client.holdkey, code);
+    if (jre) {
+		jre->CallVoidMethod(smart, _client.holdkey, code);
+		checkexception(jre);
+	}
 }
 
 void releaseKey(long code) {
-    if (jre) jre->CallVoidMethod(smart, _client.releasekey, code);
+    if (jre) {
+    	jre->CallVoidMethod(smart, _client.releasekey, code);
+		checkexception(jre);
+	}
 }
 
 void getMousePos(long& x, long& y) {
@@ -52,6 +60,7 @@ void getMousePos(long& x, long& y) {
         x = jre->GetIntField(pt, _point.x);
         y = jre->GetIntField(pt, _point.y);
         jre->DeleteLocalRef(pt);
+		checkexception(jre);
     } else {
         x = -1;
         y = -1;
@@ -59,25 +68,43 @@ void getMousePos(long& x, long& y) {
 }
 
 void moveMouse(long x, long y) {
-    if (jre) jre->CallVoidMethod(smart, _client.movemouse, x, y);
+    if (jre) {
+    	jre->CallVoidMethod(smart, _client.movemouse, x, y);
+		checkexception(jre);
+	}
 }
 
 void windMouse(long x, long y) {
-    if (jre) jre->CallVoidMethod(smart, _client.windmouse, x, y);
+    if (jre) {
+    	jre->CallVoidMethod(smart, _client.windmouse, x, y);
+		checkexception(jre);
+	}
 }
 
 void dragMouse(long x, long y) {
-    if (jre) jre->CallVoidMethod(smart, _client.dragmouse, x, y);
+    if (jre) {
+    	jre->CallVoidMethod(smart, _client.dragmouse, x, y);
+		checkexception(jre);
+	}
 }
 
 void holdMouse(long x, long y, bool left) {
-    if (jre) jre->CallVoidMethod(smart, _client.holdmouse, x, y, left ? 1 : 0);
+    if (jre) {
+    	jre->CallVoidMethod(smart, _client.holdmouse, x, y, left ? 1 : 0);
+		checkexception(jre);
+	}
 }
 
 void releaseMouse(long x, long y, bool left) {
-    if (jre) jre->CallVoidMethod(smart, _client.releasemouse, x, y, left ? 1 : 0);
+    if (jre) {
+    	jre->CallVoidMethod(smart, _client.releasemouse, x, y, left ? 1 : 0);
+		checkexception(jre);
+	}
 }
 
 void clickMouse(long x, long y, bool left) {
-    if (jre) jre->CallVoidMethod(smart, _client.clickmouse, x, y, left ? 1 : 0);
+    if (jre) {
+    	jre->CallVoidMethod(smart, _client.clickmouse, x, y, left ? 1 : 0);
+		checkexception(jre);
+	}
 }
