@@ -50,6 +50,7 @@ import java.net.URLEncoder;
 import java.net.HttpURLConnection;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.Locale;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Hashtable;
