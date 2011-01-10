@@ -75,7 +75,7 @@ import sun.applet.AppletClassLoader;
  */
 public class Client implements ActionListener, ChangeListener {
     
-    public static final String VERSION = "6.5b";
+    public static final String VERSION = "6.6";
     public static final String TITLE = "Public SMARTv" + VERSION + " - SMART Minimizing Autoing Resource Thing - By BenLand100";
 
     private static Hashtable<String, Client> clients = new Hashtable<String, Client>();
@@ -562,6 +562,8 @@ public class Client implements ActionListener, ChangeListener {
         try {
             URL url = new URL(address);
             URLConnection conn = url.openConnection();
+            conn.setConnectTimeout(5000);
+            conn.setReadTimeout(5000);
             //Firefox didn't set anything important that java didn't set by default, besides the useragent
 			String osname = System.getProperty("os.name");
 		    String windowing = "X11";
