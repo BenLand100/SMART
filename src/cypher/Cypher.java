@@ -28,6 +28,21 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 
+/**
+ * While not a part of SMART, this file is the integral part of embedding
+ * the java classes in the native library, and is thus CRUCIAL to the 
+ * build process. 
+ *
+ * This class is PURELY HISTORICAL from the times when I was attempting
+ * to keep people from decompiling SMART --- but it was too big of a 
+ * deal to rewrite the embedding code, so I leave it in here. It's a 
+ * pretty nice rotating cyper, if I do say so myself, and it builds the
+ * classes.data file through the Makefile directives.
+ *
+ * Note the key --- purely historical.
+ *
+ * @author BenLand100
+ */
 public class Cypher {
     
     public static byte[] encode(byte[] data, String key) {

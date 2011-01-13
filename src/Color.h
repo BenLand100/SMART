@@ -22,10 +22,12 @@
 
 #define OutOfBoundsCheck(x,y,sx,sy,ex,ey) if (x < sx || x > ex || y < sy || y > ey) { x = 0; y = 0; }
 
+//An HSL color --- historical
 typedef struct {
 	double hue, sat, lum;
 } HSL, *PHSL;
 
+//Allows an RGB color to be treated as components or an int easily
 typedef union {
 	struct { char b, g, r, a; };
 	int color;

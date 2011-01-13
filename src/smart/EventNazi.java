@@ -46,6 +46,8 @@ import java.util.Collections;
  * The comment "Scratch" denotes pieces of the mouse debug output code that
  * should be commented out when not using.
  *
+ * NOTE: keycodes are the windows Virtual-Key Scan Codes 
+ *
  * @author Benjamin J. Land
  */
 public class EventNazi {

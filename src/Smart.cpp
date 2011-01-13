@@ -35,77 +35,92 @@ using namespace std;
 
 #ifdef WINDOWS
 #include <windows.h>
+//Windows HDC magic
 HDC imageHDC = 0;
 HBITMAP imageHBITMAP = 0;
 HDC debugHDC = 0;
 HBITMAP debugHBITMAP = 0;
 #endif
 
+//References to the JVM
 JNIEnv* jre = 0;
 JavaVM* vm = 0;
 void* jvmdll = 0;
 
+//References to the SMART java instance
 jobject smart = 0;
 JCLIENT _client;
 JPOINT _point;
 JSTRING _string;
 
+//Info related to the current SMART instance
 char* curserver = 0;
 char* curparams = 0;
 PRGB image = 0;
 PRGB debug = 0;
-
 int client_width = 0;
 int client_height = 0;
 
 #ifdef WINDOWS
 
+//Returns the HDC of the surface where the Client's image is rendered
 long getImageHDC() {
     return (long) imageHDC;
 }
 
+//Returns the HDC of the debug space that can be rendered over the client
 long getDebugHDC() {
     return (long) debugHDC;
 }
 
 #endif
 
+//Returns the array where the client's image is rendered
 void* getImageArray() {
     return (void*) image;
 }
 
+//Returns the array of the debug space that can be rendered over the client
 void* getDebugArray() {
     return (void*) debug;
 }
 
+//Sets the color on the debug space that is considered transparent, default 0
 void setTransparentColor(jint color) {
     if (jre) jre->SetIntField(smart, _client.transcolor, color);
 }
 
+//Turns debug rendering on or off
 void setDebug(bool on) {
     if (jre) jre->CallVoidMethod(smart, _client.setdebug, on ? 1 : 0);
 }
 
+//Turns graphics rendering on or off, current data is in the ImageArray regardless
 void setGraphics(bool on) {
     if (jre) jre->CallVoidMethod(smart, _client.setgraphics, on ? 1 : 0);
 }
 
+//Returns true if the java instance is active and ready for commands
 bool isActive() {
     return jre ? jre->GetBooleanField(smart, _client.active) : false;
 }
 
+//Returns true if the client is currently blocking events and accepting fake events
 bool isBlocking() {
     return jre ? jre->GetBooleanField(smart, _client.blocking) : false;
 }
 
+//Returns the 'refresh rate' of the client, 0-100, 100 being fullspeed, 0 being very slow
 long getRefresh() {
     return jre ? jre->CallIntMethod(smart, _client.getrefresh) : -1;
 }
 
+//Sets the 'refresh rate' of the client, 0-100, 100 being fullspeed, 0 being very slow
 void setRefresh(long x) {
     if (jre) jre->CallVoidMethod(smart, _client.setrefresh, x);
 }
 
+//Erases the previous SMART state, but leaves the JVM intact
 void clearOld(){
     if (jre && smart) {
         jre->CallVoidMethod(smart, _client.destroy);
@@ -130,6 +145,7 @@ void clearOld(){
     image = 0;
 }
 
+//Caches all needed refrences to java classes and methods
 void findClasses() {
     loadClasses();
     _client.clazz = (jclass) jre->NewGlobalRef(jre->FindClass("smart/Client"));
@@ -203,6 +219,7 @@ void findClasses() {
 
 }
 
+//Frees all cached class refrences
 void freeClasses() {
     jre->DeleteGlobalRef(_client.clazz);
     jre->DeleteGlobalRef(_point.clazz);
@@ -210,6 +227,8 @@ void freeClasses() {
     unloadClasses();
 }
 
+//Entrypoint for SMART operation --- sets a new state or reuses an old one if compatible
+//loads the JVM if necessary, and initilizes anything that might need it
 void setup(char* root, char* params, long width, long height, char* initseq) {
     cout << "SmartSetup Entered\n";
     if (jre) vm->AttachCurrentThreadAsDaemon((void**)&jre, 0);
@@ -294,6 +313,7 @@ void setup(char* root, char* params, long width, long height, char* initseq) {
     }
 }
 
+//Called at Library loading to ensure a 'neat' state since initilizers might not always get run
 void internalConstructor() {
     curserver = (char*) malloc(1);
     *curserver = 0;
@@ -302,6 +322,7 @@ void internalConstructor() {
     jvmpath = 0;
 }
 
+//Called at Library unloading to ensure all memory is nicely released (or so we hope)
 void internalDestructor() {
 	if (jvmpath) free(jvmpath);
     if (jre) vm->AttachCurrentThreadAsDaemon((void**)&jre, 0);

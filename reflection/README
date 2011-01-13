@@ -1,0 +1,9 @@
+This folder contains an older and slightly outdated implementation of an 
+updater. It will not work well for new runescape clients, but it will
+function as a nice base to build off of by showing the basics of what is 
+required. It is kept for historical reasons, do not report bugs related to
+its function. Use the makefile to build a distribution.
+
+tl;dr --- This does not work, it's only an example
+
+~BenLand100

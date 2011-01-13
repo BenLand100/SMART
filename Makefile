@@ -107,7 +107,7 @@ SMARTCLASSES= \
     $(JAVA_BUILD_DIR)/smart/UnblockedEvent.class
 
 all:
-	@echo "Syntax for SMART makefile:\n    For Windows distributions: make windows\n    For Linux distributions: make linux\n    For SCAR distributions: make scar\n    For All distributions: make everything\n    To clean build files: make clean"
+	@echo "Syntax for SMART makefile:\n    For Windows distributions: make windows\n    For Linux distributions: make linux\n    For SCAR distributions: make scar\n    For All distributions: make everything\n    For test apps: make test\n    To clean build files: make clean"
 	
 everything: linux windows scar
 
@@ -130,6 +130,7 @@ test: test-apps/test-windows.cpp test-apps/test-linux.cpp test-apps/test-scar.cp
 clean: 
 	@echo "Cleaning build files..."
 	@rm -rf $(BUILD) $(DIST)
+	@rm -f $(SRC_DIR)/classes.data
 	
 #### LINUX BUILDING DIRECTIVES ####
 

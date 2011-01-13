@@ -22,7 +22,8 @@ package smart;
 import java.awt.AWTEvent;
 
 /**
- * Just an abstract class... Nothing to see here.
+ * Used for BlockingEventQueue if you want the blocked events to be sent 
+ * somewhere else for further processing
  *
  * @author Benjamin J. Land
  */

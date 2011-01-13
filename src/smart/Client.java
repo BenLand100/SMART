@@ -77,9 +77,14 @@ public class Client implements ActionListener, ChangeListener {
     
     public static final String VERSION = "6.6";
     public static final String TITLE = "Public SMARTv" + VERSION + " - SMART Minimizing Autoing Resource Thing - By BenLand100";
-
+    
+    //mantains a list of classloader strings and clients associated with it
     private static Hashtable<String, Client> clients = new Hashtable<String, Client>();
 
+    /**
+     * Since there is only one Canvas ever associated with a classloader, this method 
+     * effectively ensures that the Canvas is always correct
+     */
     public static void canvasNotify(Canvas it) {
         try {
             //System.out.println("Notify " + it.getClass().getClassLoader().toString());
@@ -91,7 +96,10 @@ public class Client implements ActionListener, ChangeListener {
             e.printStackTrace();
         }
     }
-
+    
+    /**
+     * Testing method for a non-native start of SMART
+     */
     public static void main(String... args) throws Exception {
         int w = 765;
         int h = 503;
@@ -126,6 +134,11 @@ public class Client implements ActionListener, ChangeListener {
     private Canvas canvas;
     private String initseq = null;
 
+    /**
+     * Since some applets might create a new Canvas every time the applet is focused,
+     * this callback lets the Client know the Canvas has changed, and it can grab it 
+     * as necessary.
+     */
     public void target(Canvas it) {
         if (it == canvas) {
             return;
@@ -163,6 +176,11 @@ public class Client implements ActionListener, ChangeListener {
         blitThread.start();
     }
 
+    /**
+     * Creates a new SMART java instance with the given native buffers, allocated size, and startup params.
+     * This method can take some time, but returns as SOON as the applet is loaded, i.e. does not wait
+     * for the applet to finish setting itself up.
+     */
     public Client(ByteBuffer imgBuffer, ByteBuffer debugBuffer, int w, int h, String root, String params, String initseq) {
         try {
             if (initseq != null && initseq.length() > 0) {
@@ -188,42 +206,49 @@ public class Client implements ActionListener, ChangeListener {
         }
     }
 
+    //Convenience method for Native code see Input.cpp
     public void moveMouse(int x, int y) {
         if (nazi != null) {
             nazi.moveMouse(x, y);
         }
     }
 
+    //Convenience method for Native code see Input.cpp
     public void windMouse(int x, int y) {
         if (nazi != null) {
             nazi.windMouse(x, y);
         }
     }
 
+    //Convenience method for Native code see Input.cpp
     public void clickMouse(int x, int y, boolean left) {
         if (nazi != null) {
             nazi.clickMouse(x, y, left);
         }
     }
 
+    //Convenience method for Native code see Input.cpp
     public void dragMouse(int x, int y) {
         if (nazi != null) {
             nazi.dragMouse(x, y);
         }
     }
 
+    //Convenience method for Native code see Input.cpp
     public void holdMouse(int x, int y, boolean left) {
         if (nazi != null) {
             nazi.holdMouse(x, y, left);
         }
     }
 
+    //Convenience method for Native code see Input.cpp
     public void releaseMouse(int x, int y, boolean left) {
         if (nazi != null) {
             nazi.releaseMouse(x, y, left);
         }
     }
 
+    //Convenience method for Native code see Input.cpp
     public Point getMousePos() {
         if (nazi != null) {
             return nazi.getMousePos();
@@ -231,22 +256,26 @@ public class Client implements ActionListener, ChangeListener {
         return new Point(-1, -1);
     }
 
+    //Convenience method for Native code see Input.cpp
     public void sendKeys(String string) {
         if (nazi != null) {
             nazi.sendKeys(string);
         }
     }
 
+    //Convenience method for Native code see Input.cpp
     public void holdKey(int keycode) {
         if (nazi != null) {
             nazi.holdKey(keycode);
         }
     }
 
+    //Convenience method for Native code see Input.cpp
     public boolean isKeyDown(int keycode) {
         return nazi != null ? nazi.isKeyDown(keycode) : false;
     }
-
+    
+    //Convenience method for Native code see Input.cpp
     public void releaseKey(int keycode) {
         if (nazi != null) {
             nazi.releaseKey(keycode);
@@ -278,6 +307,10 @@ public class Client implements ActionListener, ChangeListener {
         return false;
     }
 
+    /**
+     * Creates the thread that coppies the image data from the client to the screen and
+     * to the native buffer. Also handles rendering debug data.
+     */
     private Thread createBlitThread() {
         try {
             canvas.setBackground(new Color(0xFE, 0xFE, 0xFE));
@@ -397,7 +430,7 @@ public class Client implements ActionListener, ChangeListener {
     } 
 
     /**
-     * Frees any remaining refrences and exits the client.
+     * Frees any remaining refrences and exits the client, or so we hope.
      */
     public void destroy() {
         stopBlocking();
@@ -434,7 +467,9 @@ public class Client implements ActionListener, ChangeListener {
     }
 
     /**
-     * Creates the frame that contains the RuneScape client.
+     * Creates the frame that contains the RuneScape client and grabs the game's
+     * ClassLoader for use in Reflection. Also sets up KeyEvent forwarding because
+     * the Frame has to grap focus whenever the client is clicked
      */
     private void initFrame() {
         System.out.println("Setting up Frame");
@@ -512,7 +547,10 @@ public class Client implements ActionListener, ChangeListener {
         clientFrame.setResizable(false);
         clientFrame.setLocationRelativeTo(null);
     }
-
+    
+    /**
+     * Convenience method to pull an value from a given key in an applet definition
+     */
     private String parseArg(String arg) {
         return Pattern.matches("\".*\"", arg) ? arg.substring(1, arg.length() - 1) : arg;
     }
@@ -585,6 +623,10 @@ public class Client implements ActionListener, ChangeListener {
         }
     }
 
+    /**
+     * Enables or disables graphics rendering. All information is passed to
+     * native regardless of this state.
+     */
     public void setGraphics(boolean on) {
         renderWhileBlocking = on;
         if (renderWhileBlocking) {
@@ -596,6 +638,9 @@ public class Client implements ActionListener, ChangeListener {
         }
     }
 
+    /**
+     * Enables or disables debug rendering over the client.
+     */
     public void setDebug(boolean on) {
         debuggfx = on;
         if (debuggfx) {
@@ -605,6 +650,9 @@ public class Client implements ActionListener, ChangeListener {
         }
     }
 
+    /**
+     * Handles all button presses on the GUI
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == blockingbtn) {
@@ -621,6 +669,9 @@ public class Client implements ActionListener, ChangeListener {
         }
     }
 
+    /**
+     * Sets a refresh range 0-100, 0 being very slow, 100 being fast
+     */
     public void setRefresh(int x) {
         x = x < 1 ? 1 : x > 100 ? 100 : x;
         if (!refreshSlider.getValueIsAdjusting()) {
@@ -631,16 +682,29 @@ public class Client implements ActionListener, ChangeListener {
         }
         refresh = 500 / x + 20;
     }
-
+    
+    /**
+     * Returns a refresh range 0-100, 0 being very slow, 100 being fast
+     */
     public int getRefresh() {
         return refreshSlider.getValue();
     }
-
+    
+    /**
+     * Catches the slider events
+     */
     @Override
     public void stateChanged(ChangeEvent e) {
         setRefresh(refreshSlider.getValue());
     }
 
+    /**
+     * Used for all reflection methods, this takes an object refrence which is known
+     * as the parent, or zero for static scope, and a path that basically amounts to fields
+     * in objects or classes and static fields (if in the static scope), and return the
+     * value of the field. The proper return type should ALWAYS be used. Conveniance methods
+     * are provided for 1, 2, and 3 dimensional arrays
+     */
     public Object findObjectFromPath(Object o, String path) throws Exception {
         String[] parts = path.split("\\.");
         Stack<String> stack = new Stack<String>();
@@ -680,7 +744,11 @@ public class Client implements ActionListener, ChangeListener {
         }
         return o;
     }
-
+    
+    //***
+    //The following are convenience methods for the Native side of SMART
+    //***
+    
     public Object getFieldObject(Object o, String path) {
 	    if (path == null) return o;
         try {
