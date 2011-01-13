@@ -29,6 +29,7 @@ using namespace std;
 //initilized and free'd in Smart.cpp as well
 char *jvmpath = 0;
 
+//Sets the location of the library that SMART should load for the JVM
 void setJVMPath(char* path) {
 	if (path && strlen(path) > 0) {
 		if (jvmpath) free(jvmpath);
@@ -46,6 +47,7 @@ void setJVMPath(char* path) {
 
 #include <windows.h>
 
+//Loads the JVM from a given library handle
 bool initJVM(JNIEnv** env, JavaVM** vm, void* jvmdll) {
     GetJVMs getJVMs = (GetJVMs) GetProcAddress((HMODULE)jvmdll, "JNI_GetCreatedJavaVMs");
     jsize number = 0;
@@ -69,6 +71,7 @@ bool initJVM(JNIEnv** env, JavaVM** vm, void* jvmdll) {
     return false;
 }
 
+//Attempts to put Java on the user's path --- historical
 void checkPath(char* javaBin) {
     HMODULE java = LoadLibrary("java.exe");
     if (!java) {
@@ -82,6 +85,7 @@ void checkPath(char* javaBin) {
     FreeLibrary(java);
 }
 
+//Returns the set JVM path's handle, or locates the JVM in the windows registry
 void* findJVM() {
     HMODULE jvmdll;
 	if (jvmpath) {
@@ -123,6 +127,7 @@ void* findJVM() {
 
 #include <dlfcn.h>
 
+//Loads the JVM from a given library handle
 bool initJVM(JNIEnv** env, JavaVM** vm, void* jvmdll) {
     GetJVMs getJVMs = (GetJVMs) dlsym(jvmdll, "JNI_GetCreatedJavaVMs");
     jsize number = 0;
@@ -146,6 +151,7 @@ bool initJVM(JNIEnv** env, JavaVM** vm, void* jvmdll) {
     return false;
 }
 
+//Returns the set JVM path's handle, or tries the default Ubuntu locaton for the jvm
 void* findJVM() {
 	void* libjvm;
     if (jvmpath) {

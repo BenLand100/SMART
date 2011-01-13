@@ -22,7 +22,7 @@ package smart;
 import java.awt.AWTEvent;
 
 /**
- * Lets me pass events through in a Java-like manner.
+ * Lets me pass events through the blockade in a Java-like manner.
  * @author Benjamin J. Land
  */
 public class UnblockedEvent extends AWTEvent {

@@ -34,6 +34,7 @@ extern PRGB image;
 extern int client_width;
 extern int client_height;
 
+//Windows specific HDC->BITMAP magic
 /*BITMAP bmpdata(int hdc) {
     HBITMAP hbitmap = (HBITMAP) GetCurrentObject((HDC)hdc, OBJ_BITMAP);
     BITMAP bmp;
@@ -42,6 +43,7 @@ extern int client_height;
     return bmp;
 }*/
 
+//Sets the target to an array of RGB with a specified width and height
 long setTarget(PRGB newTarget, int w, int h) {
     long last = (long) target;
     if (newTarget == 0) {
@@ -56,6 +58,7 @@ long setTarget(PRGB newTarget, int w, int h) {
     return last;
 }
 
+//Converts an RGB into a HSL --- historical
 HSL toHSL(RGB& rgb) {
     double r, g, b;
     double max, min;
@@ -89,14 +92,17 @@ HSL toHSL(RGB& rgb) {
     return res;
 }
 
+//inline fast int distance
 inline int idist(int a, int b) {
     return a < b ? b - a : a - b;
 }
 
+//inline fast float distance
 inline float fdist(float a, float b) {
     return a < b ? b - a : a - b;
 }
 
+//Compares two RGB values with a given tolerance --- historical
 //use function pointers and make these into three methods... switch slows it 
 //down like nobody's buisness...
 bool cmpColors(RGB& x, RGB& y, int tol) {
@@ -123,11 +129,13 @@ bool cmpColors(RGB& x, RGB& y, int tol) {
     return false;
 }
 
+//Gets the color at a particular point --- historical
 int getColor(int x, int y) {
     RGB c = target[y*width+x];
     return ((c.b & 0xFF) << 16) | ((c.g & 0xFF) << 8) | (c.r & 0xFF);
 }
 
+//Finds a color and returns the position --- historical
 bool findColor(int& x, int& y, int color, int sx, int sy, int ex, int ey) {
     sy *= width;
     ey *= width;
@@ -146,7 +154,7 @@ bool findColor(int& x, int& y, int color, int sx, int sy, int ex, int ey) {
     return false;
 }
 
-
+//Finds a color given a tolerance and returns the position --- historical
 bool findColorTol(int& x, int& y, int color, int sx, int sy, int ex, int ey, int tol) {
     RGB find;
     find.color = color;
@@ -167,6 +175,7 @@ bool findColorTol(int& x, int& y, int color, int sx, int sy, int ex, int ey, int
     return false;
 }
 
+//Finds a color using a spiral algorithm and returns the position --- historical
 bool findColorSpiral(int& x, int& y, int color, int sx, int sy, int ex, int ey) {
     OutOfBoundsCheck(x, y, sx, sy, ex, ey);
     int cx = x, cy = y;
@@ -270,6 +279,7 @@ bool findColorSpiral(int& x, int& y, int color, int sx, int sy, int ex, int ey) 
             goto Loop;
 }
 
+//Finds the color using a spiral algorithm and a tolerance and returns the position --- historical
 bool findColorSpiralTol(int& x, int& y, int color, int sx, int sy, int ex, int ey, int tol) {
     OutOfBoundsCheck(x, y, sx, sy, ex, ey);
     RGB find;
@@ -376,6 +386,7 @@ bool findColorSpiralTol(int& x, int& y, int color, int sx, int sy, int ex, int e
 }
 
 /*
+//Windows only bitmap finding in a box with with tolerance --- antiquated
 bool findBitmapTolIn(int hdc, int& x, int& y, int sx, int sy, int ex, int ey, int tol) {
     BITMAP bmp = bmpdata(hdc);
     PRGB bpx = (PRGB) bmp.bmBits;
@@ -413,6 +424,7 @@ bool findBitmapTolIn(int hdc, int& x, int& y, int sx, int sy, int ex, int ey, in
     return false;
 }
 
+//Windows only bitmap finding in a box --- antiquated
 bool findBitmapIn(int hdc, int& x, int& y, int sx, int sy, int ex, int ey) {
     BITMAP bmp = bmpdata(hdc);
     int* bpx = (int*) bmp.bmBits;
@@ -450,6 +462,7 @@ bool findBitmapIn(int hdc, int& x, int& y, int sx, int sy, int ex, int ey) {
     return false;
 }
 
+//Windows only bitmap finding --- antiquated
 bool findBitmap(int hdc, int& x, int& y) {
     return findBitmapIn(hdc, x, y, 0, 0, (width - 1), (height - 1));
 }

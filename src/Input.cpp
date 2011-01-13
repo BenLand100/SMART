@@ -22,11 +22,13 @@
 #include "Input.h"
 #include <iostream>
 
+//Defined in Smart.cpp
 extern JNIEnv* jre;
 extern jobject smart;
 extern JCLIENT _client;
 extern JPOINT _point;
 
+//Sends a String to the client in a human way
 void sendKeys(char* text) {
     if (jre) {
         jobject string_ = jre->NewStringUTF(text);
@@ -36,10 +38,12 @@ void sendKeys(char* text) {
 	}
 }
 
+//Tests if a key (by keycode) is being held
 bool isKeyDown(long code) {
     return (jre) ? jre->CallBooleanMethod(smart, _client.iskeydown, code) : false;
 }
 
+//Holds a key (by keycode)
 void holdKey(long code) {
     if (jre) {
 		jre->CallVoidMethod(smart, _client.holdkey, code);
@@ -47,6 +51,7 @@ void holdKey(long code) {
 	}
 }
 
+//Releases a key (by keycode)
 void releaseKey(long code) {
     if (jre) {
     	jre->CallVoidMethod(smart, _client.releasekey, code);
@@ -54,6 +59,7 @@ void releaseKey(long code) {
 	}
 }
 
+//Fills the argumnet with the current mouse position
 void getMousePos(long& x, long& y) {
     if (jre) {
         jobject pt = jre->CallObjectMethod(smart, _client.getmousepos);
@@ -67,6 +73,7 @@ void getMousePos(long& x, long& y) {
     }
 }
 
+//Moves the mouse instantly to the given coords
 void moveMouse(long x, long y) {
     if (jre) {
     	jre->CallVoidMethod(smart, _client.movemouse, x, y);
@@ -74,6 +81,7 @@ void moveMouse(long x, long y) {
 	}
 }
 
+//Moves the mouse humanly to the given coords
 void windMouse(long x, long y) {
     if (jre) {
     	jre->CallVoidMethod(smart, _client.windmouse, x, y);
@@ -81,6 +89,7 @@ void windMouse(long x, long y) {
 	}
 }
 
+//Holds the left mouse button and moves humanly to the given coords then releases
 void dragMouse(long x, long y) {
     if (jre) {
     	jre->CallVoidMethod(smart, _client.dragmouse, x, y);
@@ -88,6 +97,7 @@ void dragMouse(long x, long y) {
 	}
 }
 
+//Holds the mouse (left if true, right otherwise) at a position 
 void holdMouse(long x, long y, bool left) {
     if (jre) {
     	jre->CallVoidMethod(smart, _client.holdmouse, x, y, left ? 1 : 0);
@@ -95,6 +105,7 @@ void holdMouse(long x, long y, bool left) {
 	}
 }
 
+//Holds the mouse (left if true, right otherwise) at a position 
 void releaseMouse(long x, long y, bool left) {
     if (jre) {
     	jre->CallVoidMethod(smart, _client.releasemouse, x, y, left ? 1 : 0);
@@ -102,6 +113,7 @@ void releaseMouse(long x, long y, bool left) {
 	}
 }
 
+//Clicks the mouse humanly at a position
 void clickMouse(long x, long y, bool left) {
     if (jre) {
     	jre->CallVoidMethod(smart, _client.clickmouse, x, y, left ? 1 : 0);

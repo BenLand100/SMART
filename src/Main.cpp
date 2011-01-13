@@ -128,12 +128,14 @@ long GetFunctionInfo(int index, void*& address, char*& def) {
     return -1;
 }
 
+//Linux lib entrypoint
 void load(void) {
     cout << "Running SMART Constructor\n";
     internalConstructor();
     cout << "SMART Initialized!\n";
 }
 
+//Linux lib exitpoint
 void unload(void) {
     cout << "Running SMART Destructor\n";
     internalDestructor();
@@ -163,6 +165,7 @@ long GetFunctionInfo(int index, void*& address, char*& def) {
     return -1;
 }
 
+//Windows DLL entrypoint/exitpoint
 bool DllMain(HINSTANCE instance, int reason, void* checks) {
     switch (reason) {
         case DLL_PROCESS_ATTACH:

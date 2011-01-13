@@ -18,6 +18,7 @@
  */
 
 //This file contains the stdcall wrappers, prefixed with std_ 
+//See repsective files for documentation
 
 #include "STD_Wrapper.h"
 #include "JVM.h"

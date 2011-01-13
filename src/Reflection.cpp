@@ -29,6 +29,7 @@ extern jobject smart;
 extern JCLIENT _client;
 extern JSTRING _string;
 
+//Fills the given char* with the string represented by the reference to a java byte array in obj
 int stringFromBytes(void* obj, char* delphistr) {
     if (jre && obj != 0 && delphistr != 0) {
         jstring str = (jstring) jre->NewObject(_string.clazz, _string.byteInit, (jobject)obj);
@@ -42,6 +43,7 @@ int stringFromBytes(void* obj, char* delphistr) {
     return 0;
 }
 
+//Fills the given char* with the string represented by the reference to a java char array in obj
 int stringFromChars(void* obj, char* delphistr) {
     if (jre && obj != 0 && delphistr != 0) {
         jstring str = (jstring) jre->NewObject(_string.clazz, _string.charInit, (jobject)obj);
@@ -55,6 +57,7 @@ int stringFromChars(void* obj, char* delphistr) {
     return 0;
 }
 
+//Fills the given char* with the string represented by the reference to java string
 int stringFromString(void* str, char* delphistr) {
     if (jre && str != 0 && delphistr != 0) {
         const char* chars = jre->GetStringUTFChars((jstring)str, 0);
@@ -66,6 +69,7 @@ int stringFromString(void* str, char* delphistr) {
     return 0;
 }
 
+//Calls a method that can take two ints and return an int --- historical
 int invokeIntMethod(void* obj, char* classname, char* methname, int a, int b) {
     try {
       jclass classref = jre->FindClass(classname);
@@ -80,11 +84,21 @@ int invokeIntMethod(void* obj, char* classname, char* methname, int a, int b) {
     return -1;
 }
 
+//Frees a java object refrence returned by the getField[...]Object methods
+//ALL must be freed or seriosly bad shit will happen
 void freeObject(void* obj) {
     try {
         if (jre) jre->DeleteGlobalRef((jobject)obj);
     } catch (...) { }
 }
+
+//***
+//The following getField[...] methods take an object refrence which is known
+//as the parent, or zero for static scope, and a path that basically amounts to fields
+//in objects or classes and static fields (if in the static scope), and return the
+//value of the field. The proper return type should ALWAYS be used. Conveniance methods
+//are provided for 1, 2, and 3 dimensional arrays
+//***
 
 void* getFieldObject(void* obj, char* path) {
     try {
@@ -599,6 +613,8 @@ long getFieldArraySize(void* obj, char* path, int dim) {
     return -1;
 }
 
+//Tests if two object refrences (that might not be numerically equal) point
+//to the same java object
 bool isEqual(void* a, void* b) {
     try {
         if (jre) {
@@ -608,6 +624,7 @@ bool isEqual(void* a, void* b) {
     return 0;
 }
 
+//Tests if an object refrence (that might not be numerically 0) is a null refrence
 bool isNull(void* a) {
     try {
         if (jre) {
