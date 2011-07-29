@@ -200,6 +200,7 @@ public class EventNazi {
         //System.out.println(targetArea);
         final double sqrt3 = Math.sqrt(3);
         final double sqrt5 = Math.sqrt(5);
+
         double dist, veloX = 0, veloY = 0, windX = 0, windY = 0;
         while ((dist = Math.hypot(xs - xe,ys - ye)) >= 1) {
             wind = Math.min(wind, dist);
@@ -497,7 +498,7 @@ public class EventNazi {
     public synchronized void passKeyEvent(KeyEvent e) {
         if (canInteract()) {
             if (!focused) getFocus();  
-           	System.out.println("Passing Event: " + e);
+           	//System.out.println("Passing Event: " + e.getKeyChar());
             BlockingEventQueue.sendUnblocked(new KeyEvent(comp, e.getID(), e.getWhen(), e.getModifiers(), e.getKeyCode(), e.getKeyChar(), e.getKeyLocation()));
         }
     }

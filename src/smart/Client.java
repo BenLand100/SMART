@@ -75,7 +75,7 @@ import sun.applet.AppletClassLoader;
  */
 public class Client implements ActionListener, ChangeListener {
     
-    public static final String VERSION = "6.6";
+    public static final String VERSION = "6.7 beta";
     public static final String TITLE = "Public SMARTv" + VERSION + " - SMART Minimizing Autoing Resource Thing - By BenLand100";
     
     //mantains a list of classloader strings and clients associated with it
@@ -88,9 +88,15 @@ public class Client implements ActionListener, ChangeListener {
     public static void canvasNotify(Canvas it) {
         try {
             //System.out.println("Notify " + it.getClass().getClassLoader().toString());
+            if (it == null) return;
             if (clients.containsKey(it.getClass().getClassLoader().toString())) {
                 //System.out.println("Fired");
-                clients.get(it.getClass().getClassLoader().toString()).target(it);
+                Client client = clients.get(it.getClass().getClassLoader().toString());
+                if (client == null) {
+                    System.out.println("Bad client? Interesting...");
+                } else {
+                    client.target(it);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -140,7 +146,7 @@ public class Client implements ActionListener, ChangeListener {
      * as necessary.
      */
     public void target(Canvas it) {
-        if (it == canvas) {
+        if (it == canvas || it == null) {
             return;
         }
         boolean iam = blocking;
@@ -152,21 +158,25 @@ public class Client implements ActionListener, ChangeListener {
         canvas = it;
         canvas.setRefresh(refresh);
         if (blitThread != null) {
-            blitThread.stop();
+            try {
+                blitThread.stop();
+            } catch (Exception e) {
+                System.out.println("Bad stuff went down, recovering...");
+                e.printStackTrace();
+            }
         }
         blitThread = createBlitThread();
         BlockingEventQueue.addComponent(canvas, new EventRedirect() {
-
             @Override
             public void dispatched(AWTEvent e) {
-                if (e instanceof MouseEvent && e.getID() == MouseEvent.MOUSE_CLICKED) {
-                    clientFrame.requestFocusInWindow();
-                }
+                clientFrame.requestFocusInWindow(); //any event should cause a refocus
             }
         });
+        BlockingEventQueue.ensureBlocking();
         BlockingEventQueue.setBlocking(canvas, iam);
         if (iam) {
             startBlocking();
+            clientFrame.requestFocusInWindow();
         }
         if (initseq != null) {
             nazi.sendKeys(initseq);
@@ -477,7 +487,12 @@ public class Client implements ActionListener, ChangeListener {
         clientFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         clientFrame.addWindowListener(new WindowAdapter() {
             @Override
+            public void windowActivated(WindowEvent e) {
+                clientFrame.requestFocusInWindow();
+            }
+            @Override
             public void windowDeiconified(WindowEvent e) {
+                clientFrame.requestFocusInWindow();
                 minimized = false;
             }
             @Override

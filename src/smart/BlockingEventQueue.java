@@ -102,6 +102,7 @@ public class BlockingEventQueue extends EventQueue {
             if (EventNazi.getNazi(comp) != null) EventNazi.getNazi(comp).destroy();
             blocking.put(comp, isBlocking);
         }
+        ensureBlocking();
     }
     
     /**
