@@ -106,6 +106,7 @@ SMARTCLASSES= \
     $(JAVA_BUILD_DIR)/smart/EventRedirect.class \
     $(JAVA_BUILD_DIR)/smart/UnblockedEvent.class
 
+TESTSOURCES= test-apps/test-windows.cpp test-apps/test-linux.cpp test-apps/test-scar.cpp
 all:
 	@echo "Syntax for SMART makefile:\n    For Windows distributions: make windows\n    For Linux distributions: make linux\n    For SCAR distributions: make scar\n    For All distributions: make everything\n    For test apps: make test\n    To clean build files: make clean"
 	
@@ -120,13 +121,20 @@ scar: $(DIST)/$(SCAR_NAME)
 windows: $(DIST)/$(WIN_NAME)
 	@echo "Finished Building the Windows SMART distribution"
 	
-test: test-apps/test-windows.cpp test-apps/test-linux.cpp test-apps/test-scar.cpp
+test: test-windows test-linux
+
+test-windows: $(TESTSOURCES) test-python
 	@$(WIN_GPP) -Wall -o $(DIST)/test-windows.exe test-apps/test-windows.cpp
 	@$(WIN_GPP) -Wall -o $(DIST)/test-scar.exe test-apps/test-scar.cpp
+	@echo "Finished building Windows test programs" 
+
+test-linux: $(TESTSOURCES) test-python
 	@$(LIN_GPP) -Wall -fPIC -ldl -o $(DIST)/test-linux test-apps/test-linux.cpp
+		@echo "Finished building Linux test programs" 
+
+test-python:
 	@cp test-apps/test-python.py $(DIST)/test-python
-	@echo "Finished building test programs" 
-	
+
 clean: 
 	@echo "Cleaning build files..."
 	@rm -rf $(BUILD) $(DIST)
