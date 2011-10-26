@@ -75,7 +75,7 @@ import sun.applet.AppletClassLoader;
  */
 public class Client implements ActionListener, ChangeListener {
     
-    public static final String VERSION = "6.7 beta";
+    public static final String VERSION = "6.8";
     public static final String TITLE = "Public SMARTv" + VERSION + " - SMART Minimizing Autoing Resource Thing - By BenLand100";
     
     //mantains a list of classloader strings and clients associated with it
@@ -590,7 +590,7 @@ public class Client implements ActionListener, ChangeListener {
         paramMap.put("height", parseArg(search(jsInfoPage, heightRegex, 1)));
         Matcher matcher = Pattern.compile("<param name\\=([^ ]*) value\\=([^>]*)>").matcher(jsInfoPage);
         while (matcher.find()) {
-            paramMap.put(matcher.group(1), parseArg(matcher.group(2)));
+            paramMap.put(parseArg(matcher.group(1)), parseArg(matcher.group(2)));
         }
         ClientStub stub = new ClientStub(root +  parseArg(search(jsInfoPage, archiveRegex, 1)), root, paramMap);
         clientApplet.setStub(stub);
@@ -865,6 +865,7 @@ public class Client implements ActionListener, ChangeListener {
             return -1;
         }
     }
+
 
     public int getFieldArray3DChar(Object o, String path, int x, int y, int z) {
         o = getFieldObject(o, path);

@@ -47,10 +47,7 @@ int main(int argc, char** argv) {
     Setup setup = (Setup) GetProcAddress(libsmart, "std_setup");
     setup((char*)"http://world19.runescape.com/", (char*)"plugin.js?param=o0,a1,m0", 765, 503,(char*)"s");
 
-    time_t timer = time(0) + 500;
-    while(timer >= time(0));
-
-    FreeLibrary(libsmart);
+    while (true) Sleep(1000);
 
     return 0;
 }
