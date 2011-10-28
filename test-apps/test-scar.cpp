@@ -45,7 +45,7 @@ int main(int argc, char** argv) {
     }
     cout << "Starting SMART...\n";
     Setup setup = (Setup) GetProcAddress(libsmart, "std_setup");
-    setup((char*)"http://world19.runescape.com/", (char*)"plugin.js?param=o0,a1,m0", 765, 503,(char*)"s");
+    setup((char*)"http://world19.runescape.com/", (char*)",f5", 765, 503,(char*)"");
 
     while (true) Sleep(1000);
 

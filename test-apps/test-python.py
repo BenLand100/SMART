@@ -582,7 +582,7 @@ class Smart:
 		return None
 
 if __name__ == "__main__":
-	smart = Smart('http://world19.runescape.com/', 'plugin.js?param=o0,a2,m0', 765, 503, '')
+	smart = Smart('http://world19.runescape.com/', ',f5', 765, 503, '')
 	import time
 	while True:
 	    time.sleep(1)
