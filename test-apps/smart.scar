@@ -1,0 +1,178 @@
+{$DEFINE SRL_SMART}
+{$DEFINE SMART}
+{$ifdef Simba}
+{.loadlib libsmart}
+{$endif}
+
+{$ifdef Simba}
+function IsKeyDown(C:Byte): Boolean;
+begin
+  Result := SmartIsKeyDown(C);
+end;
+{$else}
+function IsKeyDown(C:Char): Boolean;
+begin
+  Result := SmartIsKeyDown(ord(c));
+end;
+{$endif}
+
+procedure MoveMouse(x, y: Integer);
+begin
+  SmartMoveMouse(x, y);
+end;
+
+{$ifdef Simba}
+procedure HoldMouse(x, y: Integer; button : integer);
+begin
+  if button = mouse_left then
+    SmartHoldMousePlus(x,y,1)
+  else if button = mouse_middle then
+    SmartHoldMousePlus(x,y,2)
+  else if button = mouse_right then
+    SmartHoldMousePlus(x,y,3)
+  else 
+    raiseexception(ercustomerror,'Unknown mouse button in SmartHoldMousePlus');
+end;
+
+procedure ReleaseMouse(x, y: Integer; button : integer);
+begin
+  if button = mouse_left then
+    SmartReleaseMousePlus(x,y,1)
+  else if button = mouse_middle then
+    SmartReleaseMousePlus(x,y,2)
+  else if button = mouse_right then
+    SmartReleaseMousePlus(x,y,3)
+  else 
+    raiseexception(ercustomerror,'Unknown mouse button in SmartReleaseMousePlus');
+end;
+{$else}
+procedure HoldMouse(x, y: Integer; left: Boolean);
+begin
+  SmartHoldMouse(x, y, left);
+end;
+
+procedure ReleaseMouse(x, y: Integer; left: Boolean);
+begin
+  SmartReleaseMouse(x, y, left);
+end;
+{$endif}
+
+procedure KeyUp(key: Byte);
+begin
+  If Key = 13 Then
+    Key := 10;
+  SmartReleaseKey(key);
+end;
+
+procedure KeyDown(key: Byte);
+begin
+  If Key = 13 Then
+    Key := 10;
+  SmartHoldKey(key);
+end;
+
+procedure SendKeys(S: String);
+begin
+  SmartSendKeys(S);
+end;
+
+procedure GetMousePos(var x, y: Integer);
+begin
+  SmartGetMousePos(x, y);
+end;
+
+function GetColor(x, y: Integer): Integer;
+begin
+  result:= SmartGetColor(x, y);
+end;
+
+procedure SmartSetTarget;
+{$ifdef Simba}
+begin
+  SetTargetArray(SmartImageArray, 765,503);
+end;
+{$else}
+var
+  Smart_Bitmap: Integer;
+begin
+  Smart_Bitmap:= BitmapFromString(765,503,'');
+  GetBitmapCanvas(Smart_Bitmap).Handle:= SmartGetDC;
+  SetTargetBitmap(Smart_Bitmap);
+  FreeBitmap(Smart_Bitmap);
+end;
+{$endif}
+
+function FindWindow(Title: String): Boolean;
+begin
+  result:= true;
+end;
+
+procedure ActivateClient;
+begin
+end;
+
+function FindWindowBySize(Width, Height: Integer): Boolean;
+begin
+  result:= true;
+end;
+
+{procedure SmartSaveSettings(v: TVariantArray);
+var
+  i: Integer;
+  ts: TStringArray;
+begin
+  ts := ['server', 'members', 'signed', 'sd', 'DC', IncludePath + 'SRL/SRL/misc/smartINI.ini'];
+  for i := 0 to 4 do
+    WriteINI('SMART', ts[i], v[i], ts[5]);
+end;   }
+
+procedure SmartSetupEx(Server: integer; members, signed, superdetail: boolean);
+var
+  prefix: string;
+begin
+  {$IFDEF SIMBA}
+  prefix := ReadINI('World' + IntToStr(Server), 'Prefix', IncludePath + 'SRL/SRL/misc/worlds.ini');
+  {$ELSE}
+  prefix := ReadINI('World' + IntToStr(Server), 'Prefix', {$IFDEF SCAR325_UP} IncludesPath {$ELSE} AppPath + 'Includes\' {$ENDIF} + 'SRL\SRL\misc\worlds.ini');
+  {$ENDIF}
+  if(prefix = '')then
+  begin
+    writeln('Invalid world number or corrupted world list. Please review your settings');
+    TerminateScript;
+  end;
+  SmartSetup('http://'+prefix+'.runescape.com/', ',f5', 765, 503, 's');
+  //SmartSaveSettings([Server, Members, Signed, SuperDetail, SmartGetDC]);
+end;
+
+{function SmartLastSettings: TStringArray;
+var
+  i: Integer;
+  ts: TStringArray;
+begin
+  ts := ['server', 'members', 'signed', 'sd', 'DC', IncludePath + 'SRL/SRL/Misc/smartINI.ini'];
+  SetLength(Result, 5);
+  for i := 0 to 4 do
+    Result[i] := ReadINI('SMART', ts[i], ts[5]);
+end; }
+
+{$ifndef Simba}
+Procedure SaveScreenshot(s : string);
+var
+  TempBMP : integer;
+  TempS : String;
+begin;
+  Temps := s;
+  While FileExists(Temps) do
+  begin;
+    Temps := ExtractFilePath(s) + Copy(ExtractFileName(Temps),1,LastPos('.',ExtractFileName(Temps))-1) + '2' + ExtractFileExt(s);
+    Writeln(Temps);
+  end;
+  TempBMP := BitmapFromString(765,503,'');
+  Try
+    CopyClientToBitmap(TempBMP,0,0,765,503);
+    SaveBitmap(TempBMP, Temps);
+  Except
+  end;
+  FreeBitmap(TempBMP);
+end;
+{$endif}
