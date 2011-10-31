@@ -38,6 +38,8 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.awt.image.WritableRaster;
+import java.awt.image.ImageObserver;
+import java.awt.Image;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.reflect.Array;
@@ -325,7 +327,6 @@ public class Client implements ActionListener, ChangeListener {
         try {
             canvas.setBackground(new Color(0xFE, 0xFE, 0xFE));
             final Graphics canvasGraphics = canvas.getCanvasGraphics();
-            canvasGraphics.setColor(Color.RED);
             final BufferedImage buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_BGR);
             System.out.println("Replacing Canvas Drawing Surface");
             canvas.setBuffer(buffer);
@@ -337,40 +338,46 @@ public class Client implements ActionListener, ChangeListener {
             WritableRaster debugRaster = (WritableRaster) rasterField.get(debug);
             final Graphics debugGraphics = debug.getGraphics();
             final int[] debugData = ((DataBufferInt) debugRaster.getDataBuffer()).getData();
+            final BufferedImage db = new BufferedImage(width, height, BufferedImage.TYPE_INT_BGR);
+            final Graphics dbGraphics = db.getGraphics();
+            dbGraphics.setColor(Color.RED);
             return new Thread("Smart_Image_Transfer") {
                 @Override
                 public void run() {
-                    int[] temp = new int[384795];
+                    int len = width*height;
+                    int[] temp = new int[len];
                     try {
+                        
                         System.out.println("Transfer Thread Entered");
                         while (active) {
                             sleep(refresh);
                             while (blocking) {
                                 sleep(refresh);
                                 nativeBuff.rewind();
-                                for (int i = 0; i < 384795; ++i) {
+                                for (int i = 0; i < len; ++i) {
                                     if (bufferData[i] != 0xFEFEFE) {
                                         temp[i] = bufferData[i] << 8;
                                     }
                                 }
                                 nativeBuff.put(temp);
+                                final Point p = getMousePos();
                                 if (renderWhileBlocking && !minimized) {
                                     if (debuggfx) {
-                                        debugGraphics.drawImage(buffer, 0, 0, null);
+                                        dbGraphics.drawImage(buffer, 0, 0, null);
                                         nativeDebug.rewind();
-                                        for (int i = 0; i < 384795; ++i) {
+                                        for (int i = 0; i < len; ++i) {
                                             int color = nativeDebug.get() >> 8;
                                             if (color != transColor) {
                                                 debugData[i] = color;
                                             }
                                         }
-                                        canvasGraphics.drawImage(debug, 0, 0, null);
+                                        dbGraphics.drawImage(debug, 0, 0, null);
                                     } else {
-                                        canvasGraphics.drawImage(buffer, 0, 0, null);
+                                        dbGraphics.drawImage(buffer, 0, 0, null);
                                     }
-                                    Point p = getMousePos();
-                                    canvasGraphics.fillOval(p.x - 2, p.y - 2, 4, 4);
                                 }
+                                dbGraphics.fillOval(p.x - 2, p.y - 2, 4, 4);
+                                canvasGraphics.drawImage(db,0,0,null);
                             }
                             canvasGraphics.drawImage(buffer, 0, 0, null);
                         }

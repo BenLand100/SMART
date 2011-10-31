@@ -584,6 +584,8 @@ class Smart:
 if __name__ == "__main__":
 	smart = Smart('http://world19.runescape.com/', ',f5', 765, 503, '')
 	import time
+	import random
 	while True:
 	    time.sleep(1)
+	    smart.windMouse(int(random.random()*700),int(random.random()*500))
 
