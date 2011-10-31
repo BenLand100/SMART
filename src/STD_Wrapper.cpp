@@ -325,15 +325,15 @@ void std_clickMouse(long x, long y, bool left) {
 }
 
 void std_holdMousePlus(long x, long y, long button) {
-    holdMouse(x, y, button);
+    holdMousePlus(x, y, button);
 }
 
 void std_releaseMousePlus(long x, long y, long button) {
-    releaseMouse(x, y, button);
+    releaseMousePlus(x, y, button);
 }
 
 void std_clickMousePlus(long x, long y, long button) {
-    clickMouse(x, y, button);
+    clickMousePlus(x, y, button);
 }
 
 //from Color.cpp

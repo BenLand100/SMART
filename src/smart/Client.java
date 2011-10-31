@@ -77,7 +77,7 @@ import sun.applet.AppletClassLoader;
  */
 public class Client implements ActionListener, ChangeListener {
     
-    public static final String VERSION = "7.0";
+    public static final String VERSION = "6.9";
     public static final String TITLE = "Public SMARTv" + VERSION + " - SMART Minimizing Autoing Resource Thing - By BenLand100";
     
     //mantains a list of classloader strings and clients associated with it
