@@ -29,10 +29,12 @@ extern "C" void releaseKey(long) __attribute__((cdecl));
 extern "C" void getMousePos(long&, long&) __attribute__((cdecl));
 extern "C" void moveMouse(long, long) __attribute__((cdecl));
 extern "C" void windMouse(long, long) __attribute__((cdecl));
-extern "C" void dragMouse(long, long) __attribute__((cdecl));
 extern "C" void holdMouse(long, long, bool) __attribute__((cdecl));
 extern "C" void releaseMouse(long, long, bool) __attribute__((cdecl));
 extern "C" void clickMouse(long, long, bool) __attribute__((cdecl));
+extern "C" void holdMousePlus(long, long, long) __attribute__((cdecl));
+extern "C" void releaseMousePlus(long, long, long) __attribute__((cdecl));
+extern "C" void clickMousePlus(long, long, long) __attribute__((cdecl));
 
 #endif	/* _INPUT_H */
 

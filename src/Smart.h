@@ -38,7 +38,6 @@ typedef struct {
 	jclass clazz;
 	jmethodID init;
 	jmethodID movemouse;
-	jmethodID dragmouse;
 	jmethodID windmouse;
 	jmethodID holdmouse;
 	jmethodID releasemouse;

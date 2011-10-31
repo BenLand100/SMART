@@ -312,10 +312,6 @@ void std_windMouse(long x, long y) {
     windMouse(x, y);
 }
 
-void std_dragMouse(long x, long y) {
-    dragMouse(x, y);
-}
-
 void std_holdMouse(long x, long y, bool left) {
     holdMouse(x, y, left);
 }
@@ -326,6 +322,18 @@ void std_releaseMouse(long x, long y, bool left) {
 
 void std_clickMouse(long x, long y, bool left) {
     clickMouse(x, y, left);
+}
+
+void std_holdMousePlus(long x, long y, long button) {
+    holdMouse(x, y, button);
+}
+
+void std_releaseMousePlus(long x, long y, long button) {
+    releaseMouse(x, y, button);
+}
+
+void std_clickMousePlus(long x, long y, long button) {
+    clickMouse(x, y, button);
 }
 
 //from Color.cpp

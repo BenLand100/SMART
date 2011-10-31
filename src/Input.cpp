@@ -89,18 +89,10 @@ void windMouse(long x, long y) {
 	}
 }
 
-//Holds the left mouse button and moves humanly to the given coords then releases
-void dragMouse(long x, long y) {
-    if (jre) {
-    	jre->CallVoidMethod(smart, _client.dragmouse, x, y);
-		checkexception(jre);
-	}
-}
-
 //Holds the mouse (left if true, right otherwise) at a position 
 void holdMouse(long x, long y, bool left) {
     if (jre) {
-    	jre->CallVoidMethod(smart, _client.holdmouse, x, y, left ? 1 : 0);
+    	jre->CallVoidMethod(smart, _client.holdmouse, x, y, left ? 1 : 3);
 		checkexception(jre);
 	}
 }
@@ -108,7 +100,7 @@ void holdMouse(long x, long y, bool left) {
 //Holds the mouse (left if true, right otherwise) at a position 
 void releaseMouse(long x, long y, bool left) {
     if (jre) {
-    	jre->CallVoidMethod(smart, _client.releasemouse, x, y, left ? 1 : 0);
+    	jre->CallVoidMethod(smart, _client.releasemouse, x, y, left ? 1 : 3);
 		checkexception(jre);
 	}
 }
@@ -116,7 +108,31 @@ void releaseMouse(long x, long y, bool left) {
 //Clicks the mouse humanly at a position
 void clickMouse(long x, long y, bool left) {
     if (jre) {
-    	jre->CallVoidMethod(smart, _client.clickmouse, x, y, left ? 1 : 0);
+    	jre->CallVoidMethod(smart, _client.clickmouse, x, y, left ? 1 : 3);
+		checkexception(jre);
+	}
+}
+
+//Holds the mouse (left if true, right otherwise) at a position 
+void holdMousePlus(long x, long y, long button) {
+    if (jre) {
+    	jre->CallVoidMethod(smart, _client.holdmouse, x, y, button);
+		checkexception(jre);
+	}
+}
+
+//Holds the mouse (left if true, right otherwise) at a position 
+void releaseMousePlus(long x, long y, long button) {
+    if (jre) {
+    	jre->CallVoidMethod(smart, _client.releasemouse, x, y, button);
+		checkexception(jre);
+	}
+}
+
+//Clicks the mouse humanly at a position
+void clickMousePlus(long x, long y, long button) {
+    if (jre) {
+    	jre->CallVoidMethod(smart, _client.clickmouse, x, y, button);
 		checkexception(jre);
 	}
 }

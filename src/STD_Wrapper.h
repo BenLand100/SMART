@@ -105,10 +105,12 @@ extern "C" void std_releaseKey(long) __attribute__((stdcall));
 extern "C" void std_getMousePos(long&, long&) __attribute__((stdcall));
 extern "C" void std_moveMouse(long, long) __attribute__((stdcall));
 extern "C" void std_windMouse(long, long) __attribute__((stdcall));
-extern "C" void std_dragMouse(long, long) __attribute__((stdcall));
 extern "C" void std_holdMouse(long, long, bool) __attribute__((stdcall));
 extern "C" void std_releaseMouse(long, long, bool) __attribute__((stdcall));
 extern "C" void std_clickMouse(long, long, bool) __attribute__((stdcall));
+extern "C" void std_holdMousePlus(long, long, long) __attribute__((stdcall));
+extern "C" void std_releaseMousePlus(long, long, long) __attribute__((stdcall));
+extern "C" void std_clickMousePlus(long, long, long) __attribute__((stdcall));
 
 //from Color.h
 extern "C" int  std_getColor(int, int) __attribute__((stdcall));

@@ -2,7 +2,7 @@ EXPORTS
     GetFunctionCount=GetFunctionCount@0
     GetFunctionInfo=GetFunctionInfo@12
     std_clickMouse=std_clickMouse@12
-    std_dragMouse=std_dragMouse@8
+    std_clickMousePlus=std_clickMousePlus@12
     std_findColor=std_findColor@28
     std_findColorSpiral=std_findColorSpiral@28
     std_findColorSpiralTol=std_findColorSpiralTol@32
@@ -57,6 +57,7 @@ EXPORTS
     std_getRefresh=std_getRefresh@0
     std_holdKey=std_holdKey@4
     std_holdMouse=std_holdMouse@12
+    std_holdMousePlus=std_holdMousePlus@12
     std_invokeIntMethod=std_invokeIntMethod@20
     std_isActive=std_isActive@0
     std_isBlocking=std_isBlocking@0
@@ -67,6 +68,7 @@ EXPORTS
     std_moveMouse=std_moveMouse@8
     std_releaseKey=std_releaseKey@4
     std_releaseMouse=std_releaseMouse@12
+    std_releaseMousePlus=std_releaseMousePlus@12
     std_sendKeys=std_sendKeys@4
     std_setDebug=std_setDebug@4
     std_setJVMPath=std_setJVMPath@4

@@ -77,7 +77,7 @@ import sun.applet.AppletClassLoader;
  */
 public class Client implements ActionListener, ChangeListener {
     
-    public static final String VERSION = "6.8";
+    public static final String VERSION = "7.0";
     public static final String TITLE = "Public SMARTv" + VERSION + " - SMART Minimizing Autoing Resource Thing - By BenLand100";
     
     //mantains a list of classloader strings and clients associated with it
@@ -233,30 +233,23 @@ public class Client implements ActionListener, ChangeListener {
     }
 
     //Convenience method for Native code see Input.cpp
-    public void clickMouse(int x, int y, boolean left) {
+    public void clickMouse(int x, int y, int button) {
         if (nazi != null) {
-            nazi.clickMouse(x, y, left);
+            nazi.clickMouse(x, y, button);
+        }
+    }
+    
+    //Convenience method for Native code see Input.cpp
+    public void holdMouse(int x, int y, int button) {
+        if (nazi != null) {
+            nazi.holdMouse(x, y, button);
         }
     }
 
     //Convenience method for Native code see Input.cpp
-    public void dragMouse(int x, int y) {
+    public void releaseMouse(int x, int y, int button) {
         if (nazi != null) {
-            nazi.dragMouse(x, y);
-        }
-    }
-
-    //Convenience method for Native code see Input.cpp
-    public void holdMouse(int x, int y, boolean left) {
-        if (nazi != null) {
-            nazi.holdMouse(x, y, left);
-        }
-    }
-
-    //Convenience method for Native code see Input.cpp
-    public void releaseMouse(int x, int y, boolean left) {
-        if (nazi != null) {
-            nazi.releaseMouse(x, y, left);
+            nazi.releaseMouse(x, y, button);
         }
     }
 

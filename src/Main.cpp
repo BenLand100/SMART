@@ -46,10 +46,12 @@ static char* exports[] = {
     (char*)"std_getMousePos", (char*)"procedure SmartGetMousePos(var x, y: integer);",
     (char*)"std_holdMouse", (char*)"procedure SmartHoldMouse(x, y: integer; left: boolean);",
     (char*)"std_releaseMouse", (char*)"procedure SmartReleaseMouse(x, y: integer; left: boolean);",
+    (char*)"std_holdMousePlus", (char*)"procedure SmartHoldMousePlus(x, y, button: integer);",
+    (char*)"std_releaseMousePlus", (char*)"procedure SmartReleaseMousePlus(x, y, button: integer);",
     (char*)"std_moveMouse", (char*)"procedure SmartMoveMouse(x, y: integer);",
     (char*)"std_windMouse", (char*)"procedure SmartWindMouse(x, y: integer);",
-    (char*)"std_dragMouse", (char*)"procedure SmartDragMouse(x, y: integer);",
     (char*)"std_clickMouse", (char*)"procedure SmartClickMouse(x, y: integer; left: boolean);",
+    (char*)"std_clickMousePlus", (char*)"procedure SmartClickMousePlus(x, y, button: integer);",
     (char*)"std_sendKeys", (char*)"procedure SmartSendKeys(Text: String);",
     (char*)"std_holdKey", (char*)"procedure SmartHoldKey(Code: Integer);",
     (char*)"std_releaseKey", (char*)"procedure SmartReleaseKey(Code: Integer);",
@@ -111,7 +113,7 @@ static char* exports[] = {
 
 #ifdef LINUX
 
-#define NumExports 75
+#define NumExports 77
 
 //STDCALL - SCAR/Simba
 long GetFunctionCount() {
@@ -146,7 +148,7 @@ void unload(void) {
 
 #ifdef WINDOWS
 
-#define NumExports 77
+#define NumExports 79
 
 HMODULE dllinst;
 

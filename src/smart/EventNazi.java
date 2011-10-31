@@ -100,6 +100,7 @@ public class EventNazi {
     private Set<int[]> keysHeld;
     private boolean mousein;
     private boolean leftDown;
+    private boolean midDown;
     private boolean rightDown;
     private boolean focused;
     private boolean shiftDown;
@@ -201,6 +202,7 @@ public class EventNazi {
         final double sqrt3 = Math.sqrt(3);
         final double sqrt5 = Math.sqrt(5);
 
+
         double dist, veloX = 0, veloY = 0, windX = 0, windY = 0;
         while ((dist = Math.hypot(xs - xe,ys - ye)) >= 1) {
             wind = Math.min(wind, dist);
@@ -281,40 +283,21 @@ public class EventNazi {
     }
     
     /**
-     * Drags the mouse from the current position to the specified position.
-     * @param x The x destination
-     * @param y The y destination
-     * @result The actual end point
-     */
-    public synchronized Point dragMouse(int x, int y) {
-        if (canHold(true)) {
-            leftDown = true;
-            int btnMask = MouseEvent.BUTTON1_DOWN_MASK | (rightDown ? (MouseEvent.BUTTON3_DOWN_MASK | MouseEvent.META_DOWN_MASK) : 0);
-            int btn = MouseEvent.BUTTON1;
-            if (!focused) getFocus();
-            BlockingEventQueue.sendUnblocked(new MouseEvent(comp,MouseEvent.MOUSE_PRESSED,System.currentTimeMillis(),btnMask,cx,cy,1,false,btn));
-            try { Thread.sleep((int)(Math.random() * 56 + 90)); } catch (Exception ex) { }
-            Point end = moveMouse(x,y);
-            try { Thread.sleep((int)(Math.random() * 56 + 90)); } catch (Exception ex) { }
-            BlockingEventQueue.sendUnblocked(new MouseEvent(comp,MouseEvent.MOUSE_RELEASED,System.currentTimeMillis(),btnMask,end.x,end.y,1,false,btn));
-            leftDown = false;
-            if (!mousein) looseFocus(false);
-            return end;
-        }
-        return null;
-    }
-    
-    /**
      * Holds the mouse at the specified position after moving from the current
      * position to the specified position.
      * @param x The x destination
      * @param y The y destination
      * @result The actual end point
      */
-    public synchronized Point holdMouse(int x, int y, boolean left) {
-        if (canHold(left)) {
-            int btnMask = ((leftDown || left) ? MouseEvent.BUTTON1_DOWN_MASK : 0) | ((rightDown || !left) ? (MouseEvent.BUTTON3_DOWN_MASK | MouseEvent.META_DOWN_MASK) : 0);
-            int btn = left ? MouseEvent.BUTTON1 : MouseEvent.BUTTON3;
+    public synchronized Point holdMouse(int x, int y, int button) {
+        if (canHold(button)) {
+            int btnMask = ((leftDown || button==1) ? MouseEvent.BUTTON1_DOWN_MASK : 0) | ((midDown || button==2) ? (MouseEvent.BUTTON2_DOWN_MASK | MouseEvent.META_DOWN_MASK) : 0) | ((rightDown || button==3) ? (MouseEvent.BUTTON3_DOWN_MASK | MouseEvent.META_DOWN_MASK) : 0);
+            int btn = 0;
+            switch (button) {
+                case 1: btn = MouseEvent.BUTTON1; break;
+                case 2: btn = MouseEvent.BUTTON2; break;
+                case 3: btn = MouseEvent.BUTTON3; break;
+            }
             Point end = moveMouse(x,y);
             if (mousein) {
                 BlockingEventQueue.sendUnblocked(new MouseEvent(comp,MouseEvent.MOUSE_PRESSED,System.currentTimeMillis(),btnMask,cx,cy,1,false,btn));
@@ -322,7 +305,11 @@ public class EventNazi {
                     wait(25,50);
                     getFocus();
                 }
-                if (left) leftDown = true; else rightDown = true;
+                switch (button) {
+                    case 1: leftDown = true; break;
+                    case 2: midDown = true; break;
+                    case 3: rightDown = true; break;
+                }
             }
             return end;
         }
@@ -336,16 +323,25 @@ public class EventNazi {
      * @param y The y destination
      * @result The actual end point
      */
-    public synchronized Point releaseMouse(int x, int y, boolean left) {
-        if (canRelease(left)) {
-            int btnMask = ((leftDown || left) ? MouseEvent.BUTTON1_DOWN_MASK : 0) | ((rightDown || !left) ? (MouseEvent.BUTTON3_DOWN_MASK | MouseEvent.META_DOWN_MASK) : 0);
-            int btn = left ? MouseEvent.BUTTON1 : MouseEvent.BUTTON3;
+    public synchronized Point releaseMouse(int x, int y, int button) {
+        if (canRelease(button)) {
+            int btnMask = ((leftDown || button==1) ? MouseEvent.BUTTON1_DOWN_MASK : 0) | ((midDown || button==2) ? (MouseEvent.BUTTON2_DOWN_MASK | MouseEvent.META_DOWN_MASK) : 0) | ((rightDown || button==3) ? (MouseEvent.BUTTON3_DOWN_MASK | MouseEvent.META_DOWN_MASK) : 0);
+            int btn = 0;
+            switch (button) {
+                case 1: btn = MouseEvent.BUTTON1; break;
+                case 2: btn = MouseEvent.BUTTON2; break;
+                case 3: btn = MouseEvent.BUTTON3; break;
+            }
             Point end = moveMouse(x,y);
             if (mousein) {
                 long time = System.currentTimeMillis();
                 BlockingEventQueue.sendUnblocked(new MouseEvent(comp,MouseEvent.MOUSE_RELEASED,time,btnMask,end.x,end.y,1,false,btn));
                 BlockingEventQueue.sendUnblocked(new MouseEvent(comp,MouseEvent.MOUSE_CLICKED,time,btnMask,end.x,end.y,1,false,btn));
-                if (left) leftDown = false; else rightDown = false;
+                switch (button) {
+                    case 1: leftDown = false; break;
+                    case 2: midDown = false; break;
+                    case 3: rightDown = false; break;
+                }
             } else {
                 looseFocus(false);
             }
@@ -361,13 +357,23 @@ public class EventNazi {
      * @param y The y destination
      * @result The actual end point
      */
-    public synchronized Point clickMouse(int x, int y, boolean left) {
-        if (canClick(left)) {
-            int btnMask = ((leftDown || left) ? MouseEvent.BUTTON1_DOWN_MASK : 0) | ((rightDown || !left) ? (MouseEvent.BUTTON3_DOWN_MASK | MouseEvent.META_DOWN_MASK) : 0);
-            int btn = left ? MouseEvent.BUTTON1 : MouseEvent.BUTTON3;
+    public synchronized Point clickMouse(int x, int y, int button) {
+        if (canClick(button)) {
+            int btnMask = ((leftDown || button==1) ? MouseEvent.BUTTON1_DOWN_MASK : 0) | ((midDown || button==2) ? (MouseEvent.BUTTON2_DOWN_MASK | MouseEvent.META_DOWN_MASK) : 0) | ((rightDown || button==3) ? (MouseEvent.BUTTON3_DOWN_MASK | MouseEvent.META_DOWN_MASK) : 0);
+            int btn = 0;
+            switch (button) {
+                case 1: btn = MouseEvent.BUTTON1; break;
+                case 2: btn = MouseEvent.BUTTON2; break;
+                case 3: btn = MouseEvent.BUTTON3; break;
+            }
             Point end = moveMouse(x,y);
             if (mousein) {
                 BlockingEventQueue.sendUnblocked(new MouseEvent(comp,MouseEvent.MOUSE_PRESSED,System.currentTimeMillis(),btnMask,cx,cy,1,false,btn));
+                switch (button) {
+                    case 1: leftDown = true; break;
+                    case 2: midDown = true; break;
+                    case 3: rightDown = true; break;
+                }
                 if (!focused) {
                     wait(25,50);
                     getFocus();
@@ -376,7 +382,11 @@ public class EventNazi {
                 long time = System.currentTimeMillis();
                 BlockingEventQueue.sendUnblocked(new MouseEvent(comp,MouseEvent.MOUSE_RELEASED,time,btnMask,end.x,end.y,1,false,btn));
                 BlockingEventQueue.sendUnblocked(new MouseEvent(comp,MouseEvent.MOUSE_CLICKED,time,btnMask,end.x,end.y,1,false,btn));
-                leftDown = false;
+                switch (button) {
+                    case 1: leftDown = false; break;
+                    case 2: midDown = false; break;
+                    case 3: rightDown = false; break;
+                }
             } else {
                 looseFocus(false);
             }
@@ -643,27 +653,47 @@ public class EventNazi {
     }
     
     public synchronized boolean isDragging() {
-        return leftDown || rightDown;
+        return leftDown || midDown || rightDown;
     }
     
-    public synchronized boolean isDown(boolean left) {
-        return left ? leftDown : rightDown;
+    public synchronized boolean isDown(int button) {
+        switch (button) {
+            case 1: return leftDown;
+            case 2: return midDown;
+            case 3: return rightDown;
+        }
+        return false;
     }
     
     public synchronized boolean canInteract() {
         return active;
     }
     
-    public synchronized boolean canClick(boolean left) {
-        return canInteract() && (left ? !leftDown : !rightDown);
+    public synchronized boolean canClick(int button) {
+        switch (button) {
+            case 1: return canInteract() && !leftDown;
+            case 2: return canInteract() && !midDown;
+            case 3: return canInteract() && !rightDown;
+        }
+        return false;
     }
     
-    public synchronized boolean canHold(boolean left) {
-        return canInteract() && (left ? !leftDown : !rightDown);
+    public synchronized boolean canHold(int button) {
+        switch (button) {
+            case 1: return canInteract() && !leftDown;
+            case 2: return canInteract() && !midDown;
+            case 3: return canInteract() && !rightDown;
+        }
+        return false;
     }
     
-    public synchronized boolean canRelease(boolean left) {
-        return canInteract() && (left ? leftDown : rightDown);
+    public synchronized boolean canRelease(int button) {
+        switch (button) {
+            case 1: return canInteract() && leftDown;
+            case 2: return canInteract() && midDown;
+            case 3: return canInteract() && rightDown;
+        }
+        return false;
     }
     
     private class KeySender extends Thread {

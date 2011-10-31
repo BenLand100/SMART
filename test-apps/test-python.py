@@ -184,14 +184,18 @@ class Smart:
 		self._dll.moveMouse.restype = None
 		self._dll.windMouse.argtypes = [c_long, c_long]
 		self._dll.windMouse.restype = None
-		self._dll.dragMouse.argtypes = [c_long, c_long]
-		self._dll.dragMouse.restype = None
 		self._dll.holdMouse.argtypes = [c_long, c_long, c_bool]
 		self._dll.holdMouse.restype = None
 		self._dll.releaseMouse.argtypes = [c_long, c_long, c_bool]
 		self._dll.releaseMouse.restype = None
 		self._dll.clickMouse.argtypes = [c_long, c_long, c_bool]
 		self._dll.clickMouse.restype = None
+		self._dll.holdMousePlus.argtypes = [c_long, c_long, c_long]
+		self._dll.holdMousePlus.restype = None
+		self._dll.releaseMousePlus.argtypes = [c_long, c_long, c_long]
+		self._dll.releaseMousePlus.restype = None
+		self._dll.clickMousePlus.argtypes = [c_long, c_long, c_long]
+		self._dll.clickMousePlus.restype = None
 		#Color.h
 		self._dll.getColor.argtypes = [c_long, c_long]
 		self._dll.getColor.restype = c_long
@@ -529,14 +533,23 @@ class Smart:
 	def clickMouse(self, x, y, left):
 		"""Clicks the mouse (left or right) humanly at the specified position."""
 		self._dll.clickMouse(x, y, left)
+		
+	def holdMousePlus(self, x, y, button):
+		"""Holds the mouse (left or right) at the spcecified position."""
+		self._dll.holdMousePlus(x, y, button)
+
+	def releaseMousePlus(self, x, y, button):
+		"""Releases the mouse (left or right) at the specified position."""
+		self._dll.releaseMousePlus(x, y, button)
+
+	def clickMousePlus(self, x, y, button):
+		"""Clicks the mouse (left or right) humanly at the specified position."""
+		self._dll.clickMousePlus(x, y, button)
+
 
 	def windMouse(self, x, y):
 		"""Moves the mouse humanly to a specified position."""
 		self._dll.windMouse(x, y)
-
-	def dragMouse(self, x, y):
-		"""Drags the mouse humanly to a specified position."""
-		self._dll.dragMouse(x, y)
 
 	#from Color.cpp
 
