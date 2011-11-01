@@ -331,9 +331,7 @@ public class Client implements ActionListener, ChangeListener {
             WritableRaster debugRaster = (WritableRaster) rasterField.get(debug);
             final Graphics debugGraphics = debug.getGraphics();
             final int[] debugData = ((DataBufferInt) debugRaster.getDataBuffer()).getData();
-            final BufferedImage db = new BufferedImage(width, height, BufferedImage.TYPE_INT_BGR);
-            final Graphics dbGraphics = db.getGraphics();
-            dbGraphics.setColor(Color.RED);
+            debugGraphics.setColor(Color.RED);
             return new Thread("Smart_Image_Transfer") {
                 @Override
                 public void run() {
@@ -362,16 +360,15 @@ public class Client implements ActionListener, ChangeListener {
                                             if (color != transColor) {
                                                 debugData[i] = color;
                                             } else {
-                                                debugData[i] = bufferData[i];
+                                                debugData[i] = bufferData[i];   
                                             }
                                         }
-                                        dbGraphics.drawImage(debug, 0, 0, null);
                                     } else {
-                                        dbGraphics.drawImage(buffer, 0, 0, null);
+                                        debugGraphics.drawImage(buffer, 0, 0, null);
                                     }
                                 }
-                                dbGraphics.fillOval(p.x - 2, p.y - 2, 4, 4);
-                                canvasGraphics.drawImage(db,0,0,null);
+                                debugGraphics.fillOval(p.x - 2, p.y - 2, 4, 4);
+                                canvasGraphics.drawImage(debug,0,0,null);
                             }
                             canvasGraphics.drawImage(buffer, 0, 0, null);
                         }
