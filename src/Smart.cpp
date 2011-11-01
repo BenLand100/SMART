@@ -319,6 +319,7 @@ void internalConstructor() {
     curparams = (char*) malloc(1);
     *curparams = 0;
     jvmpath = 0;
+    maxmem = 256;
 }
 
 //Called at Library unloading to ensure all memory is nicely released (or so we hope)

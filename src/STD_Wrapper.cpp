@@ -33,6 +33,10 @@ void std_setJVMPath(char* path) {
 	setJVMPath(path);
 }
 
+void std_setMaxJVMMem(long mem) {
+    setMaxJVMMem(mem);
+}
+
 //from Smart.cpp
 
 #ifdef WINDOWS

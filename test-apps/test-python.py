@@ -51,6 +51,8 @@ class Smart:
 		#JVM.h
 		self._dll.setJVMPath.argtypes = [c_char_p]
 		self._dll.setJVMPath.restype = None
+		self._dll.setMaxJVMMem.argtypes = [c_long]
+		self._dll.setMaxJVMMem.restype = None
 		#Smart.h
 		self._dll.getImageArray.argtypes = []
 		self._dll.getImageArray.restype = c_long
@@ -209,13 +211,19 @@ class Smart:
 		self._dll.findColorSpiralTol.restype = c_bool
 		#set jvm path and invoke setup
 		if jvmpath != None:
-			self._dll.setJVMPath(jvmpath);
+			self._dll.setJVMPath(jvmpath)
+		self._dll.setMaxJVMMem(512)
 		self._dll.setup(root,args,width,height,initseq)
 
 	#from JVM.cpp
 
 	def setJVMPath(self, path):
 		"""Specify a JVM for SMART to use. May be called at any time, but only 
+		   affects the next full loading cycle of SMART."""
+		setJVMPath(path)
+		
+	def setJVMPath(self, path):
+		"""Specify the max MB of memory for the JVM to use. May be called at any time, but only 
 		   affects the next full loading cycle of SMART."""
 		setJVMPath(path)
 

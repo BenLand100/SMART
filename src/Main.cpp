@@ -30,6 +30,7 @@ using namespace std;
 static char* exports[] = {
     (char*)"std_setup", (char*)"procedure SmartSetup(root, params: String; width, height: Integer; initseq: String);",
     (char*)"std_setJVMPath", (char*)"procedure SmartSetJVMPath(path: String);",
+    (char*)"std_setMaxJVMMem", (char*)"procedure SmartSetMaxJVMMem(mb: integer);",
 #ifdef WINDOWS
     (char*)"std_getImageHDC", (char*)"function SmartGetDC: integer;",
     (char*)"std_getDebugHDC", (char*)"function SmartGetDebugDC: integer;",
@@ -113,7 +114,7 @@ static char* exports[] = {
 
 #ifdef LINUX
 
-#define NumExports 77
+#define NumExports 78
 
 //STDCALL - SCAR/Simba
 long GetFunctionCount() {
@@ -148,7 +149,7 @@ void unload(void) {
 
 #ifdef WINDOWS
 
-#define NumExports 79
+#define NumExports 80
 
 HMODULE dllinst;
 

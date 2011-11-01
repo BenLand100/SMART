@@ -25,6 +25,7 @@
 //from JVM.h
 
 extern "C" void std_setJVMPath(char* path) __attribute__((stdcall));
+extern "C" void std_setMaxJVMMem(long mem) __attribute__((stdcall));
 
 //from Smart.h
 

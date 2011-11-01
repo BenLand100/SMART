@@ -28,6 +28,7 @@ using namespace std;
 
 //initilized and free'd in Smart.cpp as well
 char *jvmpath = 0;
+long maxmem = 256;
 
 //Sets the location of the library that SMART should load for the JVM
 void setJVMPath(char* path) {
@@ -43,6 +44,10 @@ void setJVMPath(char* path) {
 	}
 }
 
+void setMaxJVMMem(long _maxmem) {
+    maxmem = _maxmem;
+}
+
 #ifdef WINDOWS
 
 #include <windows.h>
@@ -56,17 +61,23 @@ bool initJVM(JNIEnv** env, JavaVM** vm, void* jvmdll) {
         (*vm)->GetEnv((void**)env, JNI_VERSION_1_6);
         return true;
     } else {
+        char *maxarg = (char*)malloc(snprintf(0,0,"-Xmx%im",(int)maxmem)+1);
+        sprintf(maxarg,"-Xmx%im",(int)maxmem);
         CreateJVM create = (CreateJVM) GetProcAddress((HMODULE)jvmdll, "JNI_CreateJavaVM");
         JavaVMInitArgs vm_args;
-        JavaVMOption options[2];
+        JavaVMOption options[3];
         options[0].optionString = (char*)"-Dsun.java2d.noddraw";
         options[1].optionString = (char*)"-Xcheck:jni";
+        options[2].optionString = maxarg;
         vm_args.options = options;
-        vm_args.nOptions = 2;
+        vm_args.nOptions = 3;
         vm_args.version = JNI_VERSION_1_6;
         vm_args.ignoreUnrecognized = true;
-        if (JNI_OK == create(vm, (void**)env, &vm_args))
+        if (JNI_OK == create(vm, (void**)env, &vm_args)) {
+            free(maxarg);
             return true;
+        }
+        free(maxarg);
     }
     return false;
 }
@@ -136,17 +147,23 @@ bool initJVM(JNIEnv** env, JavaVM** vm, void* jvmdll) {
         (*vm)->GetEnv((void**)env, JNI_VERSION_1_6);
         return true;
     } else {
+        char *maxarg = (char*)malloc(snprintf(0,0,"-Xmx%im",(int)maxmem)+1);
+        sprintf(maxarg,"-Xmx%im",(int)maxmem);
         CreateJVM create = (CreateJVM) dlsym(jvmdll, "JNI_CreateJavaVM");
         JavaVMInitArgs vm_args;
-        JavaVMOption options[2];
+        JavaVMOption options[3];
         options[0].optionString = (char*)"-Dsun.java2d.noddraw";
         options[1].optionString = (char*)"-Xcheck:jni";
+        options[2].optionString = maxarg;
         vm_args.options = options;
-        vm_args.nOptions = 2;
+        vm_args.nOptions = 3;
         vm_args.version = JNI_VERSION_1_6;
         vm_args.ignoreUnrecognized = true;
-        if (JNI_OK == create(vm, (void**)env, &vm_args))
+        if (JNI_OK == create(vm, (void**)env, &vm_args)) {
+            free(maxarg);
             return true;
+        }
+        free(maxarg);
     }
     return false;
 }
