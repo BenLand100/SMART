@@ -356,12 +356,13 @@ public class Client implements ActionListener, ChangeListener {
                                 final Point p = getMousePos();
                                 if (renderWhileBlocking && !minimized) {
                                     if (debuggfx) {
-                                        dbGraphics.drawImage(buffer, 0, 0, null);
                                         nativeDebug.rewind();
                                         for (int i = 0; i < len; ++i) {
                                             int color = nativeDebug.get() >> 8;
                                             if (color != transColor) {
                                                 debugData[i] = color;
+                                            } else {
+                                                debugData[i] = bufferData[i];
                                             }
                                         }
                                         dbGraphics.drawImage(debug, 0, 0, null);
