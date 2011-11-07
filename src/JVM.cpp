@@ -67,10 +67,9 @@ bool initJVM(JNIEnv** env, JavaVM** vm, void* jvmdll) {
         JavaVMInitArgs vm_args;
         JavaVMOption options[3];
         options[0].optionString = (char*)"-Dsun.java2d.noddraw";
-        options[1].optionString = (char*)"-Xcheck:jni";
-        options[2].optionString = maxarg;
+        options[1].optionString = maxarg;
         vm_args.options = options;
-        vm_args.nOptions = 3;
+        vm_args.nOptions = 2;
         vm_args.version = JNI_VERSION_1_6;
         vm_args.ignoreUnrecognized = true;
         if (JNI_OK == create(vm, (void**)env, &vm_args)) {
@@ -153,10 +152,9 @@ bool initJVM(JNIEnv** env, JavaVM** vm, void* jvmdll) {
         JavaVMInitArgs vm_args;
         JavaVMOption options[3];
         options[0].optionString = (char*)"-Dsun.java2d.noddraw";
-        options[1].optionString = (char*)"-Xcheck:jni";
-        options[2].optionString = maxarg;
+        options[1].optionString = maxarg;
         vm_args.options = options;
-        vm_args.nOptions = 3;
+        vm_args.nOptions = 2;
         vm_args.version = JNI_VERSION_1_6;
         vm_args.ignoreUnrecognized = true;
         if (JNI_OK == create(vm, (void**)env, &vm_args)) {

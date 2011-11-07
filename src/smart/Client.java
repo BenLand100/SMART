@@ -351,8 +351,8 @@ public class Client implements ActionListener, ChangeListener {
                                     }
                                 }
                                 nativeBuff.put(temp);
-                                final Point p = getMousePos();
                                 if (renderWhileBlocking && !minimized) {
+                                    final Point p = getMousePos();
                                     if (debuggfx) {
                                         nativeDebug.rewind();
                                         for (int i = 0; i < len; ++i) {
@@ -366,9 +366,9 @@ public class Client implements ActionListener, ChangeListener {
                                     } else {
                                         debugGraphics.drawImage(buffer, 0, 0, null);
                                     }
+                                    debugGraphics.fillOval(p.x - 2, p.y - 2, 4, 4);
+                                    canvasGraphics.drawImage(debug,0,0,null);
                                 }
-                                debugGraphics.fillOval(p.x - 2, p.y - 2, 4, 4);
-                                canvasGraphics.drawImage(debug,0,0,null);
                             }
                             canvasGraphics.drawImage(buffer, 0, 0, null);
                         }
