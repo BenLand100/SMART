@@ -29,6 +29,7 @@ using namespace std;
 //Export list for the SCAR/Simba plugin loaders
 static char* exports[] = {
     (char*)"std_setup", (char*)"procedure SmartSetup(root, params: String; width, height: Integer; initseq: String);",
+    (char*)"std_hardReset", (char*)"procedure SmartHardReset();",
     (char*)"std_setJVMPath", (char*)"procedure SmartSetJVMPath(path: String);",
     (char*)"std_setMaxJVMMem", (char*)"procedure SmartSetMaxJVMMem(mb: integer);",
 #ifdef WINDOWS
@@ -114,7 +115,7 @@ static char* exports[] = {
 
 #ifdef LINUX
 
-#define NumExports 78
+#define NumExports 79
 
 //STDCALL - SCAR/Simba
 long GetFunctionCount() {
@@ -149,7 +150,7 @@ void unload(void) {
 
 #ifdef WINDOWS
 
-#define NumExports 80
+#define NumExports 81
 
 HMODULE dllinst;
 

@@ -43,6 +43,7 @@ extern "C" bool std_isBlocking() __attribute__((stdcall));
 extern "C" long std_getRefresh() __attribute__((stdcall));
 extern "C" void std_setRefresh(long x) __attribute__((stdcall));
 extern "C" void std_setup(char*,char*,long,long,char*) __attribute__((stdcall));
+extern "C" void std_hardReset() __attribute__((stdcall));
 
 //from Reflection.h
 

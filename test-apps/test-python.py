@@ -274,6 +274,10 @@ class Smart:
 	def setup(self, root, args, w, h, initseq):
 		"""(Re)Initilizes SMART with the given arguments."""
 		self._dll.setup(root, args, w, h, initseq)
+		
+	def hardReset(self):
+		"""Returns the value of the FPS slider."""
+		self._dll.hardReset()
 
 	#from Reflection.cpp
 
@@ -603,10 +607,16 @@ class Smart:
 		return None
 
 if __name__ == "__main__":
-	smart = Smart('http://world19.runescape.com/', ',f5', 765, 503, '')
-	import time
-	import random
-	while True:
-	    time.sleep(1)
-	    smart.windMouse(int(random.random()*700),int(random.random()*500))
-
+        smart = Smart('http://world19.runescape.com/', ',f5', 765, 503, '')
+        import time
+        from threading import *
+        t = Timer(10.0, smart.hardReset)
+        t.start()
+        time.sleep(50)
+        
+        
+        
+        #import random
+        #while True:
+        #    time.sleep(1)
+        #    smart.windMouse(int(random.random()*700),int(random.random()*500))

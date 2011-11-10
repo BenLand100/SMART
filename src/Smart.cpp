@@ -312,6 +312,19 @@ void setup(char* root, char* params, long width, long height, char* initseq) {
     }
 }
 
+void hardReset() {
+    vm->AttachCurrentThreadAsDaemon((void**)&jre, 0);
+    clearOld();
+    free(curserver);
+    free(curparams);
+    curserver = (char*) malloc(1);
+    *curserver = 0;
+    curparams = (char*) malloc(1);
+    *curparams = 0;
+    jre = 0;
+    vm = 0;
+}
+
 //Called at Library loading to ensure a 'neat' state since initilizers might not always get run
 void internalConstructor() {
     curserver = (char*) malloc(1);

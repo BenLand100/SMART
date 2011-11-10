@@ -91,6 +91,11 @@ void std_setup(char* root, char* args, long w, long h, char* initseq) {
     setup(root, args, w, h, initseq);
 }
 
+void std_hardReset() {
+    hardReset();
+}
+
+
 
 //from Reflection.cpp
 

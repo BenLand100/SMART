@@ -117,6 +117,8 @@ extern "C" bool isBlocking() __attribute__((cdecl));
 extern "C" long getRefresh() __attribute__((cdecl));
 extern "C" void setRefresh(long x) __attribute__((cdecl));
 extern "C" void setup(char*,char*,long,long,char*) __attribute__((cdecl));
+extern "C" void hardReset() __attribute__((cdecl));
+
 
 #endif	/* _SMART_H */
 
