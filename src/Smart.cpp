@@ -102,6 +102,10 @@ void setGraphics(bool on) {
 
 //Returns true if the java instance is active and ready for commands
 bool isActive() {
+	//This is kind of dirty, since now a thread that didn't call `setup` now owns
+	//the JVM, however I'm assuming that shortly thereafter people would either 
+	//A) Terminate the thread, or B) Call `setup`; so it won't likely cause issues
+	if (jre) vm->AttachCurrentThreadAsDaemon((void**)&jre, 0);
     return jre ? jre->GetBooleanField(smart, _client.active) : false;
 }
 
@@ -312,6 +316,8 @@ void setup(char* root, char* params, long width, long height, char* initseq) {
     }
 }
 
+//Will completely kill the JVM and as a consequence, the RS client.
+//Note, resets the state to as if the JVM hasn't been loaded yet.
 void hardReset() {
     vm->AttachCurrentThreadAsDaemon((void**)&jre, 0);
     clearOld();
@@ -344,8 +350,6 @@ void internalDestructor() {
     free(curparams);
     if (jre) {
         freeClasses();
-        //Would be nice... But this causes a MASSIVE hang.
-        //vm->DestroyJavaVM();
     }
     cout << "Releasing SMART library...\n";
     #ifdef WINDOWS
