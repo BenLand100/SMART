@@ -81,3 +81,4 @@ EXPORTS
     std_stringFromChars=std_stringFromChars@8
     std_stringFromString=std_stringFromString@8
     std_windMouse=std_windMouse@8
+    std_hardReset=std_hardReset@0
