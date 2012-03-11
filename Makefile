@@ -184,7 +184,7 @@ ${LIN_BUILD_DIR}/STD_Wrapper.o: $(SRC_DIR)/STD_Wrapper.cpp $(CPPHEADERFILES)
 $(DIST)/$(WIN_NAME): $(WINOBJFILES)
 	@echo "Linking object files..."
 	@mkdir -p $(DIST)
-	@$(WIN_GPP) -Wl,$(SRC_DIR)/libsmart.def -static-libgcc -mwindows -shared -s -o $(DIST)/$(WIN_NAME) $(WINOBJFILES)
+	@$(WIN_GPP) -Wl,$(SRC_DIR)/libsmart.def -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(WIN_NAME) $(WINOBJFILES)
 
 $(WIN_BUILD_DIR)/Main.o: $(SRC_DIR)/Main.cpp $(CPPHEADERFILES)
 	@echo "Compiling Main.cpp"
@@ -231,7 +231,7 @@ ${WIN_BUILD_DIR}/STD_Wrapper.o: $(SRC_DIR)/STD_Wrapper.cpp $(CPPHEADERFILES)
 $(DIST)/$(SCAR_NAME): $(SCAROBJFILES)
 	@echo "Linking object files..."
 	@mkdir -p $(DIST)
-	@$(WIN_GPP) -Wl,$(SRC_DIR)/libsmart.def -static-libgcc -mwindows -shared -s -o $(DIST)/$(SCAR_NAME) $(SCAROBJFILES)
+	@$(WIN_GPP) -Wl,$(SRC_DIR)/libsmart.def -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(SCAR_NAME) $(SCAROBJFILES)
 
 $(SCAR_BUILD_DIR)/Main.o: $(SRC_DIR)/Main.cpp $(CPPHEADERFILES)
 	@echo "Compiling Main.cpp"
