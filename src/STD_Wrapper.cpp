@@ -67,6 +67,10 @@ void std_setGraphics(bool on) {
     setGraphics(on);
 }
 
+void std_setEnabled(bool on) {
+    setEnabled(on);
+}
+
 void* std_getDebugArray() {
     return getDebugArray();
 }
@@ -95,7 +99,9 @@ void std_hardReset() {
     hardReset();
 }
 
-
+void std_setUserAgent(char* useragent) {
+    setUserAgent(useragent);
+}
 
 //from Reflection.cpp
 

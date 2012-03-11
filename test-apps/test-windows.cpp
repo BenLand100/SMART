@@ -24,6 +24,8 @@ using namespace std;
 
 typedef long (*GetFunctionCount) (void) __attribute__((stdcall));
 typedef long (*GetFunctionInfo)(int, void*&, char*&) __attribute__((stdcall));
+typedef void (*SetUserAgent)(char*) __attribute__((stdcall));
+typedef void (*SetEnabled)(bool) __attribute__((stdcall));
 typedef void (*Setup)(char*,char*,long,long,char*) __attribute__((stdcall));
 
 int main(int argc, char** argv) {
@@ -44,10 +46,16 @@ int main(int argc, char** argv) {
         delete def;
     }
     cout << "Starting SMART...\n";
+    //SetUserAgent useragent = (SetUserAgent) GetProcAddress(libsmart, "std_setUserAgent");
+    //useragent((char*)"SuperFox 9001");
     Setup setup = (Setup) GetProcAddress(libsmart, "std_setup");
     setup((char*)"http://world19.runescape.com/", (char*)",f5", 765, 503,(char*)"");
+    SetEnabled setenabled = (SetEnabled) GetProcAddress(libsmart, "std_setEnabled");
 
-    while (true) Sleep(1000);
+    while (true) {
+        Sleep(5000);
+        setenabled(rand() % 2);
+    }
 
     return 0;
 }

@@ -574,7 +574,7 @@ public class EventNazi {
             if (tabbed) {
                 BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_PRESSED,System.currentTimeMillis(),KeyEvent.ALT_DOWN_MASK,KeyEvent.VK_ALT,KeyEvent.CHAR_UNDEFINED,KeyEvent.KEY_LOCATION_LEFT));
                 wait(100,200);
-                BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_PRESSED,System.currentTimeMillis(),KeyEvent.ALT_DOWN_MASK,KeyEvent.VK_TAB,'\t',KeyEvent.KEY_LOCATION_STANDARD));
+                BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_PRESSED,System.currentTimeMillis(),KeyEvent.ALT_DOWN_MASK,KeyEvent.VK_TAB,KeyEvent.CHAR_UNDEFINED,KeyEvent.KEY_LOCATION_STANDARD));
                 wait(100,200);
                 BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_RELEASED,System.currentTimeMillis(),0,KeyEvent.VK_ALT,KeyEvent.CHAR_UNDEFINED,KeyEvent.KEY_LOCATION_LEFT));
                 wait(10,50);

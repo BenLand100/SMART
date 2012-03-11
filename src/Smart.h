@@ -93,6 +93,7 @@ typedef struct {
 	jmethodID getfieldarray2dobject;
 	jmethodID setgraphics;
 	jmethodID setdebug;
+	jmethodID setenabled;
 	jfieldID blocking;
 	jfieldID active;
 	jfieldID transcolor;
@@ -111,6 +112,7 @@ extern "C" void* getImageArray() __attribute__((cdecl));
 extern "C" void setTransparentColor(jint color) __attribute__((cdecl));
 extern "C" void setDebug(bool on) __attribute__((cdecl));
 extern "C" void setGraphics(bool on) __attribute__((cdecl));
+extern "C" void setEnabled(bool on) __attribute__((cdecl));
 extern "C" void* getDebugArray() __attribute__((cdecl));
 extern "C" bool isActive() __attribute__((cdecl));
 extern "C" bool isBlocking() __attribute__((cdecl));
@@ -118,6 +120,7 @@ extern "C" long getRefresh() __attribute__((cdecl));
 extern "C" void setRefresh(long x) __attribute__((cdecl));
 extern "C" void setup(char*,char*,long,long,char*) __attribute__((cdecl));
 extern "C" void hardReset() __attribute__((cdecl));
+extern "C" void setUserAgent(char*) __attribute__((cdecl));
 
 
 #endif	/* _SMART_H */

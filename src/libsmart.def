@@ -82,3 +82,5 @@ EXPORTS
     std_stringFromString=std_stringFromString@8
     std_windMouse=std_windMouse@8
     std_hardReset=std_hardReset@0
+    std_setEnabled=std_setEnabled@4
+    std_setUserAgent=std_setUserAgent@4

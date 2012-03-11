@@ -32,6 +32,7 @@ static char* exports[] = {
     (char*)"std_hardReset", (char*)"procedure SmartHardReset();",
     (char*)"std_setJVMPath", (char*)"procedure SmartSetJVMPath(path: String);",
     (char*)"std_setMaxJVMMem", (char*)"procedure SmartSetMaxJVMMem(mb: integer);",
+    (char*)"std_setUserAgent", (char*)"procedure SmartSetUserAgent(useragent: String);",
 #ifdef WINDOWS
     (char*)"std_getImageHDC", (char*)"function SmartGetDC: integer;",
     (char*)"std_getDebugHDC", (char*)"function SmartGetDebugDC: integer;",
@@ -43,6 +44,7 @@ static char* exports[] = {
     (char*)"std_setTransparentColor", (char*)"procedure SmartSetTransparentColor(color: integer);",
     (char*)"std_setDebug", (char*)"procedure SmartSetDebug(enabled: boolean);",
     (char*)"std_setGraphics", (char*)"procedure SmartSetGraphics(enabled: boolean);",
+    (char*)"std_setEnabled", (char*)"procedure SmartSetEnabled(enabled: boolean);",
     (char*)"std_isActive", (char*)"function SmartActive: boolean;",
     (char*)"std_isBlocking", (char*)"function SmartEnabled: boolean;",
     (char*)"std_getMousePos", (char*)"procedure SmartGetMousePos(var x, y: integer);",
@@ -115,7 +117,7 @@ static char* exports[] = {
 
 #ifdef LINUX
 
-#define NumExports 79
+#define NumExports 81
 
 //STDCALL - SCAR/Simba
 long GetFunctionCount() {
@@ -150,7 +152,7 @@ void unload(void) {
 
 #ifdef WINDOWS
 
-#define NumExports 81
+#define NumExports 83
 
 HMODULE dllinst;
 

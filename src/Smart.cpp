@@ -56,6 +56,7 @@ JSTRING _string;
 //Info related to the current SMART instance
 char* curserver = 0;
 char* curparams = 0;
+char* useragent = 0;
 PRGB image = 0;
 PRGB debug = 0;
 int client_width = 0;
@@ -100,6 +101,11 @@ void setGraphics(bool on) {
     if (jre) jre->CallVoidMethod(smart, _client.setgraphics, on ? 1 : 0);
 }
 
+//Enables or Disables SMART programatically 
+void setEnabled(bool on) {
+    if (jre) jre->CallVoidMethod(smart, _client.setenabled, on ? 1 : 0);
+}
+
 //Returns true if the java instance is active and ready for commands
 bool isActive() {
 	//This is kind of dirty, since now a thread that didn't call `setup` now owns
@@ -122,6 +128,13 @@ long getRefresh() {
 //Sets the 'refresh rate' of the client, 0-100, 100 being fullspeed, 0 being very slow
 void setRefresh(long x) {
     if (jre) jre->CallVoidMethod(smart, _client.setrefresh, x);
+}
+
+void setUserAgent(char *newagent) {
+    int len = newagent ? strlen(newagent) : 0;
+    free(useragent);
+    useragent = (char*) malloc(len+1);
+    strcpy(useragent,newagent);
 }
 
 //Erases the previous SMART state, but leaves the JVM intact
@@ -153,7 +166,7 @@ void clearOld(){
 void findClasses() {
     loadClasses();
     _client.clazz = (jclass) jre->NewGlobalRef(jre->FindClass("smart/Client"));
-    _client.init = jre->GetMethodID(_client.clazz, "<init>", "(Ljava/nio/ByteBuffer;Ljava/nio/ByteBuffer;IILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
+    _client.init = jre->GetMethodID(_client.clazz, "<init>", "(Ljava/nio/ByteBuffer;Ljava/nio/ByteBuffer;IILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
     _client.clickmouse = jre->GetMethodID(_client.clazz, "clickMouse", "(III)V");
     _client.getmousepos = jre->GetMethodID(_client.clazz, "getMousePos", "()Ljava/awt/Point;");
     _client.holdkey = jre->GetMethodID(_client.clazz, "holdKey", "(I)V");
@@ -212,6 +225,7 @@ void findClasses() {
     _client.getfieldarraysize = jre->GetMethodID(_client.clazz, "getFieldArraySize", "(Ljava/lang/Object;Ljava/lang/String;I)I");
     _client.setgraphics = jre->GetMethodID(_client.clazz, "setGraphics", "(Z)V");
     _client.setdebug = jre->GetMethodID(_client.clazz, "setDebug", "(Z)V");
+    _client.setenabled = jre->GetMethodID(_client.clazz, "setEnabled", "(Z)V");
     _client.transcolor = jre->GetFieldID(_client.clazz, "transColor", "I");
     _point.clazz = (jclass) jre->NewGlobalRef(jre->FindClass("java/awt/Point"));
     _point.x = jre->GetFieldID(_point.clazz, "x", "I");
@@ -219,7 +233,6 @@ void findClasses() {
     _string.clazz = (jclass) jre->NewGlobalRef(jre->FindClass("java/lang/String"));
     _string.byteInit = jre->GetMethodID(_string.clazz, "<init>", "([B)V");
     _string.charInit = jre->GetMethodID(_string.clazz, "<init>", "([C)V");
-
 }
 
 //Frees all cached class refrences
@@ -286,7 +299,8 @@ void setup(char* root, char* params, long width, long height, char* initseq) {
         jobject rootstr = jre->NewStringUTF(curserver);
         jobject paramsstr = jre->NewStringUTF(params);
         jobject initseqstr = jre->NewStringUTF(initseq);
-        jobject temp = jre->NewObject(_client.clazz, _client.init, imgBuffer, debugBuffer, client_width, client_height, rootstr, paramsstr,initseqstr);
+        jobject useragentstr = jre->NewStringUTF(useragent);
+        jobject temp = jre->NewObject(_client.clazz, _client.init, imgBuffer, debugBuffer, client_width, client_height, rootstr, paramsstr,initseqstr,useragentstr);
         smart = jre->NewGlobalRef(temp);
         jre->DeleteLocalRef(temp);
         jre->DeleteLocalRef(imgBuffer);
@@ -294,6 +308,7 @@ void setup(char* root, char* params, long width, long height, char* initseq) {
         jre->DeleteLocalRef(rootstr);
         jre->DeleteLocalRef(paramsstr);
         jre->DeleteLocalRef(initseqstr);
+        jre->DeleteLocalRef(useragentstr);
     } else {
         if (jre && (jre->GetBooleanField(smart, _client.active) == JNI_FALSE)) {
             jre->CallVoidMethod(smart, _client.destroy);
@@ -303,7 +318,8 @@ void setup(char* root, char* params, long width, long height, char* initseq) {
             jobject rootstr = jre->NewStringUTF(curserver);
             jobject paramsstr = jre->NewStringUTF(params);
             jobject initseqstr = jre->NewStringUTF(initseq);
-            jobject temp = jre->NewObject(_client.clazz, _client.init, imgBuffer, debugBuffer, client_width, client_height, rootstr, paramsstr,initseqstr);
+            jobject useragentstr = jre->NewStringUTF(useragent);
+            jobject temp = jre->NewObject(_client.clazz, _client.init, imgBuffer, debugBuffer, client_width, client_height, rootstr, paramsstr,initseqstr,useragentstr);
             smart = jre->NewGlobalRef(temp);
             jre->DeleteLocalRef(temp);
             jre->DeleteLocalRef(imgBuffer);
@@ -311,6 +327,7 @@ void setup(char* root, char* params, long width, long height, char* initseq) {
             jre->DeleteLocalRef(rootstr);
             jre->DeleteLocalRef(paramsstr);
             jre->DeleteLocalRef(initseqstr);
+            jre->DeleteLocalRef(useragentstr);
             return;
         }
     }
@@ -327,6 +344,8 @@ void hardReset() {
     *curserver = 0;
     curparams = (char*) malloc(1);
     *curparams = 0;
+    useragent = (char*) malloc(1);
+    *useragent = 0;
     jre = 0;
     vm = 0;
 }
@@ -337,6 +356,8 @@ void internalConstructor() {
     *curserver = 0;
     curparams = (char*) malloc(1);
     *curparams = 0;
+    useragent = (char*) malloc(1);
+    *useragent = 0;
     jvmpath = 0;
     maxmem = 256;
 }
@@ -348,6 +369,7 @@ void internalDestructor() {
     clearOld();
     free(curserver);
     free(curparams);
+    free(useragent);
     if (jre) {
         freeClasses();
     }

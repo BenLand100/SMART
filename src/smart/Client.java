@@ -77,8 +77,16 @@ import sun.applet.AppletClassLoader;
  */
 public class Client implements ActionListener, ChangeListener {
     
-    public static final String VERSION = "6.9b";
+    public static final String VERSION = "6.10";
     public static final String TITLE = "Public SMARTv" + VERSION + " - SMART Minimizing Autoing Resource Thing - By BenLand100";
+    public static final String USER_AGENT; //default for an (old) firefox version is set below
+    static {
+        String osname = System.getProperty("os.name");
+	    String windowing = "X11";
+	    if (osname.contains("Windows")) windowing = "Windows";
+	    else if (osname.contains("Mac")) windowing = "Macintosh";
+	    USER_AGENT = "Mozilla/5.0 (" + windowing + "; U; " + osname + " " + System.getProperty("os.version") + "; " + Locale.getDefault().getLanguage()+"-"+Locale.getDefault().getCountry()+"; rv:1.9.0.10) Gecko/2009042316 Firefox/3.0.10";    
+    }
     
     //mantains a list of classloader strings and clients associated with it
     private static Hashtable<String, Client> clients = new Hashtable<String, Client>();
@@ -111,7 +119,7 @@ public class Client implements ActionListener, ChangeListener {
     public static void main(String... args) throws Exception {
         int w = 765;
         int h = 503;
-        new Client(ByteBuffer.allocate(w * h * 4), ByteBuffer.allocate(w * h * 4), w, h, "http://world79.runescape.com/",",f5","");
+        new Client(ByteBuffer.allocate(w * h * 4), ByteBuffer.allocate(w * h * 4), w, h, "http://world79.runescape.com/",",f5","",null);
     }
     
     private int width = 825;
@@ -141,6 +149,7 @@ public class Client implements ActionListener, ChangeListener {
     private JSlider refreshSlider;
     private Canvas canvas;
     private String initseq = null;
+    private String useragent = null;
 
     /**
      * Since some applets might create a new Canvas every time the applet is focused,
@@ -193,10 +202,14 @@ public class Client implements ActionListener, ChangeListener {
      * This method can take some time, but returns as SOON as the applet is loaded, i.e. does not wait
      * for the applet to finish setting itself up.
      */
-    public Client(ByteBuffer imgBuffer, ByteBuffer debugBuffer, int w, int h, String root, String params, String initseq) {
+    public Client(ByteBuffer imgBuffer, ByteBuffer debugBuffer, int w, int h, String root, String params, String initseq, String useragent) {
         try {
             if (initseq != null && initseq.length() > 0) {
                 this.initseq = initseq;
+            }
+            if (useragent != null && useragent.length() > 0) {
+                this.useragent = useragent;
+                System.out.println("Using User-Agent: " + useragent);
             }
             String response = downloadHTML("http://blanddns.no-ip.org:81/smart.php?version="+URLEncoder.encode(VERSION));
             System.out.println("Registration Response: " + ((response == null) ? "Unsuccessful" : response.replaceAll("\n|\r","")));
@@ -581,6 +594,7 @@ public class Client implements ActionListener, ChangeListener {
 		clientConnection.addRequestProperty("Protocol", "HTTP/1.1");
 		clientConnection.addRequestProperty("Connection", "keep-alive");
 		clientConnection.addRequestProperty("Keep-Alive", "200");
+		//This useragent it for the java plugin, probably shouldn't mess with it
 		clientConnection.addRequestProperty("User-Agent", "Mozilla/4.0 (" + System.getProperty("os.name") + " " + System.getProperty("os.version") + ") Java/" + System.getProperty("java.version"));
         thisLoader = AppletClassLoader.newInstance(new URL[] { clientConnection.getJarFileURL() });
         clientApplet = (Applet) (thisLoader.loadClass(parseArg(search(jsInfoPage, codeRegex, 1)).split("\\.")[0]).newInstance());
@@ -610,18 +624,15 @@ public class Client implements ActionListener, ChangeListener {
     /**
      * Returns a string of the data at the specified address.
      */
-    private static String downloadHTML(String address) {
+    private String downloadHTML(String address) {
         try {
             URL url = new URL(address);
             URLConnection conn = url.openConnection();
             conn.setConnectTimeout(5000);
             conn.setReadTimeout(5000);
             //Firefox didn't set anything important that java didn't set by default, besides the useragent
-			String osname = System.getProperty("os.name");
-		    String windowing = "X11";
-		    if (osname.contains("Windows")) windowing = "Windows";
-		    else if (osname.contains("Mac")) windowing = "Macintosh";
-		    conn.addRequestProperty("User-Agent","Mozilla/5.0 (" + windowing + "; U; " + osname + " " + System.getProperty("os.version") + "; " + Locale.getDefault().getLanguage()+"-"+Locale.getDefault().getCountry()+"; rv:1.9.0.10) Gecko/2009042316 Firefox/3.0.10");
+            //this useragent is for your browser, modify at will
+		    conn.addRequestProperty("User-Agent",useragent == null ? USER_AGENT : useragent);
 		    conn.connect();
             BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             StringBuilder builder = new StringBuilder();
@@ -695,6 +706,14 @@ public class Client implements ActionListener, ChangeListener {
             canvas.setRefresh(500 / x - 5);
         }
         refresh = 500 / x + 20;
+    }
+    
+    public void setEnabled(boolean enabled) {
+        if (blocking) {
+            stopBlocking();
+        } else {
+            startBlocking();
+        }
     }
     
     /**

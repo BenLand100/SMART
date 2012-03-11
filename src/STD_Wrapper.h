@@ -37,6 +37,7 @@ extern "C" void* std_getImageArray() __attribute__((stdcall));
 extern "C" void std_setTransparentColor(long color) __attribute__((stdcall));
 extern "C" void std_setDebug(bool on) __attribute__((stdcall));
 extern "C" void std_setGraphics(bool on) __attribute__((stdcall));
+extern "C" void std_setEnabled(bool on) __attribute__((stdcall));
 extern "C" void* std_getDebugArray() __attribute__((stdcall));
 extern "C" bool std_isActive() __attribute__((stdcall));
 extern "C" bool std_isBlocking() __attribute__((stdcall));
@@ -44,6 +45,7 @@ extern "C" long std_getRefresh() __attribute__((stdcall));
 extern "C" void std_setRefresh(long x) __attribute__((stdcall));
 extern "C" void std_setup(char*,char*,long,long,char*) __attribute__((stdcall));
 extern "C" void std_hardReset() __attribute__((stdcall));
+extern "C" void std_setUserAgent(char*) __attribute__((stdcall));
 
 //from Reflection.h
 
