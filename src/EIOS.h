@@ -102,7 +102,7 @@ void EIOS_Finalize() __attribute__((stdcall));
  
 typedef Target void*  
  
-Target EIOS_RequestTarget() __attribute__((stdcall)); 
+Target EIOS_RequestTarget(void *initargs) __attribute__((stdcall)); 
 void EIOS_ReleaseTarget(Target t) __attribute__((stdcall)); 
  
 /** 
