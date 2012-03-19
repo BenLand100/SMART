@@ -44,7 +44,8 @@ CPPSOURCEFILES= \
 	$(SRC_DIR)/Reflection.cpp \
 	$(SRC_DIR)/JVM.cpp \
 	$(SRC_DIR)/Smart.cpp \
-	$(SRC_DIR)/STD_Wrapper.cpp
+	$(SRC_DIR)/STD_Wrapper.cpp \
+	$(SRC_DIR)/EIOS.cpp
 	
 CPPHEADERFILES= \
 	$(SRC_DIR)/jni.h \
@@ -56,7 +57,8 @@ CPPHEADERFILES= \
 	$(SRC_DIR)/Reflection.h \
 	$(SRC_DIR)/JVM.h \
 	$(SRC_DIR)/Smart.h \
-	$(SRC_DIR)/STD_Wrapper.h
+	$(SRC_DIR)/STD_Wrapper.h \
+	$(SRC_DIR)/EIOS.h
 	
 WINOBJFILES= \
 	$(WIN_BUILD_DIR)/Main.o \
@@ -66,7 +68,8 @@ WINOBJFILES= \
 	$(WIN_BUILD_DIR)/Reflection.o \
 	$(WIN_BUILD_DIR)/JVM.o \
 	$(WIN_BUILD_DIR)/Smart.o \
-	$(WIN_BUILD_DIR)/STD_Wrapper.o
+	$(WIN_BUILD_DIR)/STD_Wrapper.o \
+	$(WIN_BUILD_DIR)/EIOS.o
 
 SCAROBJFILES= \
 	$(SCAR_BUILD_DIR)/Main.o \
@@ -86,7 +89,8 @@ LINOBJFILES= \
 	$(LIN_BUILD_DIR)/Reflection.o \
 	$(LIN_BUILD_DIR)/JVM.o \
 	$(LIN_BUILD_DIR)/Smart.o \
-	$(LIN_BUILD_DIR)/STD_Wrapper.o
+	$(LIN_BUILD_DIR)/STD_Wrapper.o \
+	$(LIN_BUILD_DIR)/EIOS.o
 	
 SMARTSOURCES= \
     $(SRC_DIR)/java/awt/Canvas.java \
@@ -179,6 +183,11 @@ ${LIN_BUILD_DIR}/STD_Wrapper.o: $(SRC_DIR)/STD_Wrapper.cpp $(CPPHEADERFILES)
 	@mkdir -p $(LIN_BUILD_DIR)
 	@$(LIN_GPP) $(LIN_COMPILE_ARGS) -o $(LIN_BUILD_DIR)/STD_Wrapper.o $(SRC_DIR)/STD_Wrapper.cpp
 
+${LIN_BUILD_DIR}/EIOS.o: $(SRC_DIR)/EIOS.cpp $(CPPHEADERFILES)
+	@echo "Compiling STD_Wrapper.cpp"
+	@mkdir -p $(LIN_BUILD_DIR)
+	@$(LIN_GPP) $(LIN_COMPILE_ARGS) -o $(LIN_BUILD_DIR)/EIOS.o $(SRC_DIR)/EIOS.cpp
+
 #### WINDOWS BUILDING DIRECTIVES ####
 
 $(DIST)/$(WIN_NAME): $(WINOBJFILES)
@@ -225,6 +234,11 @@ ${WIN_BUILD_DIR}/STD_Wrapper.o: $(SRC_DIR)/STD_Wrapper.cpp $(CPPHEADERFILES)
 	@echo "Compiling STD_Wrapper.cpp"
 	@mkdir -p $(WIN_BUILD_DIR)
 	@$(WIN_GPP) $(WIN_COMPILE_ARGS) -o $(WIN_BUILD_DIR)/STD_Wrapper.o $(SRC_DIR)/STD_Wrapper.cpp
+	
+${WIN_BUILD_DIR}/EIOS.o: $(SRC_DIR)/EIOS.cpp $(CPPHEADERFILES)
+	@echo "Compiling EIOS.cpp"
+	@mkdir -p $(WIN_BUILD_DIR)
+	@$(WIN_GPP) $(WIN_COMPILE_ARGS) -o $(WIN_BUILD_DIR)/EIOS.o $(SRC_DIR)/EIOS.cpp
 
 #### SCAR BUILDING DIRECTIVES ####
 

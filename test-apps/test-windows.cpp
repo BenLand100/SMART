@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
     //SetUserAgent useragent = (SetUserAgent) GetProcAddress(libsmart, "std_setUserAgent");
     //useragent((char*)"SuperFox 9001");
     Setup setup = (Setup) GetProcAddress(libsmart, "std_setup");
-    setup((char*)"http://world19.runescape.com/", (char*)",f5", 765, 503,(char*)"");
+    setup((char*)"http://world55.runescape.com/", (char*)"l=2/,f2492772472491484653", 765, 503,(char*)"");
     SetEnabled setenabled = (SetEnabled) GetProcAddress(libsmart, "std_setEnabled");
 
     while (true) {

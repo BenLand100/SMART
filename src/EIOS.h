@@ -17,8 +17,6 @@
  *  along with EIOS. If not, see <http://www.gnu.org/licenses/>. 
  */ 
   
-//Sadly, I never actually implemented this. Maybe one day! Its a nice standard.
-  
 /** 
  *  This is the C++ header for the Extensible Input/Output System. 
  *  EIOS is designed as a plugable interface to allow easy routing of 
@@ -67,18 +65,8 @@
  *  method names may be modified to whatever end. What is important 
  *  is that the proper pointers are available to the Controller. 
  */ 
- 
-/** 
- *  EIOS_Initialize and EIOS_Finalize should be called after the 
- *  loading and before the unloading of a plugin, respectively. 
- *  This allows a Client to preform any global setup/cleanup in  
- *  a safe and standardized way. No methods may be used outside  
- *  of code bounded by these methods, and these methods must be  
- *  called in the specified order. 
- */ 
-  
-void EIOS_Initialize() __attribute__((stdcall)); 
-void EIOS_Finalize() __attribute__((stdcall)); 
+
+extern "C" {
  
 /** 
  *  EIOS_RequestTarget informs a Client that the Controller is ready  
@@ -100,7 +88,7 @@ void EIOS_Finalize() __attribute__((stdcall));
  *  making this call. 
  */ 
  
-typedef Target void*  
+typedef void* Target;
  
 Target EIOS_RequestTarget(void *initargs) __attribute__((stdcall)); 
 void EIOS_ReleaseTarget(Target t) __attribute__((stdcall)); 
@@ -142,7 +130,7 @@ typedef union {
 	unsigned long color; 
 } rgb; 
  
-*rgb EIOS_GetImageBuffer(Target t) __attribute__((stdcall)); 
+rgb* EIOS_GetImageBuffer(Target t) __attribute__((stdcall)); 
 void EIOS_UpdateImageBuffer(Target t) __attribute__((stdcall)); 
  
 /** 
@@ -187,9 +175,9 @@ void EIOS_UpdateImageBuffer(Target t) __attribute__((stdcall));
   
 void EIOS_GetMousePosition(Target t, long* x, long* y) __attribute__((stdcall)); 
 void EIOS_MoveMouse(Target t, long x, long y) __attribute__((stdcall)); 
-void EIOS_HoldMouse(Target t, long x, long y, bool left) __attribute__((stdcall)); 
-void EIOS_ReleaseMouse(Target t, long x, long y, bool left) __attribute__((stdcall)); 
-bool EIOS_IsMouseHeld(Target t, bool left) __attribute__((stdcall)); 
+void EIOS_HoldMouse(Target t, long x, long y, int button) __attribute__((stdcall)); 
+void EIOS_ReleaseMouse(Target t, long x, long y, int button) __attribute__((stdcall)); 
+bool EIOS_IsMouseHeld(Target t, int button) __attribute__((stdcall)); 
  
 /** 
  *  Keyboard control is abstracted to holds and releases of keys. In this 
@@ -213,4 +201,6 @@ void EIOS_SendString(Target t, char* str) __attribute__((stdcall));
 void EIOS_HoldKey(Target t, long key) __attribute__((stdcall)); 
 void EIOS_ReleaseKey(Target t, long key) __attribute__((stdcall)); 
 bool EIOS_IsKeyHeld(Target t, long key) __attribute__((stdcall)); 
+
+};
   

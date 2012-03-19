@@ -86,6 +86,11 @@ void* getDebugArray() {
     return (void*) debug;
 }
 
+void getDimensions(int *w, int *h) {
+    *w = client_width;
+    *h = client_height;
+}
+
 //Sets the color on the debug space that is considered transparent, default 0
 void setTransparentColor(jint color) {
     if (jre) jre->SetIntField(smart, _client.transcolor, color);

@@ -104,6 +104,8 @@ typedef struct {
 void internalConstructor();
 void internalDestructor();
 
+void getDimensions(int *w, int *h);
+
 #ifdef WINDOWS
 extern "C" long getImageHDC() __attribute__((cdecl));
 extern "C" long getDebugHDC() __attribute__((cdecl));
