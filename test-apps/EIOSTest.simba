@@ -16,7 +16,7 @@ begin
   height:= 503;
   initseq:= 's';
   maxmem:= -1; //use SMART's default
-  jvmpath:= '/usr/lib/jvm/sun-jdk-1.6/jre/lib/amd64/server/libjvm.so'; //use SMART's default
+  jvmpath:= ''; //use SMART's default
   useragent:= ''; //use SMART's default
   SetEIOSTarget('libsmart',IntToStr(version)+',"'+root+'","'+params+'",'+IntToStr(width)+','+IntToStr(height)+',"'+initseq+'",'+IntToStr(maxmem)+',"'+jvmpath+'","'+useragent+'"');
 end;
@@ -24,4 +24,9 @@ end;
 begin
   InitSmart();
   //Now, all of Simba's functions use SMART as the target, no hacks.
+  while true do
+  begin
+    MoveMouse(Random(765),Random(503));
+    Wait(1000);
+  end;
 end.
