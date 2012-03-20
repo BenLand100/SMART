@@ -27,7 +27,11 @@ typedef long (*GetFunctionInfo)(int, void*&, char*&) __attribute__((stdcall));
 typedef void (*Setup)(char*,char*,long,long,char*) __attribute__((stdcall));
 
 int main(int argc, char** argv) {
-    void* libsmart = dlopen("./libsmart.so",RTLD_LAZY);
+    #if __SIZEOF_POINTER__ == 4
+    void* libsmart = dlopen("./libsmart32.so",RTLD_LAZY);
+    #else
+    void* libsmart = dlopen("./libsmart64.so",RTLD_LAZY);
+    #endif
     cout << "Library: " << libsmart << '\n';
     char* error = dlerror();
     if (error) cout << error << '\n';

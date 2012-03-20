@@ -43,6 +43,7 @@ typedef struct {
 	jmethodID releasemouse;
 	jmethodID clickmouse;
 	jmethodID getmousepos;
+	jmethodID ismousebuttonheld;
 	jmethodID holdkey;
 	jmethodID iskeydown;
 	jmethodID releasekey;

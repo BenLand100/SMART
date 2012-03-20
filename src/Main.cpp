@@ -56,6 +56,7 @@ static char* exports[] = {
     (char*)"std_windMouse", (char*)"procedure SmartWindMouse(x, y: integer);",
     (char*)"std_clickMouse", (char*)"procedure SmartClickMouse(x, y: integer; left: boolean);",
     (char*)"std_clickMousePlus", (char*)"procedure SmartClickMousePlus(x, y, button: integer);",
+    (char*)"std_isMouseButtonHeld", (char*)"function SmartIsMouseButtonHeld(button: integer): boolean;",
     (char*)"std_sendKeys", (char*)"procedure SmartSendKeys(Text: String);",
     (char*)"std_holdKey", (char*)"procedure SmartHoldKey(Code: Integer);",
     (char*)"std_releaseKey", (char*)"procedure SmartReleaseKey(Code: Integer);",
@@ -117,7 +118,7 @@ static char* exports[] = {
 
 #ifdef LINUX
 
-#define NumExports 81
+#define NumExports 82
 
 //STDCALL - SCAR/Simba
 long GetFunctionCount() {
@@ -152,7 +153,7 @@ void unload(void) {
 
 #ifdef WINDOWS
 
-#define NumExports 83
+#define NumExports 84
 
 HMODULE dllinst;
 

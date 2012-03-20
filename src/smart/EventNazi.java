@@ -395,6 +395,15 @@ public class EventNazi {
         return null;
     }
     
+    public synchronized boolean isMouseButtonHeld(int button) {
+        switch (button) {
+            case 1: return leftDown;
+            case 2: return midDown;
+            case 3: return rightDown;
+        }
+        return false;
+    }
+    
     /**
      * Tests if a character requires the shift key to be pressed.
      * @param c Char to check for
@@ -575,8 +584,6 @@ public class EventNazi {
                 BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_PRESSED,System.currentTimeMillis(),KeyEvent.ALT_DOWN_MASK,KeyEvent.VK_ALT,KeyEvent.CHAR_UNDEFINED,KeyEvent.KEY_LOCATION_LEFT));
                 wait(100,200);
                 BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_PRESSED,System.currentTimeMillis(),KeyEvent.ALT_DOWN_MASK,KeyEvent.VK_TAB,KeyEvent.CHAR_UNDEFINED,KeyEvent.KEY_LOCATION_STANDARD));
-                wait(100,200);
-                BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_RELEASED,System.currentTimeMillis(),0,KeyEvent.VK_ALT,KeyEvent.CHAR_UNDEFINED,KeyEvent.KEY_LOCATION_LEFT));
                 wait(10,50);
             }
             BlockingEventQueue.sendUnblocked(new FocusEvent(comp, FocusEvent.FOCUS_LOST, false, null));
@@ -635,7 +642,7 @@ public class EventNazi {
             //Its impossible for the comp to have focus, you clicked elsewhere
             //in order to stop blocking...
             //Don't forget to clear native focus also...
-            KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
+            //KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
             looseFocus(true);
         }
         nazies.remove(comp);

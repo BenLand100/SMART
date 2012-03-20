@@ -29,7 +29,11 @@ typedef void (*SetEnabled)(bool) __attribute__((stdcall));
 typedef void (*Setup)(char*,char*,long,long,char*) __attribute__((stdcall));
 
 int main(int argc, char** argv) {
-    HMODULE libsmart = LoadLibrary("./libsmart.dll");
+    #if __SIZEOF_POINTER__ == 4
+    HMODULE libsmart = LoadLibrary("./libsmart32.dll");
+    #else
+    HMODULE libsmart = LoadLibrary("./libsmart64.dll");
+    #endif
     cout << "Library: " << libsmart << '\n';
     cout << "GetFunctionCount: " << (void*)GetProcAddress(libsmart, "GetFunctionCount") << '\n';
     cout << "GetFunctionInfo: " << (void*)GetProcAddress(libsmart, "GetFunctionInfo") << '\n';

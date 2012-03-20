@@ -115,6 +115,7 @@ extern "C" void std_clickMouse(long, long, bool) __attribute__((stdcall));
 extern "C" void std_holdMousePlus(long, long, long) __attribute__((stdcall));
 extern "C" void std_releaseMousePlus(long, long, long) __attribute__((stdcall));
 extern "C" void std_clickMousePlus(long, long, long) __attribute__((stdcall));
+extern "C" bool std_isMouseButtonHeld( long) __attribute__((stdcall));
 
 //from Color.h
 extern "C" int  std_getColor(int, int) __attribute__((stdcall));

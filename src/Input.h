@@ -35,6 +35,7 @@ extern "C" void clickMouse(long, long, bool) __attribute__((cdecl));
 extern "C" void holdMousePlus(long, long, long) __attribute__((cdecl));
 extern "C" void releaseMousePlus(long, long, long) __attribute__((cdecl));
 extern "C" void clickMousePlus(long, long, long) __attribute__((cdecl));
+extern "C" bool isMouseButtonHeld(long) __attribute__((cdecl));
 
 #endif	/* _INPUT_H */
 

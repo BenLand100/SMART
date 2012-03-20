@@ -113,7 +113,7 @@ void clickMouse(long x, long y, bool left) {
 	}
 }
 
-//Holds the mouse (left if true, right otherwise) at a position 
+//Holds the mouse (left=1, mid=2, right=3) at a position 
 void holdMousePlus(long x, long y, long button) {
     if (jre) {
     	jre->CallVoidMethod(smart, _client.holdmouse, x, y, button);
@@ -121,12 +121,21 @@ void holdMousePlus(long x, long y, long button) {
 	}
 }
 
-//Holds the mouse (left if true, right otherwise) at a position 
+//Holds the mouse (left=1, mid=2, right=3e) at a position 
 void releaseMousePlus(long x, long y, long button) {
     if (jre) {
     	jre->CallVoidMethod(smart, _client.releasemouse, x, y, button);
 		checkexception(jre);
 	}
+}
+
+bool isMouseButtonHeld(long button) {
+    if (jre) {
+    	bool held = jre->CallBooleanMethod(smart, _client.ismousebuttonheld, button);
+		checkexception(jre);
+		return held;
+	}
+	return false;
 }
 
 //Clicks the mouse humanly at a position

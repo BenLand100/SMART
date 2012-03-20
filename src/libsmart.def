@@ -69,6 +69,7 @@ EXPORTS
     std_releaseKey=std_releaseKey@4
     std_releaseMouse=std_releaseMouse@12
     std_releaseMousePlus=std_releaseMousePlus@12
+    std_isMouseButtonHeld=std_isMouseButtonHeld@4
     std_sendKeys=std_sendKeys@4
     std_setDebug=std_setDebug@4
     std_setJVMPath=std_setJVMPath@4

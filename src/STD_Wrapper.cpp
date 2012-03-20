@@ -351,6 +351,10 @@ void std_clickMousePlus(long x, long y, long button) {
     clickMousePlus(x, y, button);
 }
 
+bool std_isMouseButtonHeld(long button) {
+    return isMouseButtonHeld( button);
+}
+
 //from Color.cpp
 
 int std_getColor(int x, int y) {

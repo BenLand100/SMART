@@ -267,6 +267,11 @@ public class Client implements ActionListener, ChangeListener {
     }
 
     //Convenience method for Native code see Input.cpp
+    public boolean isMouseButtonHeld( int button) {
+        return nazi != null ? nazi.isMouseButtonHeld(button) : false;
+    }
+
+    //Convenience method for Native code see Input.cpp
     public Point getMousePos() {
         if (nazi != null) {
             return nazi.getMousePos();

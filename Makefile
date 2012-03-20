@@ -162,11 +162,12 @@ windows64: $(DIST)/$(WIN64_NAME)
 	@echo "Finished Building the Windows 64bit SMART distribution"
 	
 test: test-apps/test-windows.cpp test-apps/test-linux.cpp test-apps/test-scar.cpp
-	@$(WIN_GPP) -Wall -o $(DIST)/test-windows.exe test-apps/test-windows32.cpp
-	@$(WIN64_GPP) -Wall -o $(DIST)/test-windows.exe test-apps/test-windows64.cpp
+	@mkdir -p $(DIST)
+	@$(WIN_GPP) -Wall -o $(DIST)/test-windows32.exe test-apps/test-windows.cpp
+	@$(WIN64_GPP) -Wall -o $(DIST)/test-windows64.exe test-apps/test-windows.cpp
 	@$(WIN_GPP) -Wall -o $(DIST)/test-scar.exe test-apps/test-scar.cpp
-	@$(LIN_GPP) -Wall -fPIC -ldl -o $(DIST)/test-linux test-apps/test-linux32.cpp
-	@$(LIN64_GPP) -Wall -fPIC -ldl -o $(DIST)/test-linux test-apps/test-linux64.cpp
+	@$(LIN_GPP) -Wall -fPIC -ldl -o $(DIST)/test-linux32 test-apps/test-linux.cpp
+	@$(LIN64_GPP) -Wall -fPIC -ldl -o $(DIST)/test-linux64 test-apps/test-linux.cpp
 	@cp test-apps/test-python.py $(DIST)/test-python
 	@echo "Finished building test programs" 
 	

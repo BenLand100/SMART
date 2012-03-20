@@ -118,8 +118,7 @@ void EIOS_ReleaseMouse(Target t, long x, long y, int button) {
 }
 
 bool EIOS_IsMouseHeld(Target t, int button) {
-    //Will have to do something for this
-    return false;
+    return isMouseButtonHeld(button);
 }
   
 void EIOS_SendString(Target t, char* str) {
