@@ -22,6 +22,8 @@
 #include "Input.h"
 #include "JVM.h"
 #include <string.h>
+#include <iostream>
+#include <cstdlib>
 
 typedef struct {
     int version;
@@ -33,20 +35,58 @@ typedef struct {
 } initargs;
   
  
-Target EIOS_RequestTarget(void *_initargs) {
-    initargs *args = (initargs*)_initargs;
-    if (args->version == 0) {
-        if (args->maxmem != -1) setMaxJVMMem(args->maxmem);
-        if (args->jvmpath != 0 && strlen(args->jvmpath) > 0) setJVMPath(args->jvmpath);
-        if (args->useragent != 0 && strlen(args->useragent) > 0) setUserAgent(args->useragent);
-        setup(args->root,args->params,args->width,args->height,args->initseq);
-        return (void*)1; //Smart only supports one target at a time, this is just a success response.
+Target EIOS_RequestTarget(char *initarg) {
+    int len;
+    if (initarg != 0 && (len=strlen(initarg)) > 0) {
+        initargs args;
+        char *buffer = new char[len+1];
+        int ida=0,idb=0,idx;
+        while (ida < len && (buffer[idb++]=initarg[ida++]) != ','); buffer[idb-1]=0;
+        if (initarg[ida++] != '"') return NULL;
+        args.version = atoi(&buffer[0]);
+        if (args.version == 0) {
+            args.root = &buffer[idb];
+            while (ida < len && (buffer[idb++]=initarg[ida++]) != '"'); buffer[idb-1]=0;
+            if (initarg[ida++] != ',') return NULL;
+            if (initarg[ida++] != '"') return NULL;
+            args.params = &buffer[idb];
+            while (ida < len && (buffer[idb++]=initarg[ida++]) != '"'); buffer[idb-1]=0;
+            if (initarg[ida++] != ',') return NULL;
+            idx = idb;
+            while (ida < len && (buffer[idb++]=initarg[ida++]) != ','); buffer[idb-1]=0;
+            if (initarg[ida-1] != ',') return NULL;
+            args.width = atoi(&buffer[idx]);
+            idx = idb;
+            while (ida < len && (buffer[idb++]=initarg[ida++]) != ','); buffer[idb-1]=0;
+            if (initarg[ida-1] != ',') return NULL;
+            args.height = atoi(&buffer[idx]);
+            if (initarg[ida++] != '"') return NULL;
+            args.initseq = &buffer[idb];
+            while (ida < len && (buffer[idb++]=initarg[ida++]) != '"'); buffer[idb-1]=0;
+            if (initarg[ida++] != ',') return NULL;
+            idx = idb;
+            while (ida < len && (buffer[idb++]=initarg[ida++]) != ','); buffer[idb-1]=0;
+            if (initarg[ida-1] != ',') return NULL;
+            args.maxmem = atoi(&buffer[idx]);
+            if (initarg[ida++] != '"') return NULL;
+            args.jvmpath = &buffer[idb];
+            while (ida < len && (buffer[idb++]=initarg[ida++]) != '"'); buffer[idb-1]=0;
+            if (initarg[ida++] != ',') return NULL;if (initarg[ida++] != '"') return NULL;
+            args.useragent = &buffer[idb];
+            while (ida < len && (buffer[idb++]=initarg[ida++]) != '"'); buffer[idb-1]=0;
+            
+            if (args.maxmem != -1) setMaxJVMMem(args.maxmem);
+            if (strlen(args.jvmpath) > 0) setJVMPath(args.jvmpath);
+            if (strlen(args.useragent) > 0) setUserAgent(args.useragent);
+            setup(args.root,args.params,args.width,args.height,args.initseq);
+            return (void*)1; //Smart only supports one target at a time, this is just a success response.
+        }
     }
     return NULL; //This result signifies a failure
 }
 
 void EIOS_ReleaseTarget(Target t) {
-    hardReset();
+    //hardReset();
 }
  
 void EIOS_GetTargetDimensions(Target t, long* width, long* height) {

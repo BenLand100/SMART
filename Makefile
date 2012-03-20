@@ -17,6 +17,7 @@
 
 WIN_GPP=i686-pc-mingw32-g++
 LIN_GPP=i686-pc-linux-gnu-g++
+LIN64_GPP=g++
 JAVAC=javac
 JAVA=java
 
@@ -24,15 +25,18 @@ DIST=dist
 BUILD=build
 SCAR_NAME=Embedded_SMART.dll
 WIN_NAME=libsmart.dll
-LIN_NAME=libsmart.so
+LIN_NAME=libsmart32.so
+LIN64_NAME=libsmart64.so
 
 WIN_COMPILE_ARGS=-DWINDOWS -Wall -O0 -s -c
 SCAR_COMPILE_ARGS=-DWINDOWS -DNEWSCAR -Wall -O0 -s -c
 LIN_COMPILE_ARGS=-fPIC -DLINUX -Wall -O3 -s -c
+LIN64_COMPILE_ARGS=-fPIC -DLINUX -Wall -O3 -s -c
 
 SRC_DIR=src
-LIN_BUILD_DIR=$(BUILD)/linux
-WIN_BUILD_DIR=$(BUILD)/windows
+LIN_BUILD_DIR=$(BUILD)/linux32
+LIN64_BUILD_DIR=$(BUILD)/linux64
+WIN_BUILD_DIR=$(BUILD)/windows32
 SCAR_BUILD_DIR=$(BUILD)/scar
 JAVA_BUILD_DIR=$(BUILD)/java
 
@@ -92,6 +96,17 @@ LINOBJFILES= \
 	$(LIN_BUILD_DIR)/STD_Wrapper.o \
 	$(LIN_BUILD_DIR)/EIOS.o
 	
+LIN64OBJFILES= \
+	$(LIN64_BUILD_DIR)/Main.o \
+	$(LIN64_BUILD_DIR)/Color.o \
+	$(LIN64_BUILD_DIR)/ClassLoader.o \
+	$(LIN64_BUILD_DIR)/Input.o \
+	$(LIN64_BUILD_DIR)/Reflection.o \
+	$(LIN64_BUILD_DIR)/JVM.o \
+	$(LIN64_BUILD_DIR)/Smart.o \
+	$(LIN64_BUILD_DIR)/STD_Wrapper.o \
+	$(LIN64_BUILD_DIR)/EIOS.o
+	
 SMARTSOURCES= \
     $(SRC_DIR)/java/awt/Canvas.java \
     $(SRC_DIR)/smart/BlockingEventQueue.java \
@@ -113,10 +128,13 @@ SMARTCLASSES= \
 all:
 	@echo "Syntax for SMART makefile:\n    For Windows distributions: make windows\n    For Linux distributions: make linux\n    For SCAR distributions: make scar\n    For All distributions: make everything\n    For test apps: make test\n    To clean build files: make clean"
 	
-everything: linux windows scar
+everything: linux linux64 windows scar
 
 linux: $(DIST)/$(LIN_NAME)
-	@echo "Finished Building the Linux SMART distribution"
+	@echo "Finished Building the Linux 32bit SMART distribution"
+	
+linux64: $(DIST)/$(LIN64_NAME)
+	@echo "Finished Building the Linux 64bit SMART distribution"
 	
 scar: $(DIST)/$(SCAR_NAME)
 	@echo "Finished Building the SCAR SMART distribution"
@@ -134,7 +152,7 @@ test: test-apps/test-windows.cpp test-apps/test-linux.cpp test-apps/test-scar.cp
 clean: 
 	@echo "Cleaning build files..."
 	@rm -rf $(BUILD) $(DIST)
-	@rm -f $(SRC_DIR)/classes.data
+	@rm -f $(SRC_DIR)/classes.datai6    
 	
 #### LINUX BUILDING DIRECTIVES ####
 
@@ -187,6 +205,58 @@ ${LIN_BUILD_DIR}/EIOS.o: $(SRC_DIR)/EIOS.cpp $(CPPHEADERFILES)
 	@echo "Compiling STD_Wrapper.cpp"
 	@mkdir -p $(LIN_BUILD_DIR)
 	@$(LIN_GPP) $(LIN_COMPILE_ARGS) -o $(LIN_BUILD_DIR)/EIOS.o $(SRC_DIR)/EIOS.cpp
+	
+#### LINUX64 BUILDING DIRECTIVES ####
+
+$(DIST)/$(LIN64_NAME): $(LIN64OBJFILES)
+	@echo "Linking SMART object files..."
+	@mkdir -p $(DIST)
+	@$(LIN64_GPP) -fPIC -shared -s -o $(DIST)/$(LIN64_NAME) $(LIN64OBJFILES)
+
+$(LIN64_BUILD_DIR)/Main.o: $(SRC_DIR)/Main.cpp $(CPPHEADERFILES)
+	@echo "Compiling Main.cpp"
+	@mkdir -p $(LIN64_BUILD_DIR)
+	@$(LIN64_GPP) $(LIN64_COMPILE_ARGS) -o $(LIN64_BUILD_DIR)/Main.o $(SRC_DIR)/Main.cpp
+
+${LIN64_BUILD_DIR}/Color.o: $(SRC_DIR)/Color.cpp $(CPPHEADERFILES)
+	@echo "Compiling Color.cpp"
+	@mkdir -p $(LIN64_BUILD_DIR)
+	@$(LIN64_GPP) $(LIN64_COMPILE_ARGS) -o $(LIN64_BUILD_DIR)/Color.o $(SRC_DIR)/Color.cpp
+
+${LIN64_BUILD_DIR}/ClassLoader.o: $(SRC_DIR)/ClassLoader.cpp $(SRC_DIR)/classes.data $(CPPHEADERFILES)
+	@echo "Compiling ClassLoader.cpp"
+	@mkdir -p $(LIN64_BUILD_DIR)
+	@$(LIN64_GPP) $(LIN64_COMPILE_ARGS) -o $(LIN64_BUILD_DIR)/ClassLoader.o $(SRC_DIR)/ClassLoader.cpp
+
+${LIN64_BUILD_DIR}/Input.o: $(SRC_DIR)/Input.cpp $(CPPHEADERFILES)
+	@echo "Compiling Input.cpp"
+	@mkdir -p $(LIN64_BUILD_DIR)
+	@$(LIN64_GPP) $(LIN64_COMPILE_ARGS) -o $(LIN64_BUILD_DIR)/Input.o $(SRC_DIR)/Input.cpp
+
+${LIN64_BUILD_DIR}/Reflection.o: $(SRC_DIR)/Reflection.cpp $(CPPHEADERFILES)
+	@echo "Compiling Reflection.cpp"
+	@mkdir -p $(LIN64_BUILD_DIR)
+	@$(LIN64_GPP) $(LIN64_COMPILE_ARGS) -o $(LIN64_BUILD_DIR)/Reflection.o $(SRC_DIR)/Reflection.cpp
+
+${LIN64_BUILD_DIR}/JVM.o: $(SRC_DIR)/JVM.cpp $(CPPHEADERFILES)
+	@echo "Compiling JVM.cpp"
+	@mkdir -p $(LIN64_BUILD_DIR)
+	@$(LIN64_GPP) $(LIN64_COMPILE_ARGS) -o $(LIN64_BUILD_DIR)/JVM.o $(SRC_DIR)/JVM.cpp
+
+${LIN64_BUILD_DIR}/Smart.o: $(SRC_DIR)/Smart.cpp $(CPPHEADERFILES)
+	@echo "Compiling Smart.cpp"
+	@mkdir -p $(LIN64_BUILD_DIR)
+	@$(LIN64_GPP) $(LIN64_COMPILE_ARGS) -o $(LIN64_BUILD_DIR)/Smart.o $(SRC_DIR)/Smart.cpp
+
+${LIN64_BUILD_DIR}/STD_Wrapper.o: $(SRC_DIR)/STD_Wrapper.cpp $(CPPHEADERFILES)
+	@echo "Compiling STD_Wrapper.cpp"
+	@mkdir -p $(LIN64_BUILD_DIR)
+	@$(LIN64_GPP) $(LIN64_COMPILE_ARGS) -o $(LIN64_BUILD_DIR)/STD_Wrapper.o $(SRC_DIR)/STD_Wrapper.cpp
+
+${LIN64_BUILD_DIR}/EIOS.o: $(SRC_DIR)/EIOS.cpp $(CPPHEADERFILES)
+	@echo "Compiling STD_Wrapper.cpp"
+	@mkdir -p $(LIN64_BUILD_DIR)
+	@$(LIN64_GPP) $(LIN64_COMPILE_ARGS) -o $(LIN_BUILD_DIR)/EIOS.o $(SRC_DIR)/EIOS.cpp
 
 #### WINDOWS BUILDING DIRECTIVES ####
 

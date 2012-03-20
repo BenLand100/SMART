@@ -84,17 +84,4 @@ EXPORTS
     std_hardReset=std_hardReset@0
     std_setEnabled=std_setEnabled@4
     std_setUserAgent=std_setUserAgent@4
-    EIOS_RequestTarget=EIOS_RequestTarget@4
-    EIOS_ReleaseTarget=EIOS_ReleaseTarget@4
-    EIOS_GetTargetDimensions=EIOS_GetTargetDimensions@12
-    EIOS_GetImageBuffer=EIOS_GetImageBuffer@4
-    EIOS_UpdateImageBuffer=EIOS_UpdateImageBuffer@4
-    EIOS_GetMousePosition=EIOS_GetMousePosition@12
-    EIOS_MoveMouse=EIOS_MoveMouse@12
-    EIOS_HoldMouse=EIOS_HoldMouse@16
-    EIOS_ReleaseMouse=EIOS_ReleaseMouse@16
-    EIOS_IsMouseHeld=EIOS_IsMouseHeld@8
-    EIOS_SendString=EIOS_SendString@8
-    EIOS_HoldKey=EIOS_HoldKey@8
-    EIOS_ReleaseKey=EIOS_ReleaseKey@8
-    EIOS_IsKeyHeld=EIOS_IsKeyHeld@8
+

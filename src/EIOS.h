@@ -90,7 +90,7 @@ extern "C" {
  
 typedef void* Target;
  
-Target EIOS_RequestTarget(void *initargs) __attribute__((stdcall)); 
+Target EIOS_RequestTarget(char *initargs) __attribute__((stdcall)); 
 void EIOS_ReleaseTarget(Target t) __attribute__((stdcall)); 
  
 /** 
