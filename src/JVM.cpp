@@ -136,6 +136,8 @@ void* findJVM() {
 #ifdef LINUX
 
 #include <dlfcn.h>
+#include <sys/stat.h>
+#include <libgen.h>
 
 //Loads the JVM from a given library handle
 bool initJVM(JNIEnv** env, JavaVM** vm, void* jvmdll) {
@@ -166,6 +168,97 @@ bool initJVM(JNIEnv** env, JavaVM** vm, void* jvmdll) {
     return false;
 }
 
+#define JAVA_EXECUTABLE "/usr/bin/java"
+#define JAVA_DEFAULT_HOME "/usr/lib/jvm/default-java"
+#define HARDCODED_JAVA_HOME "/usr/lib/jvm/java-6-sun"
+
+std::string findJVMFolder() {
+    //Try using the JAVA_HOME environmental variable
+    char * jvmhome=getenv("JAVA_HOME");
+    if(jvmhome) {
+       return std::string(jvmhome);
+    }
+    struct stat sts;
+    //Try to trace back the symbolic link from the java executable
+    if ((lstat (JAVA_EXECUTABLE, &sts)) == 0) {
+	if((sts.st_mode & S_IFMT)==S_IFLNK){
+	    //If /usr/bin/java exists and is a symbolic link, then...
+            char BUFF1[255];
+            char BUFF2[255];
+            strcpy(BUFF1,JAVA_EXECUTABLE);
+            int sz;
+            //Loop to unwind symbolic links.
+            do {
+                sz=readlink(BUFF1,BUFF2,255);
+		if(sz<0) {
+                   break;
+                }
+                BUFF2[sz]=0;
+                strcpy(BUFF1,BUFF2);
+                lstat(BUFF1,&sts);
+            } while((sts.st_mode & S_IFMT) ==S_IFLNK);
+            if(sz>0) {
+                const char* parentdir=dirname(BUFF1);
+                //basename could overwrite parentdir, so we copy it for safe keeping.
+                strcpy(BUFF1,parentdir);
+                const char* parentbase=basename(BUFF1);
+                //If our executable is in a "bin" directory, then we really want the directory above it.
+                if(!strcmp(parentbase,"bin")) {
+                    parentdir=dirname(BUFF1);
+                } else {
+                    parentdir=BUFF1;
+                }
+                return std::string(parentdir);
+            }
+        }
+    }
+    //Try the symbolic link to the default JRE on Debian based systems
+    if ((stat (JAVA_DEFAULT_HOME, &sts)) == 0) {
+        return std::string(HARDCODED_JAVA_HOME);
+    }
+    //Try the hardcoded Java 6 path (for backwards compatibility)
+    if ((stat (HARDCODED_JAVA_HOME, &sts)) == 0) {
+        return std::string(HARDCODED_JAVA_HOME);
+    }
+    cout <<"Could not find any trace of a JVM on your system.\n";
+    return std::string("/usr/lib");
+}
+
+//Mostly taken from the debian listing of packages with the file libjvm.so in them.
+static const char* architectures[]= {"/i386","/amd64","/arm","/alpha","/mips","/mipsel","/ppc","/s390",NULL};
+static const char* vmtypes[]= {"/server","/client","/zero","/shark","/cacao",NULL};
+
+std::string findLibJVMso(std::string jvmfolder) {
+     struct stat sts;
+      if(stat(jvmfolder.c_str(),&sts)!=0) {
+         return std::string();
+     }
+     std::string test=jvmfolder + "/libjvm.so";
+
+     if(stat(test.c_str(),&sts)==0) {
+         return test;
+     }
+     jvmfolder += "/lib";
+     test=jvmfolder + "/libjvm.so";
+     if(stat(test.c_str(),&sts)==0) {
+         return test;
+     }
+     //Try every combination of architecture and VM type to find libjvm.so
+     for(const char** arch=architectures; *arch; arch++) {
+         std::string archfolder=jvmfolder + *arch;
+         if(stat(archfolder.c_str(),&sts)==0) {
+             for(const char** vm=vmtypes; *vm; vm++) {
+                 test=archfolder + *vm + "/libjvm.so";
+                 if(stat(test.c_str(),&sts)==0) {
+                     return test;
+                 }
+             }
+         }
+     }
+
+     return std::string();
+}
+
 //Returns the set JVM path's handle, or tries the default Ubuntu locaton for the jvm
 void* findJVM() {
 	void* libjvm;
@@ -173,13 +266,19 @@ void* findJVM() {
     	cout << "Attempting to load custom JVM\n";
     	libjvm = dlopen(jvmpath, RTLD_LAZY);
 		if (libjvm) return libjvm;
-	}
-    libjvm = dlopen("/usr/lib/jvm/java-6-sun/jre/lib/i386/server/libjvm.so", RTLD_LAZY);
-    cout << "Attempting to load default server JVM\n";
-    if (!libjvm) {
-    	libjvm = dlopen("/usr/lib/jvm/java-6-sun/jre/lib/i386/client/libjvm.so", RTLD_LAZY);
-    	cout << "Attempting to load default client JVM\n";
     }
+    std::string jvmfolder=findJVMFolder();
+    cout << "Found jvm folder: " << jvmfolder <<"\n";
+    std::string path=findLibJVMso(jvmfolder);
+    if(path.size()==0) {
+        path=findLibJVMso(jvmfolder + "/jre");
+    }
+    if(path.size()==0) {
+         cout <<"Could not find libjvm.so anywhere. If you think you know where a JVM is installed, try setting the JAVA_HOME environmental variable appropriately.\n";
+    }
+    libjvm = dlopen(path.c_str(), RTLD_LAZY);
+    cout << "Attempting to load JVM discovered in " << path << "\n";
+
     return libjvm;
 }
 
