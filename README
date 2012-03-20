@@ -2,17 +2,16 @@ SMART was created by BenLand100 a very long time ago. It is currently hosted
 on github at https://github.com/BenLand100/SMART and is mostly used by the
 SRL community at http://villavu.com/ where it is a key component in their 
 attempts to cheat at RuneScape. SMART is released under the GPLv3 and at this
-time generally gets about 10,000 uses each month. For questions, suggestions,
+time generally gets about 15,000 uses each day. For questions, suggestions,
 comments, etc., try one of the two links given earlier.
 
 To Build SMART, use the instructions given in the Makefile by running `make`
 in the root directory (the directory this file is in). Currently SMART has 
-build targets for Linux and Windows and is mostly architecture independent, 
-minus problems with Windows x64 which are most likely the result of being 
-used improperly. For historical reasons, the longest lasting program to 
-ever be used in RuneScape cheating, SCAR, has its own target option, which 
-is basically the same as Windows. Newer programs such as Simba and other
-lanuage bindings should use the generic platform targets.
+build targets for Linux and Windows and is mostly architecture independent.
+For historical reasons, the longest lasting program to ever be used in RuneScape 
+cheating, SCAR, has its own target option, which is basically the same as 
+Windows. Newer programs such as Simba and other lanuage bindings should use the 
+generic platform targets.
 
 SMART comes with some examples of use and various language bindings in the
 test-apps folder, use `make test` in the root folder to build them into 
