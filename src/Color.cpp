@@ -44,10 +44,10 @@ extern int client_height;
 }*/
 
 //Sets the target to an array of RGB with a specified width and height
-long setTarget(PRGB newTarget, int w, int h) {
-    long last = (long) target;
+PRGB setTarget(PRGB newTarget, int w, int h) {
+    PRGB last = target;
     if (newTarget == 0) {
-        target = (PRGB) image;
+        target = image;
         width = client_width;
         height = client_height;
     } else {

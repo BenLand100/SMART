@@ -35,7 +35,7 @@ typedef union {
 
 inline HSL toHSL(RGB&);
 inline bool cmpColors(RGB&, RGB&, int);
-long setTarget(PRGB newTarget, int w, int h);
+PRGB setTarget(PRGB newTarget, int w, int h);
 
 extern "C" int  getColor(int, int) __attribute__((cdecl));
 extern "C" bool findColor(int&, int&, int, int, int, int, int) __attribute__((cdecl));

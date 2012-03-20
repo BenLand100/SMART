@@ -107,8 +107,8 @@ void internalDestructor();
 void getDimensions(int *w, int *h);
 
 #ifdef WINDOWS
-extern "C" long getImageHDC() __attribute__((cdecl));
-extern "C" long getDebugHDC() __attribute__((cdecl));
+extern "C" void* getImageHDC() __attribute__((cdecl));
+extern "C" void* getDebugHDC() __attribute__((cdecl));
 #endif
 extern "C" void* getImageArray() __attribute__((cdecl));
 extern "C" void setTransparentColor(jint color) __attribute__((cdecl));

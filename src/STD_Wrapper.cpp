@@ -41,11 +41,11 @@ void std_setMaxJVMMem(long mem) {
 
 #ifdef WINDOWS
 
-long std_getImageHDC() {
+void* std_getImageHDC() {
     return getImageHDC();
 }
 
-long std_getDebugHDC() {
+void* std_getDebugHDC() {
     return getDebugHDC();
 }
 

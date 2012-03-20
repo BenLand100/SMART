@@ -65,13 +65,13 @@ int client_height = 0;
 #ifdef WINDOWS
 
 //Returns the HDC of the surface where the Client's image is rendered
-long getImageHDC() {
-    return (long) imageHDC;
+void* getImageHDC() {
+    return (void*) imageHDC;
 }
 
 //Returns the HDC of the debug space that can be rendered over the client
-long getDebugHDC() {
-    return (long) debugHDC;
+void* getDebugHDC() {
+    return (void*) debugHDC;
 }
 
 #endif

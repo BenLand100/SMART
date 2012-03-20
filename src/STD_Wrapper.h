@@ -30,8 +30,8 @@ extern "C" void std_setMaxJVMMem(long mem) __attribute__((stdcall));
 //from Smart.h
 
 #ifdef WINDOWS
-extern "C" long std_getImageHDC() __attribute__((stdcall));
-extern "C" long std_getDebugHDC() __attribute__((stdcall));
+extern "C" void* std_getImageHDC() __attribute__((stdcall));
+extern "C" void* std_getDebugHDC() __attribute__((stdcall));
 #endif
 extern "C" void* std_getImageArray() __attribute__((stdcall));
 extern "C" void std_setTransparentColor(long color) __attribute__((stdcall));
