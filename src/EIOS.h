@@ -102,7 +102,7 @@ void EIOS_ReleaseTarget(Target t) __attribute__((stdcall));
  *  positions outside this area. 
  */ 
   
-void EIOS_GetTargetDimensions(Target t, long* width, long* height) __attribute__((stdcall)); 
+void EIOS_GetTargetDimensions(Target t, int* width, int* height) __attribute__((stdcall)); 
  
 /** 
  *  EIOS_GetImageBuffer and EIOS_UpdateImageBuffer both deal with the  
@@ -127,7 +127,7 @@ void EIOS_GetTargetDimensions(Target t, long* width, long* height) __attribute__
   
 typedef union { 
 	struct { char b, g, r, a; }; 
-	unsigned long color; 
+	unsigned int color; 
 } rgb; 
  
 rgb* EIOS_GetImageBuffer(Target t) __attribute__((stdcall)); 
@@ -173,10 +173,10 @@ void EIOS_UpdateImageBuffer(Target t) __attribute__((stdcall));
  *  method with a position argument will be the specified position. 
  */ 
   
-void EIOS_GetMousePosition(Target t, long* x, long* y) __attribute__((stdcall)); 
-void EIOS_MoveMouse(Target t, long x, long y) __attribute__((stdcall)); 
-void EIOS_HoldMouse(Target t, long x, long y, int button) __attribute__((stdcall)); 
-void EIOS_ReleaseMouse(Target t, long x, long y, int button) __attribute__((stdcall)); 
+void EIOS_GetMousePosition(Target t, int* x, int* y) __attribute__((stdcall)); 
+void EIOS_MoveMouse(Target t, int x, int y) __attribute__((stdcall)); 
+void EIOS_HoldMouse(Target t, int x, int y, int button) __attribute__((stdcall)); 
+void EIOS_ReleaseMouse(Target t, int x, int y, int button) __attribute__((stdcall)); 
 bool EIOS_IsMouseHeld(Target t, int button) __attribute__((stdcall)); 
  
 /** 
@@ -198,9 +198,9 @@ bool EIOS_IsMouseHeld(Target t, int button) __attribute__((stdcall));
  */ 
   
 void EIOS_SendString(Target t, char* str) __attribute__((stdcall)); 
-void EIOS_HoldKey(Target t, long key) __attribute__((stdcall)); 
-void EIOS_ReleaseKey(Target t, long key) __attribute__((stdcall)); 
-bool EIOS_IsKeyHeld(Target t, long key) __attribute__((stdcall)); 
+void EIOS_HoldKey(Target t, int key) __attribute__((stdcall)); 
+void EIOS_ReleaseKey(Target t, int key) __attribute__((stdcall)); 
+bool EIOS_IsKeyHeld(Target t, int key) __attribute__((stdcall)); 
 
 };
   

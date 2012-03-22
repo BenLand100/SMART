@@ -126,12 +126,12 @@ bool isBlocking() {
 }
 
 //Returns the 'refresh rate' of the client, 0-100, 100 being fullspeed, 0 being very slow
-long getRefresh() {
+int getRefresh() {
     return jre ? jre->CallIntMethod(smart, _client.getrefresh) : -1;
 }
 
 //Sets the 'refresh rate' of the client, 0-100, 100 being fullspeed, 0 being very slow
-void setRefresh(long x) {
+void setRefresh(int x) {
     if (jre) jre->CallVoidMethod(smart, _client.setrefresh, x);
 }
 
@@ -251,7 +251,7 @@ void freeClasses() {
 
 //Entrypoint for SMART operation --- sets a new state or reuses an old one if compatible
 //loads the JVM if necessary, and initilizes anything that might need it
-void setup(char* root, char* params, long width, long height, char* initseq) {
+void setup(char* root, char* params, int width, int height, char* initseq) {
     cout << "SmartSetup Entered\n";
     if (jre) vm->AttachCurrentThreadAsDaemon((void**)&jre, 0);
     if (strcmp(root, curserver) || strcmp(params, curparams) || width != client_width || height != client_height) {

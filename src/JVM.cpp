@@ -28,7 +28,7 @@ using namespace std;
 
 //initilized and free'd in Smart.cpp as well
 char *jvmpath = 0;
-long maxmem = 256;
+int maxmem = 256;
 
 //Sets the location of the library that SMART should load for the JVM
 void setJVMPath(char* path) {
@@ -44,7 +44,7 @@ void setJVMPath(char* path) {
 	}
 }
 
-void setMaxJVMMem(long _maxmem) {
+void setMaxJVMMem(int _maxmem) {
     maxmem = _maxmem;
 }
 

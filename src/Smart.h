@@ -119,9 +119,9 @@ extern "C" void setEnabled(bool on) __attribute__((cdecl));
 extern "C" void* getDebugArray() __attribute__((cdecl));
 extern "C" bool isActive() __attribute__((cdecl));
 extern "C" bool isBlocking() __attribute__((cdecl));
-extern "C" long getRefresh() __attribute__((cdecl));
-extern "C" void setRefresh(long x) __attribute__((cdecl));
-extern "C" void setup(char*,char*,long,long,char*) __attribute__((cdecl));
+extern "C" int getRefresh() __attribute__((cdecl));
+extern "C" void setRefresh(int x) __attribute__((cdecl));
+extern "C" void setup(char*,char*,int,int,char*) __attribute__((cdecl));
 extern "C" void hardReset() __attribute__((cdecl));
 extern "C" void setUserAgent(char*) __attribute__((cdecl));
 

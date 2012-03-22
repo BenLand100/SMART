@@ -23,9 +23,9 @@
 #include "jni.h"
 
 extern char* jvmpath;
-extern long maxmem;
+extern int maxmem;
 extern "C" void setJVMPath(char* path) __attribute__((cdecl));
-extern "C" void setMaxJVMMem(long maxmem) __attribute__((cdecl));
+extern "C" void setMaxJVMMem(int maxmem) __attribute__((cdecl));
 
 typedef jint (JNICALL *CreateJVM)(JavaVM**, void**, void*);
 typedef jint (JNICALL *GetJVMs)(JavaVM**,jsize,jsize*);

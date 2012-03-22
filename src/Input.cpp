@@ -39,12 +39,12 @@ void sendKeys(char* text) {
 }
 
 //Tests if a key (by keycode) is being held
-bool isKeyDown(long code) {
+bool isKeyDown(int code) {
     return (jre) ? jre->CallBooleanMethod(smart, _client.iskeydown, code) : false;
 }
 
 //Holds a key (by keycode)
-void holdKey(long code) {
+void holdKey(int code) {
     if (jre) {
 		jre->CallVoidMethod(smart, _client.holdkey, code);
 		checkexception(jre);
@@ -52,7 +52,7 @@ void holdKey(long code) {
 }
 
 //Releases a key (by keycode)
-void releaseKey(long code) {
+void releaseKey(int code) {
     if (jre) {
     	jre->CallVoidMethod(smart, _client.releasekey, code);
 		checkexception(jre);
@@ -60,7 +60,7 @@ void releaseKey(long code) {
 }
 
 //Fills the argumnet with the current mouse position
-void getMousePos(long& x, long& y) {
+void getMousePos(int& x, int& y) {
     if (jre) {
         jobject pt = jre->CallObjectMethod(smart, _client.getmousepos);
         x = jre->GetIntField(pt, _point.x);
@@ -74,7 +74,7 @@ void getMousePos(long& x, long& y) {
 }
 
 //Moves the mouse instantly to the given coords
-void moveMouse(long x, long y) {
+void moveMouse(int x, int y) {
     if (jre) {
     	jre->CallVoidMethod(smart, _client.movemouse, x, y);
 		checkexception(jre);
@@ -82,7 +82,7 @@ void moveMouse(long x, long y) {
 }
 
 //Moves the mouse humanly to the given coords
-void windMouse(long x, long y) {
+void windMouse(int x, int y) {
     if (jre) {
     	jre->CallVoidMethod(smart, _client.windmouse, x, y);
 		checkexception(jre);
@@ -90,7 +90,7 @@ void windMouse(long x, long y) {
 }
 
 //Holds the mouse (left if true, right otherwise) at a position 
-void holdMouse(long x, long y, bool left) {
+void holdMouse(int x, int y, bool left) {
     if (jre) {
     	jre->CallVoidMethod(smart, _client.holdmouse, x, y, left ? 1 : 3);
 		checkexception(jre);
@@ -98,7 +98,7 @@ void holdMouse(long x, long y, bool left) {
 }
 
 //Holds the mouse (left if true, right otherwise) at a position 
-void releaseMouse(long x, long y, bool left) {
+void releaseMouse(int x, int y, bool left) {
     if (jre) {
     	jre->CallVoidMethod(smart, _client.releasemouse, x, y, left ? 1 : 3);
 		checkexception(jre);
@@ -106,7 +106,7 @@ void releaseMouse(long x, long y, bool left) {
 }
 
 //Clicks the mouse humanly at a position
-void clickMouse(long x, long y, bool left) {
+void clickMouse(int x, int y, bool left) {
     if (jre) {
     	jre->CallVoidMethod(smart, _client.clickmouse, x, y, left ? 1 : 3);
 		checkexception(jre);
@@ -114,7 +114,7 @@ void clickMouse(long x, long y, bool left) {
 }
 
 //Holds the mouse (left=1, mid=2, right=3) at a position 
-void holdMousePlus(long x, long y, long button) {
+void holdMousePlus(int x, int y, int button) {
     if (jre) {
     	jre->CallVoidMethod(smart, _client.holdmouse, x, y, button);
 		checkexception(jre);
@@ -122,14 +122,14 @@ void holdMousePlus(long x, long y, long button) {
 }
 
 //Holds the mouse (left=1, mid=2, right=3e) at a position 
-void releaseMousePlus(long x, long y, long button) {
+void releaseMousePlus(int x, int y, int button) {
     if (jre) {
     	jre->CallVoidMethod(smart, _client.releasemouse, x, y, button);
 		checkexception(jre);
 	}
 }
 
-bool isMouseButtonHeld(long button) {
+bool isMouseButtonHeld(int button) {
     if (jre) {
     	bool held = jre->CallBooleanMethod(smart, _client.ismousebuttonheld, button);
 		checkexception(jre);
@@ -139,7 +139,7 @@ bool isMouseButtonHeld(long button) {
 }
 
 //Clicks the mouse humanly at a position
-void clickMousePlus(long x, long y, long button) {
+void clickMousePlus(int x, int y, int button) {
     if (jre) {
     	jre->CallVoidMethod(smart, _client.clickmouse, x, y, button);
 		checkexception(jre);

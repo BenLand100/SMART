@@ -89,7 +89,7 @@ void EIOS_ReleaseTarget(Target t) {
     //hardReset();
 }
  
-void EIOS_GetTargetDimensions(Target t, long* width, long* height) {
+void EIOS_GetTargetDimensions(Target t, int* width, int* height) {
     getDimensions((int*)width,(int*)height); //Hope these are the same size lol
 }
  
@@ -101,19 +101,19 @@ void EIOS_UpdateImageBuffer(Target t) {
     //SMART constantly updates the buffer, so ignore
 }
   
-void EIOS_GetMousePosition(Target t, long* x, long* y) {
+void EIOS_GetMousePosition(Target t, int* x, int* y) {
     getMousePos(*x,*y);
 }
 
-void EIOS_MoveMouse(Target t, long x, long y) {
+void EIOS_MoveMouse(Target t, int x, int y) {
     moveMouse(x,y);
 }
 
-void EIOS_HoldMouse(Target t, long x, long y, int button) {
+void EIOS_HoldMouse(Target t, int x, int y, int button) {
     holdMousePlus(x,y,button);
 }
 
-void EIOS_ReleaseMouse(Target t, long x, long y, int button) {
+void EIOS_ReleaseMouse(Target t, int x, int y, int button) {
     releaseMousePlus(x,y,button);
 }
 
@@ -125,14 +125,14 @@ void EIOS_SendString(Target t, char* str) {
     sendKeys(str);
 }
 
-void EIOS_HoldKey(Target t, long key) {
+void EIOS_HoldKey(Target t, int key) {
     holdKey(key);
 }
  
-void EIOS_ReleaseKey(Target t, long key) {
+void EIOS_ReleaseKey(Target t, int key) {
     releaseKey(key);
 }
  
-bool EIOS_IsKeyHeld(Target t, long key) {
+bool EIOS_IsKeyHeld(Target t, int key) {
     return isKeyDown(key);
 }

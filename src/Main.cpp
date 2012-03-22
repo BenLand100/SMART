@@ -121,12 +121,12 @@ static char* exports[] = {
 #define NumExports 82
 
 //STDCALL - SCAR/Simba
-long GetFunctionCount() {
+int GetFunctionCount() {
     return NumExports;
 }
 
 //STDCALL - SCAR/Simba
-long GetFunctionInfo(int index, void*& address, char*& def) {
+int GetFunctionInfo(int index, void*& address, char*& def) {
     if (index < NumExports) {
         address = dlsym(RTLD_DEFAULT,exports[index*2]);
         strcpy(def, exports[index*2+1]);
@@ -158,12 +158,12 @@ void unload(void) {
 HMODULE dllinst;
 
 //STDCALL - SCAR/Simba
-long GetFunctionCount() {
+int GetFunctionCount() {
     return NumExports;
 }
 
 //STDCALL - SCAR/Simba
-long GetFunctionInfo(int index, void*& address, char*& def) {
+int GetFunctionInfo(int index, void*& address, char*& def) {
     if (index < NumExports) {
         address = (void*)GetProcAddress(dllinst, exports[index*2]);
         strcpy(def, exports[index*2+1]);

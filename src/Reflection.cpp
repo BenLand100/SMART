@@ -128,11 +128,11 @@ bool isPathValid(void* obj, char* path) {
     return 0;
 }
 
-long getFieldInt(void* obj, char* path) {
+int getFieldInt(void* obj, char* path) {
     try {
         if (jre) {
             jobject jpath = jre->NewStringUTF(path);
-            long i = jre->CallIntMethod(smart, _client.getfieldint, obj == 0 ? NULL : (jobject)obj, jpath);
+            int i = jre->CallIntMethod(smart, _client.getfieldint, obj == 0 ? NULL : (jobject)obj, jpath);
             jre->DeleteLocalRef(jpath);
             return i;
         }
@@ -140,11 +140,11 @@ long getFieldInt(void* obj, char* path) {
     return -1;
 }
 
-long getFieldShort(void* obj, char* path) {
+int getFieldShort(void* obj, char* path) {
     try {
         if (jre) {
             jobject jpath = jre->NewStringUTF(path);
-            long i = jre->CallIntMethod(smart, _client.getfieldshort, obj == 0 ? NULL : (jobject)obj, jpath);
+            int i = jre->CallIntMethod(smart, _client.getfieldshort, obj == 0 ? NULL : (jobject)obj, jpath);
             jre->DeleteLocalRef(jpath);
             return i;
         }
@@ -153,11 +153,11 @@ long getFieldShort(void* obj, char* path) {
 }
 
 
-long getFieldByte(void* obj, char* path) {
+int getFieldByte(void* obj, char* path) {
     try {
         if (jre) {
             jobject jpath = jre->NewStringUTF(path);
-            long i = jre->CallByteMethod(smart, _client.getfieldbyte, obj == 0 ? NULL : (jobject)obj, jpath);
+            int i = jre->CallByteMethod(smart, _client.getfieldbyte, obj == 0 ? NULL : (jobject)obj, jpath);
             jre->DeleteLocalRef(jpath);
             return i;
         }
@@ -201,11 +201,11 @@ bool getFieldBool(void* obj, char* path) {
     return -1;
 }
 
-long getFieldLongH(void* obj, char* path) {
+int getFieldLongH(void* obj, char* path) {
     try {
         if (jre) {
             jobject jpath = jre->NewStringUTF(path);
-            long i = jre->CallIntMethod(smart, _client.getfieldlongh, obj == 0 ? NULL : (jobject)obj, jpath);
+            int i = jre->CallIntMethod(smart, _client.getfieldlongh, obj == 0 ? NULL : (jobject)obj, jpath);
             jre->DeleteLocalRef(jpath);
             return i;
         }
@@ -213,11 +213,11 @@ long getFieldLongH(void* obj, char* path) {
     return -1;
 }
 
-long getFieldLongL(void* obj, char* path) {
+int getFieldLongL(void* obj, char* path) {
     try {
         if (jre) {
             jobject jpath = jre->NewStringUTF(path);
-            long i = jre->CallIntMethod(smart, _client.getfieldlongl, obj == 0 ? NULL : (jobject)obj, jpath);
+            int i = jre->CallIntMethod(smart, _client.getfieldlongl, obj == 0 ? NULL : (jobject)obj, jpath);
             jre->DeleteLocalRef(jpath);
             return i;
         }
@@ -241,11 +241,11 @@ void* getFieldArrayObject(void* obj, char* path, int index) {
     return 0;
 }
 
-long getFieldArrayInt(void* obj, char* path, int index) {
+int getFieldArrayInt(void* obj, char* path, int index) {
     try {
         if (jre) {
             jobject jpath = jre->NewStringUTF(path);
-            long i = jre->CallIntMethod(smart, _client.getfieldarrayint, obj == 0 ? NULL : (jobject)obj, jpath, index);
+            int i = jre->CallIntMethod(smart, _client.getfieldarrayint, obj == 0 ? NULL : (jobject)obj, jpath, index);
             jre->DeleteLocalRef(jpath);
             return i;
         }
@@ -289,11 +289,11 @@ bool getFieldArrayBool(void* obj, char* path, int index) {
     return -1;
 }
 
-long getFieldArrayLongH(void* obj, char* path, int index) {
+int getFieldArrayLongH(void* obj, char* path, int index) {
     try {
         if (jre) {
             jobject jpath = jre->NewStringUTF(path);
-            long i = jre->CallIntMethod(smart, _client.getfieldarraylongh, obj == 0 ? NULL : (jobject)obj, jpath, index);
+            int i = jre->CallIntMethod(smart, _client.getfieldarraylongh, obj == 0 ? NULL : (jobject)obj, jpath, index);
             jre->DeleteLocalRef(jpath);
             return i;
         }
@@ -301,11 +301,11 @@ long getFieldArrayLongH(void* obj, char* path, int index) {
     return -1;
 }
 
-long getFieldArrayLongL(void* obj, char* path, int index) {
+int getFieldArrayLongL(void* obj, char* path, int index) {
     try {
         if (jre) {
             jobject jpath = jre->NewStringUTF(path);
-            long i = jre->CallIntMethod(smart, _client.getfieldarraylongl, obj == 0 ? NULL : (jobject)obj, jpath, index);
+            int i = jre->CallIntMethod(smart, _client.getfieldarraylongl, obj == 0 ? NULL : (jobject)obj, jpath, index);
             jre->DeleteLocalRef(jpath);
             return i;
         }
@@ -313,24 +313,11 @@ long getFieldArrayLongL(void* obj, char* path, int index) {
     return -1;
 }
 
-long getFieldArrayByte(void* obj, char* path, int index) {
+int getFieldArrayByte(void* obj, char* path, int index) {
     try {
         if (jre) {
             jobject jpath = jre->NewStringUTF(path);
-            long i = jre->CallIntMethod(smart, _client.getfieldarraybyte, obj == 0 ? NULL : (jobject)obj, jpath, index);
-            jre->DeleteLocalRef(jpath);
-            return i;
-        }
-    } catch (...) { }
-    return -1;
-}
-
-
-long getFieldArrayShort(void* obj, char* path, int index) {
-    try {
-        if (jre) {
-            jobject jpath = jre->NewStringUTF(path);
-            long i = jre->CallIntMethod(smart, _client.getfieldarrayshort, obj == 0 ? NULL : (jobject)obj, jpath, index);
+            int i = jre->CallIntMethod(smart, _client.getfieldarraybyte, obj == 0 ? NULL : (jobject)obj, jpath, index);
             jre->DeleteLocalRef(jpath);
             return i;
         }
@@ -339,11 +326,24 @@ long getFieldArrayShort(void* obj, char* path, int index) {
 }
 
 
-long getFieldArrayChar(void* obj, char* path, int index) {
+int getFieldArrayShort(void* obj, char* path, int index) {
     try {
         if (jre) {
             jobject jpath = jre->NewStringUTF(path);
-            long i = jre->CallIntMethod(smart, _client.getfieldarraychar, obj == 0 ? NULL : (jobject)obj, jpath, index);
+            int i = jre->CallIntMethod(smart, _client.getfieldarrayshort, obj == 0 ? NULL : (jobject)obj, jpath, index);
+            jre->DeleteLocalRef(jpath);
+            return i;
+        }
+    } catch (...) { }
+    return -1;
+}
+
+
+int getFieldArrayChar(void* obj, char* path, int index) {
+    try {
+        if (jre) {
+            jobject jpath = jre->NewStringUTF(path);
+            int i = jre->CallIntMethod(smart, _client.getfieldarraychar, obj == 0 ? NULL : (jobject)obj, jpath, index);
             jre->DeleteLocalRef(jpath);
             return i;
         }
@@ -367,11 +367,11 @@ void* getFieldArray3DObject(void* obj, char* path, int x, int y, int z) {
     return 0;
 }
 
-long getFieldArray3DInt(void* obj, char* path, int x, int y, int z) {
+int getFieldArray3DInt(void* obj, char* path, int x, int y, int z) {
     try {
         if (jre) {
             jobject jpath = jre->NewStringUTF(path);
-            long i = jre->CallIntMethod(smart, _client.getfieldarray3dint, obj == 0 ? NULL : (jobject)obj, jpath, x, y, z);
+            int i = jre->CallIntMethod(smart, _client.getfieldarray3dint, obj == 0 ? NULL : (jobject)obj, jpath, x, y, z);
             jre->DeleteLocalRef(jpath);
             return i;
         }
@@ -415,11 +415,11 @@ bool getFieldArray3DBool(void* obj, char* path, int x, int y, int z) {
     return -1;
 }
 
-long getFieldArray3DLongH(void* obj, char* path, int x, int y, int z) {
+int getFieldArray3DLongH(void* obj, char* path, int x, int y, int z) {
     try {
         if (jre) {
             jobject jpath = jre->NewStringUTF(path);
-            long i = jre->CallIntMethod(smart, _client.getfieldarray3dlongh, obj == 0 ? NULL : (jobject)obj, jpath, x, y, z);
+            int i = jre->CallIntMethod(smart, _client.getfieldarray3dlongh, obj == 0 ? NULL : (jobject)obj, jpath, x, y, z);
             jre->DeleteLocalRef(jpath);
             return i;
         }
@@ -427,11 +427,11 @@ long getFieldArray3DLongH(void* obj, char* path, int x, int y, int z) {
     return -1;
 }
 
-long getFieldArray3DLongL(void* obj, char* path, int x, int y, int z) {
+int getFieldArray3DLongL(void* obj, char* path, int x, int y, int z) {
     try {
         if (jre) {
             jobject jpath = jre->NewStringUTF(path);
-            long i = jre->CallIntMethod(smart, _client.getfieldarray3dlongl, obj == 0 ? NULL : (jobject)obj, jpath, x, y, z);
+            int i = jre->CallIntMethod(smart, _client.getfieldarray3dlongl, obj == 0 ? NULL : (jobject)obj, jpath, x, y, z);
             jre->DeleteLocalRef(jpath);
             return i;
         }
@@ -439,11 +439,11 @@ long getFieldArray3DLongL(void* obj, char* path, int x, int y, int z) {
     return -1;
 }
 
-long getFieldArray3DByte(void* obj, char* path, int x, int y, int z) {
+int getFieldArray3DByte(void* obj, char* path, int x, int y, int z) {
     try {
         if (jre) {
             jobject jpath = jre->NewStringUTF(path);
-            long i = jre->CallIntMethod(smart, _client.getfieldarray3dbyte, obj == 0 ? NULL : (jobject)obj, jpath, x, y, z);
+            int i = jre->CallIntMethod(smart, _client.getfieldarray3dbyte, obj == 0 ? NULL : (jobject)obj, jpath, x, y, z);
             jre->DeleteLocalRef(jpath);
             return i;
         }
@@ -451,11 +451,11 @@ long getFieldArray3DByte(void* obj, char* path, int x, int y, int z) {
     return -1;
 }
 
-long getFieldArray3DShort(void* obj, char* path, int x, int y, int z) {
+int getFieldArray3DShort(void* obj, char* path, int x, int y, int z) {
     try {
         if (jre) {
             jobject jpath = jre->NewStringUTF(path);
-            long i = jre->CallIntMethod(smart, _client.getfieldarray3dshort, obj == 0 ? NULL : (jobject)obj, jpath, x, y, z);
+            int i = jre->CallIntMethod(smart, _client.getfieldarray3dshort, obj == 0 ? NULL : (jobject)obj, jpath, x, y, z);
             jre->DeleteLocalRef(jpath);
             return i;
         }
@@ -463,11 +463,11 @@ long getFieldArray3DShort(void* obj, char* path, int x, int y, int z) {
     return -1;
 }
 
-long getFieldArray3DChar(void* obj, char* path, int x, int y, int z) {
+int getFieldArray3DChar(void* obj, char* path, int x, int y, int z) {
     try {
         if (jre) {
             jobject jpath = jre->NewStringUTF(path);
-            long i = jre->CallIntMethod(smart, _client.getfieldarray3dchar, obj == 0 ? NULL : (jobject)obj, jpath, x, y, z);
+            int i = jre->CallIntMethod(smart, _client.getfieldarray3dchar, obj == 0 ? NULL : (jobject)obj, jpath, x, y, z);
             jre->DeleteLocalRef(jpath);
             return i;
         }
@@ -491,11 +491,11 @@ void* getFieldArray2DObject(void* obj, char* path, int x, int y) {
     return 0;
 }
 
-long getFieldArray2DInt(void* obj, char* path, int x, int y) {
+int getFieldArray2DInt(void* obj, char* path, int x, int y) {
     try {
         if (jre) {
             jobject jpath = jre->NewStringUTF(path);
-            long i = jre->CallIntMethod(smart, _client.getfieldarray2dint, obj == 0 ? NULL : (jobject)obj, jpath, x, y);
+            int i = jre->CallIntMethod(smart, _client.getfieldarray2dint, obj == 0 ? NULL : (jobject)obj, jpath, x, y);
             jre->DeleteLocalRef(jpath);
             return i;
         }
@@ -541,11 +541,11 @@ bool getFieldArray2DBool(void* obj, char* path, int x, int y) {
     return -1;
 }
 
-long getFieldArray2DLongH(void* obj, char* path, int x, int y) {
+int getFieldArray2DLongH(void* obj, char* path, int x, int y) {
     try {
         if (jre) {
             jobject jpath = jre->NewStringUTF(path);
-            long i = jre->CallIntMethod(smart, _client.getfieldarray2dlongh, obj == 0 ? NULL : (jobject)obj, jpath, x, y);
+            int i = jre->CallIntMethod(smart, _client.getfieldarray2dlongh, obj == 0 ? NULL : (jobject)obj, jpath, x, y);
             jre->DeleteLocalRef(jpath);
             return i;
         }
@@ -553,11 +553,11 @@ long getFieldArray2DLongH(void* obj, char* path, int x, int y) {
     return -1;
 }
 
-long getFieldArray2DLongL(void* obj, char* path, int x, int y) {
+int getFieldArray2DLongL(void* obj, char* path, int x, int y) {
     try {
         if (jre) {
             jobject jpath = jre->NewStringUTF(path);
-            long i = jre->CallIntMethod(smart, _client.getfieldarray2dlongl, obj == 0 ? NULL : (jobject)obj, jpath, x, y);
+            int i = jre->CallIntMethod(smart, _client.getfieldarray2dlongl, obj == 0 ? NULL : (jobject)obj, jpath, x, y);
             jre->DeleteLocalRef(jpath);
             return i;
         }
@@ -565,11 +565,11 @@ long getFieldArray2DLongL(void* obj, char* path, int x, int y) {
     return -1;
 }
 
-long getFieldArray2DByte(void* obj, char* path, int x, int y) {
+int getFieldArray2DByte(void* obj, char* path, int x, int y) {
     try {
         if (jre) {
             jobject jpath = jre->NewStringUTF(path);
-            long i = jre->CallIntMethod(smart, _client.getfieldarray2dbyte, obj == 0 ? NULL : (jobject)obj, jpath, x, y);
+            int i = jre->CallIntMethod(smart, _client.getfieldarray2dbyte, obj == 0 ? NULL : (jobject)obj, jpath, x, y);
             jre->DeleteLocalRef(jpath);
             return i;
         }
@@ -577,11 +577,11 @@ long getFieldArray2DByte(void* obj, char* path, int x, int y) {
     return -1;
 }
 
-long getFieldArray2DChar(void* obj, char* path, int x, int y) {
+int getFieldArray2DChar(void* obj, char* path, int x, int y) {
     try {
         if (jre) {
             jobject jpath = jre->NewStringUTF(path);
-            long i = jre->CallIntMethod(smart, _client.getfieldarray2dchar, obj == 0 ? NULL : (jobject)obj, jpath, x, y);
+            int i = jre->CallIntMethod(smart, _client.getfieldarray2dchar, obj == 0 ? NULL : (jobject)obj, jpath, x, y);
             jre->DeleteLocalRef(jpath);
             return i;
         }
@@ -589,11 +589,11 @@ long getFieldArray2DChar(void* obj, char* path, int x, int y) {
     return -1;
 }
 
-long getFieldArray2DShort(void* obj, char* path, int x, int y) {
+int getFieldArray2DShort(void* obj, char* path, int x, int y) {
     try {
         if (jre) {
             jobject jpath = jre->NewStringUTF(path);
-            long i = jre->CallIntMethod(smart, _client.getfieldarray2dshort, obj == 0 ? NULL : (jobject)obj, jpath, x, y);
+            int i = jre->CallIntMethod(smart, _client.getfieldarray2dshort, obj == 0 ? NULL : (jobject)obj, jpath, x, y);
             jre->DeleteLocalRef(jpath);
             return i;
         }
@@ -601,11 +601,11 @@ long getFieldArray2DShort(void* obj, char* path, int x, int y) {
     return -1;
 }
 
-long getFieldArraySize(void* obj, char* path, int dim) {
+int getFieldArraySize(void* obj, char* path, int dim) {
     try {
         if (jre) {
             jobject jpath = jre->NewStringUTF(path);
-            long i = jre->CallIntMethod(smart, _client.getfieldarraysize, obj == 0 ? NULL : (jobject)obj, jpath, dim);
+            int i = jre->CallIntMethod(smart, _client.getfieldarraysize, obj == 0 ? NULL : (jobject)obj, jpath, dim);
             jre->DeleteLocalRef(jpath);
             return i;
         }

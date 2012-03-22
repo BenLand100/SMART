@@ -23,19 +23,19 @@
 #include "Smart.h"
 
 extern "C" void sendKeys(char*) __attribute__((cdecl));
-extern "C" bool isKeyDown(long) __attribute__((cdecl));
-extern "C" void holdKey(long) __attribute__((cdecl));
-extern "C" void releaseKey(long) __attribute__((cdecl));
-extern "C" void getMousePos(long&, long&) __attribute__((cdecl));
-extern "C" void moveMouse(long, long) __attribute__((cdecl));
-extern "C" void windMouse(long, long) __attribute__((cdecl));
-extern "C" void holdMouse(long, long, bool) __attribute__((cdecl));
-extern "C" void releaseMouse(long, long, bool) __attribute__((cdecl));
-extern "C" void clickMouse(long, long, bool) __attribute__((cdecl));
-extern "C" void holdMousePlus(long, long, long) __attribute__((cdecl));
-extern "C" void releaseMousePlus(long, long, long) __attribute__((cdecl));
-extern "C" void clickMousePlus(long, long, long) __attribute__((cdecl));
-extern "C" bool isMouseButtonHeld(long) __attribute__((cdecl));
+extern "C" bool isKeyDown(int) __attribute__((cdecl));
+extern "C" void holdKey(int) __attribute__((cdecl));
+extern "C" void releaseKey(int) __attribute__((cdecl));
+extern "C" void getMousePos(int&, int&) __attribute__((cdecl));
+extern "C" void moveMouse(int, int) __attribute__((cdecl));
+extern "C" void windMouse(int, int) __attribute__((cdecl));
+extern "C" void holdMouse(int, int, bool) __attribute__((cdecl));
+extern "C" void releaseMouse(int, int, bool) __attribute__((cdecl));
+extern "C" void clickMouse(int, int, bool) __attribute__((cdecl));
+extern "C" void holdMousePlus(int, int, int) __attribute__((cdecl));
+extern "C" void releaseMousePlus(int, int, int) __attribute__((cdecl));
+extern "C" void clickMousePlus(int, int, int) __attribute__((cdecl));
+extern "C" bool isMouseButtonHeld(int) __attribute__((cdecl));
 
 #endif	/* _INPUT_H */
 

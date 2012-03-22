@@ -33,7 +33,7 @@ void std_setJVMPath(char* path) {
 	setJVMPath(path);
 }
 
-void std_setMaxJVMMem(long mem) {
+void std_setMaxJVMMem(int mem) {
     setMaxJVMMem(mem);
 }
 
@@ -55,7 +55,7 @@ void* std_getImageArray() {
     return getImageArray();
 }
 
-void std_setTransparentColor(long color) {
+void std_setTransparentColor(int color) {
     setTransparentColor(color);
 }
 
@@ -83,15 +83,15 @@ bool std_isBlocking() {
     return isBlocking();
 }
 
-long std_getRefresh() {
+int std_getRefresh() {
     return getRefresh();
 }
 
-void std_setRefresh(long x) {
+void std_setRefresh(int x) {
     setRefresh(x);
 }
 
-void std_setup(char* root, char* args, long w, long h, char* initseq) {
+void std_setup(char* root, char* args, int w, int h, char* initseq) {
     setup(root, args, w, h, initseq);
 }
 
@@ -129,15 +129,15 @@ void* std_getFieldObject(void* parent, char* path) {
     return getFieldObject(parent, path);
 }
 
-long std_getFieldInt(void* parent, char* path) {
+int std_getFieldInt(void* parent, char* path) {
     return getFieldInt(parent, path);
 }
 
-long std_getFieldShort(void* parent, char* path) {
+int std_getFieldShort(void* parent, char* path) {
     return getFieldShort(parent, path);
 }
 
-long std_getFieldByte(void* parent, char* path) {
+int std_getFieldByte(void* parent, char* path) {
     return getFieldByte(parent, path);
 }
 
@@ -145,11 +145,11 @@ bool std_getFieldBool(void* parent, char* path) {
     return getFieldBool(parent, path);
 }
 
-long std_getFieldLongH(void* parent, char* path) {
+int std_getFieldLongH(void* parent, char* path) {
     return getFieldLongH(parent, path);
 }
 
-long std_getFieldLongL(void* parent, char* path) {
+int std_getFieldLongL(void* parent, char* path) {
     return getFieldLongL(parent, path);
 }
 
@@ -165,7 +165,7 @@ void* std_getFieldArrayObject(void* parent, char* path, int i) {
     return getFieldArrayObject(parent, path, i);
 }
 
-long std_getFieldArrayInt(void* parent, char* path, int i) {
+int std_getFieldArrayInt(void* parent, char* path, int i) {
     return getFieldArrayInt(parent, path, i);
 }
 
@@ -181,23 +181,23 @@ bool std_getFieldArrayBool(void* parent, char* path, int i) {
     return getFieldArrayBool(parent, path, i);
 }
 
-long std_getFieldArrayLongH(void* parent, char* path, int i) {
+int std_getFieldArrayLongH(void* parent, char* path, int i) {
     return getFieldArrayLongH(parent, path, i);
 }
 
-long std_getFieldArrayLongL(void* parent, char* path, int i) {
+int std_getFieldArrayLongL(void* parent, char* path, int i) {
     return getFieldArrayLongL(parent, path, i);
 }
 
-long std_getFieldArrayByte(void* parent, char* path, int i) {
+int std_getFieldArrayByte(void* parent, char* path, int i) {
     return getFieldArrayByte(parent, path, i);
 }
 
-long std_getFieldArrayShort(void* parent, char* path, int i) {
+int std_getFieldArrayShort(void* parent, char* path, int i) {
     return getFieldArrayShort(parent, path, i);
 }
 
-long std_getFieldArrayChar(void* parent, char* path, int i) {
+int std_getFieldArrayChar(void* parent, char* path, int i) {
     return getFieldArrayChar(parent, path, i);
 }
 
@@ -205,7 +205,7 @@ void* std_getFieldArray3DObject(void* parent, char* path, int i, int j, int k) {
     return getFieldArray3DObject(parent, path, i, j, k);
 }
 
-long std_getFieldArray3DInt(void* parent, char* path, int i, int j, int k) {
+int std_getFieldArray3DInt(void* parent, char* path, int i, int j, int k) {
     return getFieldArray3DInt(parent, path, i, j, k);
 }
 
@@ -221,23 +221,23 @@ bool std_getFieldArray3DBool(void* parent, char* path, int i, int j, int k) {
     return getFieldArray3DBool(parent, path, i, j, k);
 }
 
-long std_getFieldArray3DLongH(void* parent, char* path, int i, int j, int k) {
+int std_getFieldArray3DLongH(void* parent, char* path, int i, int j, int k) {
     return getFieldArray3DLongH(parent, path, i, j, k);
 }
 
-long std_getFieldArray3DLongL(void* parent, char* path, int i, int j, int k) {
+int std_getFieldArray3DLongL(void* parent, char* path, int i, int j, int k) {
     return getFieldArray3DLongL(parent, path, i, j, k);
 }
 
-long std_getFieldArray3DByte(void* parent, char* path, int i, int j, int k) {
+int std_getFieldArray3DByte(void* parent, char* path, int i, int j, int k) {
     return getFieldArray3DByte(parent, path, i, j, k);
 }
 
-long std_getFieldArray3DShort(void* parent, char* path, int i, int j, int k) {
+int std_getFieldArray3DShort(void* parent, char* path, int i, int j, int k) {
     return getFieldArray3DShort(parent, path, i, j, k);
 }
 
-long std_getFieldArray3DChar(void* parent, char* path, int i, int j, int k) {
+int std_getFieldArray3DChar(void* parent, char* path, int i, int j, int k) {
     return getFieldArray3DChar(parent, path, i, j, k);
 }
 
@@ -245,7 +245,7 @@ void* std_getFieldArray2DObject(void* parent, char* path, int i, int j) {
     return getFieldArray2DObject(parent, path, i, j);
 }
 
-long std_getFieldArray2DInt(void* parent, char* path, int i, int j) {
+int std_getFieldArray2DInt(void* parent, char* path, int i, int j) {
     return getFieldArray2DInt(parent, path, i, j);
 }
 
@@ -261,27 +261,27 @@ bool std_getFieldArray2DBool(void* parent, char* path, int i, int j) {
     return getFieldArray2DBool(parent, path, i, j);
 }
 
-long std_getFieldArray2DLongH(void* parent, char* path, int i, int j) {
+int std_getFieldArray2DLongH(void* parent, char* path, int i, int j) {
     return getFieldArray2DLongH(parent, path, i, j);
 }
 
-long std_getFieldArray2DLongL(void* parent, char* path, int i, int j) {
+int std_getFieldArray2DLongL(void* parent, char* path, int i, int j) {
     return getFieldArray2DLongL(parent, path, i, j);
 }
 
-long std_getFieldArray2DByte(void* parent, char* path, int i, int j) {
+int std_getFieldArray2DByte(void* parent, char* path, int i, int j) {
     return getFieldArray2DByte(parent, path, i, j);
 }
 
-long std_getFieldArray2DShort(void* parent, char* path, int i, int j) {
+int std_getFieldArray2DShort(void* parent, char* path, int i, int j) {
     return getFieldArray2DShort(parent, path, i, j);
 }
 
-long std_getFieldArray2DChar(void* parent, char* path, int i, int j) {
+int std_getFieldArray2DChar(void* parent, char* path, int i, int j) {
     return getFieldArray2DChar(parent, path, i, j);
 }
 
-long std_getFieldArraySize(void* parent, char* path, int dim) {
+int std_getFieldArraySize(void* parent, char* path, int dim) {
     return getFieldArraySize(parent, path, dim);
 }
 
@@ -303,55 +303,55 @@ void std_sendKeys(char* str) {
     sendKeys(str);
 }
 
-bool std_isKeyDown(long c) {
+bool std_isKeyDown(int c) {
     return isKeyDown(c);
 }
 
-void std_holdKey(long c) {
+void std_holdKey(int c) {
     holdKey(c);
 }
 
-void std_releaseKey(long c) {
+void std_releaseKey(int c) {
     releaseKey(c);
 }
 
-void std_getMousePos(long& x, long& y) {
+void std_getMousePos(int& x, int& y) {
     getMousePos(x, y);
 }
 
-void std_moveMouse(long x, long y) {
+void std_moveMouse(int x, int y) {
     moveMouse(x, y);
 }
 
-void std_windMouse(long x, long y) {
+void std_windMouse(int x, int y) {
     windMouse(x, y);
 }
 
-void std_holdMouse(long x, long y, bool left) {
+void std_holdMouse(int x, int y, bool left) {
     holdMouse(x, y, left);
 }
 
-void std_releaseMouse(long x, long y, bool left) {
+void std_releaseMouse(int x, int y, bool left) {
     releaseMouse(x, y, left);
 }
 
-void std_clickMouse(long x, long y, bool left) {
+void std_clickMouse(int x, int y, bool left) {
     clickMouse(x, y, left);
 }
 
-void std_holdMousePlus(long x, long y, long button) {
+void std_holdMousePlus(int x, int y, int button) {
     holdMousePlus(x, y, button);
 }
 
-void std_releaseMousePlus(long x, long y, long button) {
+void std_releaseMousePlus(int x, int y, int button) {
     releaseMousePlus(x, y, button);
 }
 
-void std_clickMousePlus(long x, long y, long button) {
+void std_clickMousePlus(int x, int y, int button) {
     clickMousePlus(x, y, button);
 }
 
-bool std_isMouseButtonHeld(long button) {
+bool std_isMouseButtonHeld(int button) {
     return isMouseButtonHeld( button);
 }
 
