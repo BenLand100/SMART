@@ -20,7 +20,7 @@
 """
 
 from ctypes import *
-import platform
+import platform, sys
 
 class point:
 	"""Dummy class for a generic point."""
@@ -44,10 +44,11 @@ class Smart:
 		"""Sets up the python bindings for SMART, sets the JVM if specified, 
 		   and invokes the setup routine, assuming the libsmart library is
 		   in the current path."""
+		bitstr = '64' if sys.maxsize > 2**32 else '32'
 		if platform.system() == 'Windows':
-			self._dll = CDLL('./libsmart.dll')
+			self._dll = CDLL('./libsmart'+bitstr+'.dll')
 		else:
-			self._dll = CDLL('./libsmart.so')
+			self._dll = CDLL('./libsmart'+bitstr+'.so')
 		#JVM.h
 		self._dll.setJVMPath.argtypes = [c_char_p]
 		self._dll.setJVMPath.restype = None
