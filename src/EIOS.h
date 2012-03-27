@@ -65,8 +65,6 @@
  *  method names may be modified to whatever end. What is important 
  *  is that the proper pointers are available to the Controller. 
  */ 
-
-extern "C" {
  
 /** 
  *  EIOS_RequestTarget informs a Client that the Controller is ready  
@@ -90,8 +88,8 @@ extern "C" {
  
 typedef void* Target;
  
-Target EIOS_RequestTarget(char *initargs) __attribute__((stdcall)); 
-void EIOS_ReleaseTarget(Target t) __attribute__((stdcall)); 
+extern "C" Target EIOS_RequestTarget(char *initargs) __attribute__((stdcall)); 
+extern "C" void EIOS_ReleaseTarget(Target t) __attribute__((stdcall)); 
  
 /** 
  *  The width and height may be obtained by passing pointers, or  
@@ -102,7 +100,7 @@ void EIOS_ReleaseTarget(Target t) __attribute__((stdcall));
  *  positions outside this area. 
  */ 
   
-void EIOS_GetTargetDimensions(Target t, int* width, int* height) __attribute__((stdcall)); 
+extern "C" void EIOS_GetTargetDimensions(Target t, int* width, int* height) __attribute__((stdcall)); 
  
 /** 
  *  EIOS_GetImageBuffer and EIOS_UpdateImageBuffer both deal with the  
@@ -130,8 +128,8 @@ typedef union {
 	unsigned int color; 
 } rgb; 
  
-rgb* EIOS_GetImageBuffer(Target t) __attribute__((stdcall)); 
-void EIOS_UpdateImageBuffer(Target t) __attribute__((stdcall)); 
+extern "C" rgb* EIOS_GetImageBuffer(Target t) __attribute__((stdcall)); 
+extern "C" void EIOS_UpdateImageBuffer(Target t) __attribute__((stdcall)); 
  
 /** 
  *  Mouse control is abstracted into very basic and implementation  
@@ -173,11 +171,11 @@ void EIOS_UpdateImageBuffer(Target t) __attribute__((stdcall));
  *  method with a position argument will be the specified position. 
  */ 
   
-void EIOS_GetMousePosition(Target t, int* x, int* y) __attribute__((stdcall)); 
-void EIOS_MoveMouse(Target t, int x, int y) __attribute__((stdcall)); 
-void EIOS_HoldMouse(Target t, int x, int y, int button) __attribute__((stdcall)); 
-void EIOS_ReleaseMouse(Target t, int x, int y, int button) __attribute__((stdcall)); 
-bool EIOS_IsMouseHeld(Target t, int button) __attribute__((stdcall)); 
+extern "C" void EIOS_GetMousePosition(Target t, int* x, int* y) __attribute__((stdcall)); 
+extern "C" void EIOS_MoveMouse(Target t, int x, int y) __attribute__((stdcall)); 
+extern "C" void EIOS_HoldMouse(Target t, int x, int y, int button) __attribute__((stdcall)); 
+extern "C" void EIOS_ReleaseMouse(Target t, int x, int y, int button) __attribute__((stdcall)); 
+extern "C" bool EIOS_IsMouseHeld(Target t, int button) __attribute__((stdcall)); 
  
 /** 
  *  Keyboard control is abstracted to holds and releases of keys. In this 
@@ -197,10 +195,8 @@ bool EIOS_IsMouseHeld(Target t, int button) __attribute__((stdcall));
  *  EIOS_IsKeyHeld return true if the key is held 
  */ 
   
-void EIOS_SendString(Target t, char* str) __attribute__((stdcall)); 
-void EIOS_HoldKey(Target t, int key) __attribute__((stdcall)); 
-void EIOS_ReleaseKey(Target t, int key) __attribute__((stdcall)); 
-bool EIOS_IsKeyHeld(Target t, int key) __attribute__((stdcall)); 
-
-};
+extern "C" void EIOS_SendString(Target t, char* str) __attribute__((stdcall)); 
+extern "C" void EIOS_HoldKey(Target t, int key) __attribute__((stdcall)); 
+extern "C" void EIOS_ReleaseKey(Target t, int key) __attribute__((stdcall)); 
+extern "C" bool EIOS_IsKeyHeld(Target t, int key) __attribute__((stdcall)); 
   

@@ -99,7 +99,8 @@ SCAROBJFILES= \
 	$(SCAR_BUILD_DIR)/Reflection.o \
 	$(SCAR_BUILD_DIR)/JVM.o \
 	$(SCAR_BUILD_DIR)/Smart.o \
-	$(SCAR_BUILD_DIR)/STD_Wrapper.o
+	$(SCAR_BUILD_DIR)/STD_Wrapper.o \
+	$(SCAR_BUILD_DIR)/EIOS.o
 	
 LINOBJFILES= \
 	$(LIN_BUILD_DIR)/Main.o \
@@ -168,6 +169,10 @@ test: test-apps/test-windows.cpp test-apps/test-linux.cpp test-apps/test-scar.cp
 	@$(WIN_GPP) -Wall -o $(DIST)/test-scar.exe test-apps/test-scar.cpp
 	@$(LIN_GPP) -Wall -fPIC -ldl -o $(DIST)/test-linux32 test-apps/test-linux.cpp
 	@$(LIN64_GPP) -Wall -fPIC -ldl -o $(DIST)/test-linux64 test-apps/test-linux.cpp
+	@$(WIN_GPP) -Wall -o $(DIST)/test-eios-win32.exe test-apps/test-eios.cpp
+	@$(WIN64_GPP) -Wall -o $(DIST)/test-eios-win64.exe test-apps/test-eios.cpp
+	@$(LIN_GPP) -Wall -fPIC -ldl -o $(DIST)/test-eios-lin32 test-apps/test-eios.cpp
+	@$(LIN64_GPP) -Wall -fPIC -ldl -o $(DIST)/test-eios-lin64 test-apps/test-eios.cpp
 	@cp test-apps/test-python.py $(DIST)/test-python
 	@echo "Finished building test programs" 
 	
@@ -430,6 +435,11 @@ ${SCAR_BUILD_DIR}/STD_Wrapper.o: $(SRC_DIR)/STD_Wrapper.cpp $(CPPHEADERFILES)
 	@echo "Compiling STD_Wrapper.cpp"
 	@mkdir -p $(SCAR_BUILD_DIR)
 	@$(WIN_GPP) $(SCAR_COMPILE_ARGS) -o $(SCAR_BUILD_DIR)/STD_Wrapper.o $(SRC_DIR)/STD_Wrapper.cpp
+	
+${SCAR_BUILD_DIR}/EIOS.o: $(SRC_DIR)/EIOS.cpp $(CPPHEADERFILES)
+	@echo "Compiling EIOS.cpp"
+	@mkdir -p $(SCAR_BUILD_DIR)
+	@$(WIN_GPP) $(SCAR_COMPILE_ARGS) -o $(SCAR_BUILD_DIR)/EIOS.o $(SRC_DIR)/EIOS.cpp
 
 
 #### JAVA/Cypher BUILDING DIRECTIVES ####
