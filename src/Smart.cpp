@@ -249,9 +249,7 @@ void freeClasses() {
     unloadClasses();
 }
 
-//Entrypoint for SMART operation --- sets a new state or reuses an old one if compatible
-//loads the JVM if necessary, and initilizes anything that might need it
-void setup(char* root, char* params, int width, int height, char* initseq) {
+void setupRemote(char* root, char* params, int width, int height, void* _image, void* _debug, char* initseq) {
     cout << "SmartSetup Entered\n";
     if (jre) vm->AttachCurrentThreadAsDaemon((void**)&jre, 0);
     if (strcmp(root, curserver) || strcmp(params, curparams) || width != client_width || height != client_height) {
@@ -275,30 +273,35 @@ void setup(char* root, char* params, int width, int height, char* initseq) {
         strcpy(curparams, params);
         client_height = height;
         client_width = width;
-        #ifdef WINDOWS
-        cout << "Allocating image HDC(s)\n";
-        BITMAPINFO info;
-        info.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-        info.bmiHeader.biWidth = client_width;
-        info.bmiHeader.biHeight = -client_height;
-        info.bmiHeader.biPlanes = 1;
-        info.bmiHeader.biBitCount = 32;
-        info.bmiHeader.biCompression = BI_RGB;
-        info.bmiHeader.biSizeImage = 0;
-        info.bmiHeader.biClrUsed = 0;
-        imageHDC = CreateCompatibleDC(0);
-        imageHBITMAP = CreateDIBSection(imageHDC, &info, DIB_RGB_COLORS, (void**)&image, 0, 0);
-        SelectObject(imageHDC, imageHBITMAP);
-        debugHDC = CreateCompatibleDC(0);
-        debugHBITMAP = CreateDIBSection(debugHDC, &info, DIB_RGB_COLORS, (void**)&debug, 0, 0);
-        SelectObject(debugHDC, debugHBITMAP);
-        cout << "Image: " << (void*)image << " Debug: " << (void*)debug << '\n';
-        #endif
-        #ifdef LINUX
-        cout << "Allocating image swap area(s)\n";
-        image = (PRGB) malloc(client_width*client_height*4);
-        debug = (PRGB) malloc(client_width*client_height*4);
-        #endif
+        if (image == NULL || debug == NULL || image == 0 || debug == 0) {
+            #ifdef WINDOWS
+            cout << "Allocating image HDC(s)\n";
+            BITMAPINFO info;
+            info.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+            info.bmiHeader.biWidth = client_width;
+            info.bmiHeader.biHeight = -client_height;
+            info.bmiHeader.biPlanes = 1;
+            info.bmiHeader.biBitCount = 32;
+            info.bmiHeader.biCompression = BI_RGB;
+            info.bmiHeader.biSizeImage = 0;
+            info.bmiHeader.biClrUsed = 0;
+            imageHDC = CreateCompatibleDC(0);
+            imageHBITMAP = CreateDIBSection(imageHDC, &info, DIB_RGB_COLORS, (void**)&image, 0, 0);
+            SelectObject(imageHDC, imageHBITMAP);
+            debugHDC = CreateCompatibleDC(0);
+            debugHBITMAP = CreateDIBSection(debugHDC, &info, DIB_RGB_COLORS, (void**)&debug, 0, 0);
+            SelectObject(debugHDC, debugHBITMAP);
+            cout << "Image: " << (void*)image << " Debug: " << (void*)debug << '\n';
+            #endif
+            #ifdef LINUX
+            cout << "Allocating image swap area(s)\n";
+            image = (PRGB) malloc(client_width*client_height*4);
+            debug = (PRGB) malloc(client_width*client_height*4);
+            #endif
+        } else {
+            image = (PRGB)_image;
+            debug = (PRGB)_debug;
+        }
         setTarget(0,client_width,client_height);
         jobject imgBuffer = jre->NewDirectByteBuffer((void*)image, client_height*client_width*4);
         jobject debugBuffer = jre->NewDirectByteBuffer((void*)debug, client_height*client_width*4);
@@ -337,6 +340,12 @@ void setup(char* root, char* params, int width, int height, char* initseq) {
             return;
         }
     }
+}
+
+//Entrypoint for SMART operation --- sets a new state or reuses an old one if compatible
+//loads the JVM if necessary, and initilizes anything that might need it
+void setup(char* root, char* params, int width, int height, char* initseq) {
+    setupRemote(root,params,width,height,0,0,initseq);
 }
 
 //Will completely kill the JVM and as a consequence, the RS client.

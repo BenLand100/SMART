@@ -162,6 +162,7 @@ EXPORTS
     setGraphics
     setRefresh
     setup
+    setupRemote
     stringFromBytes
     stringFromChars
     stringFromString
