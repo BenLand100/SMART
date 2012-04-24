@@ -30,8 +30,26 @@
 using namespace std;
 
 static int width,height;
-void* memmap;
-shm_data *data;
+static int fd;
+static void* memmap;
+static shm_data *data;
+
+void pairClient(int id) {
+    if (memmap) {
+        munmap(memmap,width*height*2+sizeof(shm_data));
+        close(fd);
+    }
+    char shmfile[256];
+    sprintf(shmfile,"SMART.%i",id);
+    fd = open(shmfile,O_RDWR);
+    memmap = mmap(NULL,sizeof(shm_data),PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+    data = (shm_data*)memmap;
+    width = data->width;
+    height = data->height;
+    munmap(memmap,+sizeof(shm_data));
+    memmap = mmap(NULL,2*width*height+sizeof(shm_data),PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+    data = (shm_data*)memmap;
+}
 
 void* std_getImageArray() {
     return data ? memmap + data->imgstart : 0;
@@ -41,15 +59,198 @@ void* std_getDebugArray() {
     return data ? memmap + data->dbgstart : 0;
 }
 
-void std_pairClient(int id, int _width, int _height) {
-    if (memmap) munmap(memmap,width*height*2+sizeof(shm_data));
-    width = _width;
-    height = _height;
-    char shmfile[256];
-    sprintf(shmfile,"SMART.%i",id);
-    int fd = open(shmfile,O_RDWR);
-    memmap = mmap(NULL,width*height*2+sizeof(shm_data),PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-    data = (shm_data*)memmap;
+void call(int funid) {
+    data->funid = funid;
+    while (data->funid) { /* sleep */ }
+}
+
+int std_getRefresh() {
+    call(getRefresh);
+    return *(int*)(data->args);
+}
+
+void std_setRefresh(int x) {
+    *(int*)(data->args) = x;
+    call(setRefresh);
+}
+
+void std_setTransparentColor(int color) {
+    *(int*)(data->args) = color;
+    call(setTransparentColor);
+}
+
+void std_setDebug(bool enabled) {
+    *(bool*)(data->args) = enabled;
+    call(setDebug);
+}
+
+
+void std_setGraphics(bool enabled) {
+    *(bool*)(data->args) = enabled;
+    call(setGraphics);
+}
+
+void std_setEnabled(bool enabled) {
+    *(bool*)(data->args) = enabled;
+    call(setEnabled);
+}
+
+bool std_isActive() {
+    call(isActive);
+    return *(bool*)(data->args);
+}
+
+bool std_isBlocking() {
+    call(isBlocking);
+    return *(bool*)(data->args);
+}
+
+void std_getMousePos(int &x, int &y) {
+    call(getMousePos);
+    x = ((int*)(data->args))[0];
+    y = ((int*)(data->args))[1];
+}
+
+void std_holdMouse(int x, int y, bool left) {
+    ((int*)(data->args))[0] = x;
+    ((int*)(data->args))[1] = y;
+    ((int*)(data->args))[2] = left; //not a mistake
+    call(holdMouse);
+}
+
+void std_releaseMouse(int x, int y, bool left) {
+    ((int*)(data->args))[0] = x;
+    ((int*)(data->args))[1] = y;
+    ((int*)(data->args))[2] = left; //not a mistake
+    call(releaseMouse);
+}
+
+void std_holdMousePlus(int x, int y, int button) {
+    ((int*)(data->args))[0] = x;
+    ((int*)(data->args))[1] = y;
+    ((int*)(data->args))[2] = button;
+    call(holdMousePlus);
+}
+
+void std_releaseMousePlus(int x, int y, int button) {
+    ((int*)(data->args))[0] = x;
+    ((int*)(data->args))[1] = y;
+    ((int*)(data->args))[2] = button;
+    call(releaseMousePlus);
+}
+
+void std_moveMouse(int x, int y) {
+    ((int*)(data->args))[0] = x;
+    ((int*)(data->args))[1] = y;
+    call(moveMouse);
+}
+
+void std_windMouse(int x, int y) {
+    ((int*)(data->args))[0] = x;
+    ((int*)(data->args))[1] = y;
+    call(windMouse);
+}
+
+void std_clickMouse(int x, int y, bool left) {
+    ((int*)(data->args))[0] = x;
+    ((int*)(data->args))[1] = y;
+    ((int*)(data->args))[2] = left; //not a mistake
+    call(clickMouse);
+}
+
+void std_clickMousePlus(int x, int y, int button) {
+    ((int*)(data->args))[0] = x;
+    ((int*)(data->args))[1] = y;
+    ((int*)(data->args))[2] = button;
+    call(clickMousePlus);
+}
+
+bool std_isMouseButtonHeld(int button) {
+    *(int*)(data->args) = button;
+    call(isMouseButtonHeld);
+    return *(bool*)(data->args);
+}
+
+void std_sendKeys(char *text) {
+    strcpy((char*)data->args,text);
+    call(sendKeys);
+}
+
+void std_holdKey(int code) {
+    *(int*)(data->args) = code;
+    call(holdKey);
+}
+
+void std_releaseKey(int code) {
+    *(int*)(data->args) = code;
+    call(releaseKey);
+}
+
+bool std_isKeyDown(int code) {
+    *(int*)(data->args) = code;
+    call(isKeyDown);
+    return *(bool*)(data->args);
+}
+
+int std_getColor(int x, int y) {
+    ((int*)(data->args))[0] = x;
+    ((int*)(data->args))[1] = y;
+    call(getColor);
+    return *(int*)(data->args);
+}
+
+bool std_findColor(int &x, int& y, int color, int sx, int sy, int ex, int ey) {
+    ((int*)(data->args))[0] = x;
+    ((int*)(data->args))[1] = y;
+    ((int*)(data->args))[2] = color;
+    ((int*)(data->args))[3] = sx;
+    ((int*)(data->args))[4] = sy;
+    ((int*)(data->args))[5] = ex;
+    ((int*)(data->args))[6] = ey;
+    call(findColor);
+    x = ((int*)(data->args))[0];
+    y = ((int*)(data->args))[1];
+}
+
+bool std_findColorTol(int &x, int& y, int color, int sx, int sy, int ex, int ey, int tol) {
+    ((int*)(data->args))[0] = x;
+    ((int*)(data->args))[1] = y;
+    ((int*)(data->args))[2] = color;
+    ((int*)(data->args))[3] = sx;
+    ((int*)(data->args))[4] = sy;
+    ((int*)(data->args))[5] = ex;
+    ((int*)(data->args))[6] = ey;
+    ((int*)(data->args))[7] = tol;
+    call(findColorTol);
+    x = ((int*)(data->args))[0];
+    y = ((int*)(data->args))[1];
+}
+
+bool std_findColorSpiral(int &x, int& y, int color, int sx, int sy, int ex, int ey) {
+    ((int*)(data->args))[0] = x;
+    ((int*)(data->args))[1] = y;
+    ((int*)(data->args))[2] = color;
+    ((int*)(data->args))[3] = sx;
+    ((int*)(data->args))[4] = sy;
+    ((int*)(data->args))[5] = ex;
+    ((int*)(data->args))[6] = ey;
+    call(findColorSpiral);
+    x = ((int*)(data->args))[0];
+    y = ((int*)(data->args))[1];
+}
+
+bool std_findColorSpiralTol(int &x, int& y, int color, int sx, int sy, int ex, int ey, int tol) {
+    ((int*)(data->args))[0] = x;
+    ((int*)(data->args))[1] = y;
+    ((int*)(data->args))[2] = color;
+    ((int*)(data->args))[3] = sx;
+    ((int*)(data->args))[4] = sy;
+    ((int*)(data->args))[5] = ex;
+    ((int*)(data->args))[6] = ey;
+    ((int*)(data->args))[7] = tol;
+    call(findColorSpiralTol);
+    x = ((int*)(data->args))[0];
+    y = ((int*)(data->args))[1];
 }
 
 void internal_constructor() {
@@ -58,11 +259,14 @@ void internal_constructor() {
 }
 
 void internal_destructor() {
-    if (memmap) munmap(memmap,width*height*2+sizeof(shm_data));
+    if (memmap) {
+        munmap(memmap,width*height*2+sizeof(shm_data));
+        close(fd);
+    }
 }
 
 int main(int argc, char** argv) {
-    std_pairClient(atoi(argv[1]),765,503);
+    pairClient(atoi(argv[1]));
     data->die = 1;
 }
 

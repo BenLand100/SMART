@@ -33,6 +33,7 @@ static char *root,*params,*initseq,*useragent,*jvmpath,*maxmem;
 static int width,height;
 static void *img,*dbg;
 static void *memmap;
+static void **functions;
 
 typedef void (*SetupRemote)(char*,char*,long,long,void*,void*,char*) __attribute__((cdecl));
 typedef void (*SetUserAgent)(char*) __attribute__((cdecl));
@@ -56,6 +57,7 @@ void initSMART() {
         #endif
     #endif
     cout << "Library: " << libsmart << '\n';
+    functions = (void**)malloc(sizeof(void*)*NumExports);
     SetupRemote setup;
     SetUserAgent setAgent;
     SetJVMPath setPath;
@@ -65,11 +67,17 @@ void initSMART() {
         setAgent = (SetUserAgent)dlsym(libsmart, "setUserAgent");
         setPath = (SetJVMPath)dlsym(libsmart, "setJVMPath");
         setMem = (SetMaxJVMMem)dlsym(libsmart, "setMaxJVMMem");
+        for (int i = 0; i < NumImports; i++) {
+            functions[i] = (void*)dlsym(libsmart, imports[i]);
+        }
     #else
         setup = (SetupRemote)GetProcAddress(libsmart, "setupRemote");
         setAgent = (SetUserAgent)GetProcAddress(libsmart, "setUserAgent");
         setPath = (SetJVMPath)GetProcAddress(libsmart, "setJVMPath");
         setMem = (SetMaxJVMMem)GetProcAddress(libsmart, "setMaxJVMMem");
+        for (int i = 0; i < NumImports; i++) {
+            functions[i] = (void*)GetProcAddress(libsmart, imports[i]);
+        }
     #endif
     cout << "Found my functions!\n";
     if (useragent) setAgent(useragent);
@@ -80,14 +88,98 @@ void initSMART() {
 
 void execfun() {
     switch (data->funid) {
-        case 1: cout << (char*)data->scratch << '\n';
+        case getRefresh:
+            *(int*)(data->args) = ((type_getRefresh)(functions[getRefresh-NoFunc]))();
+            break;
+        case setRefresh:
+            ((type_setRefresh)(functions[setRefresh-NoFunc]))(*(int*)(data->args));
+            break;
+        case setTransparentColor:
+            ((type_setTransparentColor)(functions[setTransparentColor-NoFunc]))(*(int*)(data->args));
+            break;
+        case setDebug:
+            ((type_setDebug)(functions[setDebug-NoFunc]))(*(bool*)(data->args));
+            break;
+        case setGraphics:
+            ((type_setGraphics)(functions[setGraphics-NoFunc]))(*(bool*)(data->args));
+            break;
+        case setEnabled:
+            ((type_setEnabled)(functions[setEnabled-NoFunc]))(*(bool*)(data->args));
+            break;
+        case isActive:
+            *(bool*)(data->args) = ((type_isActive)(functions[isActive-NoFunc]))();
+            break;
+        case isBlocking:
+            *(bool*)(data->args) = ((type_isBlocking)(functions[isBlocking-NoFunc]))();
+            break;
+        case getMousePos:
+            ((type_getMousePos)(functions[getMousePos-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1]);
+            break;
+        case holdMouse:
+            ((type_holdMouse)(functions[holdMouse-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],(bool)(((int*)(data->args))[2-NoFunc]));
+            break;
+        case releaseMouse:
+            ((type_releaseMouse)(functions[releaseMouse-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],(bool)(((int*)(data->args))[2-NoFunc]));
+            break;
+        case holdMousePlus:
+            ((type_holdMousePlus)(functions[holdMousePlus-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],((int*)(data->args))[2]);
+            break;
+        case releaseMousePlus:
+            ((type_releaseMousePlus)(functions[releaseMousePlus-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],((int*)(data->args))[2]);
+            break;
+        case moveMouse:
+            ((type_moveMouse)(functions[moveMouse-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1]);
+            break;
+        case windMouse:
+            ((type_windMouse)(functions[windMouse-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1]);
+            break;
+        case clickMouse:
+            ((type_clickMouse)(functions[clickMouse-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],(bool)(((int*)(data->args))[2-NoFunc]));
+            break;
+        case clickMousePlus:
+            ((type_clickMousePlus)(functions[clickMousePlus-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],((int*)(data->args))[2]);
+            break;
+        case isMouseButtonHeld:
+            *(bool*)(data->args) = ((type_isMouseButtonHeld)(functions[isMouseButtonHeld-NoFunc]))(*(int*)(data->args));
+            break;
+        case sendKeys:
+            ((type_sendKeys)(functions[sendKeys-NoFunc]))((char*)data->args);
+            break;
+        case holdKey:
+            ((type_holdKey)(functions[holdKey-NoFunc]))(*(int*)data->args);
+            break;
+        case releaseKey:
+            ((type_releaseKey)(functions[releaseKey-NoFunc]))(*(int*)data->args);
+            break;
+        case isKeyDown:
+            *(bool*)(data->args) = ((type_isKeyDown)(functions[isKeyDown-NoFunc]))(*(int*)data->args);
+            break;
+        case getColor:
+            *(int*)(data->args) = ((type_getColor)(functions[getColor-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1]);
+            break;
+        case findColor:
+            *(bool*)(data->args) = ((type_findColor)(functions[findColor-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],((int*)(data->args))[2],((int*)(data->args))[3],((int*)(data->args))[4],((int*)(data->args))[5],((int*)(data->args))[6]);
+            //x&y autoupdated
+            break;
+        case findColorTol:
+            *(bool*)(data->args) = ((type_findColorTol)(functions[findColorTol-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],((int*)(data->args))[2],((int*)(data->args))[3],((int*)(data->args))[4],((int*)(data->args))[5],((int*)(data->args))[6],((int*)(data->args))[7]);
+            //x&y autoupdated
+            break;
+        case findColorSpiral:
+            *(bool*)(data->args) = ((type_findColorSpiral)(functions[findColorSpiral-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],((int*)(data->args))[2],((int*)(data->args))[3],((int*)(data->args))[4],((int*)(data->args))[5],((int*)(data->args))[6]);
+            //x&y autoupdated
+            break;
+        case findColorSpiralTol:
+            *(bool*)(data->args) = ((type_findColorSpiralTol)(functions[findColorSpiralTol-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],((int*)(data->args))[2],((int*)(data->args))[3],((int*)(data->args))[4],((int*)(data->args))[5],((int*)(data->args))[6],((int*)(data->args))[7]);
+            //x&y autoupdated
+            break;
+        default:
+            cout << "Invalid function id: " << data->funid << '\n';
     }
     data->funid = 0;
 }
 
 int main(int argc, char** argv) {
-    cout << "Can has starting!\n";
-    
     if (argc != 9) exit(0);
     
     root = argv[1];
@@ -102,8 +194,6 @@ int main(int argc, char** argv) {
     if (strlen(jvmpath)<=0) jvmpath = 0;
     maxmem = argv[8];
     if (strlen(maxmem)<=0) maxmem = 0;
-    
-    cout << "Can has arguments\n";
    
     char shmfile[256];
     sprintf(shmfile,"SMART.%i",getpid());
@@ -113,21 +203,18 @@ int main(int argc, char** argv) {
     fsync(fd);
     memmap = mmap(NULL, width*height*2+sizeof(shm_data), PROT_READ|PROT_WRITE, MAP_FILE|MAP_SHARED, fd, 0);
     
-    cout << "Can has shared memory @ " << memmap << "\n";
-    
-    
+    cout << "Shared Memory mapped to " << memmap << "\n";
+   
     data = (shm_data*)memmap;
     data->id = getpid();
     data->paired = 0;
     data->width = width;
     data->height = height;
-    data->ping = data->pong = time(0);
+    data->time = 0;
     data->die = 0;
     data->funid = 0;
     
     fsync(fd);
-    
-    cout << "Can has data\n";
     
     data->imgstart = sizeof(shm_data);
     data->dbgstart = sizeof(shm_data)+width*height;
@@ -139,16 +226,17 @@ int main(int argc, char** argv) {
     
     cout << "Can has waiting...\n";
 
-    while (!data->die) {
-        data->ping = time(0);
-        //if (data->ping - data->pong > 5000) data->paired = 0;
+    while (!data->die && ((type_isActive)functions[isActive-NoFunc])()) {
+        data->time = time(0);
         if (data->funid != 0) execfun();
+        sleep(0);
     }
     
     cout << "Can has unwanted :<\n";
     
     munmap(memmap,width*height*2+sizeof(shm_data));
     close(fd);
+    unlink(shmfile);
     
     cout << "Can has dead.\n";
     
