@@ -24,8 +24,10 @@
 #include <cstring>
 #include <iostream>
 #include <stdlib.h>
+#ifndef _WIN32
 #include <sys/mman.h>
 #include <fcntl.h>
+#endif
 
 #define TIMEOUT 5
 
@@ -38,10 +40,14 @@ static shm_data *data;
 
 void cleanup() {
     if (memmap) {
+        #ifndef _WIN32
         munmap(memmap,width*height*2+sizeof(shm_data));
+        close(fd);
+        #else
+        //Implement
+        #endif
         memmap = NULL;
         data = NULL;
-        close(fd);
     }
 }
 
@@ -59,33 +65,61 @@ bool pairClient(int id) {
     cleanup();
     char shmfile[256];
     sprintf(shmfile,"SMART.%i",id);
+    #ifndef _WIN32
     fd = open(shmfile,O_RDWR);
+    #else
+    //implement
+    #endif
     if (fd != -1) {
+        #ifndef _WIN32
         memmap = mmap(NULL,sizeof(shm_data),PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+        #else
+        //implement
+        #endif
         data = (shm_data*)memmap;
         int client_time = data->time;
         int client_paired = data->paired;
         width = data->width;
         height = data->height;
+        #ifndef _WIN32
         munmap(memmap,+sizeof(shm_data));
+        #else
+        //implement
+        #endif
         if (client_time != 0 && time(0) - client_time > TIMEOUT) {
             cout << "Failed to pair - Zombie client detected\n";
+            #ifndef _WIN32
             unlink(shmfile);
+            close(fd);
+            #else
+            //implement
+            #endif
             memmap = NULL;
             data = NULL;
-            close(fd);
             return false;
         }
         if (client_paired) { 
             cout << "Failed to pair - Client appears to be paired\n";
+            #ifndef _WIN32
+            close(fd);
+            #else
+            //implement
+            #endif
             memmap = NULL;
             data = NULL;
-            close(fd);
             return false;
         }
+        #ifndef _WIN32
         memmap = mmap(NULL,2*width*height+sizeof(shm_data),PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+        #else
+        //implement
+        #endif
         data = (shm_data*)memmap;
+        #ifndef _WIN32
         data->paired = getpid();
+        #else
+        //implement
+        #endif
     } else {
         cout << "Failed to pair - No client by that ID\n";
         return false;
@@ -106,13 +140,22 @@ void call(int funid) {
     //assume that anything calling this already checked if data is nonzero
     data->funid = funid;
     while (data->funid) { 
+        #ifndef _WIN32
         sleep(0); 
+        #else
+        //implement
+        #endif
         if (time(0) - data->time > TIMEOUT) {
             cout << "Client appears to have died: aborting link\n";
             char shmfile[256];
             sprintf(shmfile,"SMART.%i",data->id);
             cleanup();
             unlink(shmfile);
+            #ifndef _WIN32
+            unlink(shmfile);
+            #else
+            //implement
+            #endif
         }
     }
 }
@@ -366,10 +409,7 @@ void internal_constructor() {
 }
 
 void internal_destructor() {
-    if (memmap) {
-        munmap(memmap,width*height*2+sizeof(shm_data));
-        close(fd);
-    }
+    cleanup();
 }
 
 int main(int argc, char** argv) {

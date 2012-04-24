@@ -20,13 +20,15 @@
 #include "Remote.h"
 #include "Bridge.h"
 #include <iostream>
-#include <sys/mman.h>
 #include <time.h>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#ifndef _WIN32
+#include <sys/mman.h>
 #include <fcntl.h>
 #include <signal.h>
+#endif
 
 using namespace std;
 
@@ -201,11 +203,15 @@ int main(int argc, char** argv) {
     //Create the shared memory file
     char shmfile[256];
     sprintf(shmfile,"SMART.%i",getpid());
+    #ifndef _WIN32
     int fd = open(shmfile,O_CREAT|O_RDWR,S_IRWXU|S_IRWXG|S_IRWXO); 
     lseek(fd,width*height*2+sizeof(shm_data),0);
     write(fd,"\0",1); //ensure proper size
     fsync(fd); //flush to disk
     memmap = mmap(NULL, width*height*2+sizeof(shm_data), PROT_READ|PROT_WRITE, MAP_FILE|MAP_SHARED, fd, 0);
+    #else
+    //IMPLEMENT
+    #endif
     cout << "Shared Memory mapped to " << memmap << "\n";
     
     //Init the shm_data structure
@@ -219,7 +225,11 @@ int main(int argc, char** argv) {
     data->funid = 0;
     data->imgstart = sizeof(shm_data);
     data->dbgstart = sizeof(shm_data)+width*height;
+    #ifndef _WIN32
     fsync(fd); //Flush this to disk, probably not necessary
+    #else
+    //IMPLEMENT
+    #endif
 
     //Let SMART use the shared memory for the images
     img = memmap + data->imgstart;
@@ -233,19 +243,31 @@ int main(int argc, char** argv) {
     for (unsigned int i = 0; !data->die && ((type_isActive)functions[isActive-NoFunc])(); i++) {
         data->time = time(0);
         if (data->funid != 0) execfun();
+        #ifndef _WIN32
         sleep(0);
+        #else
+        //IMPLEMENT
+        #endif
         if (!(i%1000000)) {
+            #ifndef _WIN32
             if (data->paired && kill(data->paired,0)) {
+            #else
+            if (data->paired && true /*not dead*/) {//IMPLEMENT
+            #endif
                 cout << "Paired process terminate: reset\n";
                 data->paired = 0;
             }
         }
     }
     
+    #ifndef _WIN32
     //Free memory and delete SMART.[pid] on terminate
     munmap(memmap,width*height*2+sizeof(shm_data));
     close(fd);
     unlink(shmfile);
+    #else
+    //IMPLEMENT
+    #endif
     
     return 1;
 }
