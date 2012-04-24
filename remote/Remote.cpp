@@ -26,6 +26,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <fcntl.h>
+#include <signal.h>
 
 using namespace std;
 
@@ -226,10 +227,16 @@ int main(int argc, char** argv) {
     
     cout << "Can has waiting...\n";
 
-    while (!data->die && ((type_isActive)functions[isActive-NoFunc])()) {
+    for (int i = 0; !data->die && ((type_isActive)functions[isActive-NoFunc])(); i++) {
         data->time = time(0);
         if (data->funid != 0) execfun();
         sleep(0);
+        if (!(i%1000000)) {
+            if (data->paired && kill(data->paired,0)) {
+                cout << "Paired process terminate: reset\n";
+                data->paired = 0;
+            }
+        }
     }
     
     cout << "Can has unwanted :<\n";

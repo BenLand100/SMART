@@ -54,6 +54,7 @@ bool pairClient(int id) {
         memmap = mmap(NULL,sizeof(shm_data),PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
         data = (shm_data*)memmap;
         int client_time = data->time;
+        int client_paired = data->paired;
         width = data->width;
         height = data->height;
         munmap(memmap,+sizeof(shm_data));
@@ -65,8 +66,16 @@ bool pairClient(int id) {
             close(fd);
             return false;
         }
+        if (client_paired) { 
+            cout << "Failed to pair - Client appears to be paired\n";
+            memmap = NULL;
+            data = NULL;
+            close(fd);
+            return false;
+        }
         memmap = mmap(NULL,2*width*height+sizeof(shm_data),PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
         data = (shm_data*)memmap;
+        data->paired = getpid();
     } else {
         cout << "Failed to pair - No client by that ID\n";
         return false;
