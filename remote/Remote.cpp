@@ -36,13 +36,12 @@ static void *img,*dbg;
 static void *memmap;
 static void **functions;
 
-typedef void (*SetupRemote)(char*,char*,long,long,void*,void*,char*) __attribute__((cdecl));
-typedef void (*SetUserAgent)(char*) __attribute__((cdecl));
-typedef void (*SetJVMPath)(char*) __attribute__((cdecl));
-typedef void (*SetMaxJVMMem)(int) __attribute__((cdecl));
-
 shm_data *data;
 
+/**
+ * Loads the SMART library, links the required methods, and starts SMART according
+ * to the current arguments
+ */
 void initSMART() {
     #ifndef _WIN32
         #if __SIZEOF_POINTER__ == 4
@@ -80,13 +79,15 @@ void initSMART() {
             functions[i] = (void*)GetProcAddress(libsmart, imports[i]);
         }
     #endif
-    cout << "Found my functions!\n";
     if (useragent) setAgent(useragent);
     if (jvmpath) setPath(jvmpath);
     if (maxmem) setMem(atoi(maxmem));
     setup(root,params,width,height,img,dbg,initseq);
 }
 
+/**
+ * Executes functions passed from the paired process
+ */
 void execfun() {
     switch (data->funid) {
         case getRefresh:
@@ -181,6 +182,7 @@ void execfun() {
 }
 
 int main(int argc, char** argv) {
+    //Read init args from arguments
     if (argc != 9) exit(0);
     
     root = argv[1];
@@ -196,16 +198,17 @@ int main(int argc, char** argv) {
     maxmem = argv[8];
     if (strlen(maxmem)<=0) maxmem = 0;
    
+    //Create the shared memory file
     char shmfile[256];
     sprintf(shmfile,"SMART.%i",getpid());
     int fd = open(shmfile,O_CREAT|O_RDWR,S_IRWXU|S_IRWXG|S_IRWXO); 
     lseek(fd,width*height*2+sizeof(shm_data),0);
-    write(fd,"\0",1);
-    fsync(fd);
+    write(fd,"\0",1); //ensure proper size
+    fsync(fd); //flush to disk
     memmap = mmap(NULL, width*height*2+sizeof(shm_data), PROT_READ|PROT_WRITE, MAP_FILE|MAP_SHARED, fd, 0);
-    
     cout << "Shared Memory mapped to " << memmap << "\n";
-   
+    
+    //Init the shm_data structure
     data = (shm_data*)memmap;
     data->id = getpid();
     data->paired = 0;
@@ -214,20 +217,20 @@ int main(int argc, char** argv) {
     data->time = 0;
     data->die = 0;
     data->funid = 0;
-    
-    fsync(fd);
-    
     data->imgstart = sizeof(shm_data);
     data->dbgstart = sizeof(shm_data)+width*height;
+    fsync(fd); //Flush this to disk, probably not necessary
 
+    //Let SMART use the shared memory for the images
     img = memmap + data->imgstart;
     dbg = memmap + data->dbgstart;
     
+    //Load the smart plugin and link functions
     initSMART();
-    
-    cout << "Can has waiting...\n";
 
-    for (int i = 0; !data->die && ((type_isActive)functions[isActive-NoFunc])(); i++) {
+    //Event loop: updates time, checks for function calls, and unpairs if the paired process dies
+    //Terminates when the SMART client closes OR if we recieve a die flag from a paired process
+    for (unsigned int i = 0; !data->die && ((type_isActive)functions[isActive-NoFunc])(); i++) {
         data->time = time(0);
         if (data->funid != 0) execfun();
         sleep(0);
@@ -239,13 +242,10 @@ int main(int argc, char** argv) {
         }
     }
     
-    cout << "Can has unwanted :<\n";
-    
+    //Free memory and delete SMART.[pid] on terminate
     munmap(memmap,width*height*2+sizeof(shm_data));
     close(fd);
     unlink(shmfile);
-    
-    cout << "Can has dead.\n";
     
     return 1;
 }

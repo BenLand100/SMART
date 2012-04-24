@@ -20,6 +20,11 @@
 #ifndef _REMOTE_H
 #define	_REMOTE _H
 
+typedef void (*SetupRemote)(char*,char*,long,long,void*,void*,char*) __attribute__((cdecl));
+typedef void (*SetUserAgent)(char*) __attribute__((cdecl));
+typedef void (*SetJVMPath)(char*) __attribute__((cdecl));
+typedef void (*SetMaxJVMMem)(int) __attribute__((cdecl));
+
 #ifndef _WIN32
 #include <dlfcn.h>
 #endif

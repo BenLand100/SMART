@@ -45,6 +45,16 @@ void cleanup() {
     }
 }
 
+/**
+ * Pairing logic: 
+ * 1) Try to open the file SMART.[pid]
+ * 2) If file does not exist, abort
+ * 3) Read the shm_data structure at the beginning of the file
+ * 4) If data->time is older than TIMEOUT, assume zombie, destroy file, and abort
+ * 5) If data->paired is nonzero, assume paired and abort
+ * 6) Remap file with proper size of image and debug included
+ * 7) Set data->paired to our PID
+ */
 bool pairClient(int id) {
     cleanup();
     char shmfile[256];
@@ -81,11 +91,13 @@ bool pairClient(int id) {
         return false;
     }
 }
-
+ 
+//Returns a pointer into shared memory where the image resides
 void* std_getImageArray() {
     return data ? memmap + data->imgstart : 0;
 }
 
+//Returns a pointer into shared memory where the debug image resides
 void* std_getDebugArray() {
     return data ? memmap + data->dbgstart : 0;
 }
