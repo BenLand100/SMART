@@ -68,6 +68,7 @@ typedef bool (*type_findColorSpiral)(int &x, int& y, int color, int sx, int sy, 
 typedef bool (*type_findColorSpiralTol)(int &x, int& y, int color, int sx, int sy, int ex, int ey, int tol) __attribute__((cdecl));
 
 //These methods are exported by Local
+extern "C" bool std_pairClient(int pid) __attribute__((stdcall));
 extern "C" void* std_getImageArray() __attribute__((stdcall));
 extern "C" void* std_getDebugArray() __attribute__((stdcall));
 extern "C" int std_getRefresh() __attribute__((stdcall));
@@ -99,8 +100,9 @@ extern "C" bool std_findColorSpiral(int &x, int& y, int color, int sx, int sy, i
 extern "C" bool std_findColorSpiralTol(int &x, int& y, int color, int sx, int sy, int ex, int ey, int tol) __attribute__((stdcall));
 
 //Exports for Local
-#define NumExports 29
+#define NumExports 30
 static char* exports[] = {
+    (char*)"std_pairClient", (char*)"function SmartPairClient(pid: integer): boolean;",
     (char*)"std_getImageArray", (char*)"function SmartImageArray(): integer;",
     (char*)"std_getDebugArray", (char*)"function SmartDebugArray(): integer;",
     (char*)"std_getRefresh", (char*)"function SmartGetRefresh: integer;",

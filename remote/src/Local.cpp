@@ -68,7 +68,7 @@ void cleanup() {
  * 6) Remap file with proper size of image and debug included
  * 7) Set data->paired to our PID
  */
-bool pairClient(int id) {
+bool std_pairClient(int id) {
     cleanup();
     char shmfile[256];
     sprintf(shmfile,"SMART.%i",id);
@@ -367,6 +367,7 @@ bool std_findColor(int &x, int& y, int color, int sx, int sy, int ex, int ey) {
         call(findColor);
         x = ((int*)(data->args))[0];
         y = ((int*)(data->args))[1];
+        return (bool)(((int*)(data->args))[2]);
     } else return false;
 }
 
@@ -383,6 +384,7 @@ bool std_findColorTol(int &x, int& y, int color, int sx, int sy, int ex, int ey,
         call(findColorTol);
         x = ((int*)(data->args))[0];
         y = ((int*)(data->args))[1];
+        return (bool)(((int*)(data->args))[2]);
     } else return false;
 }
 
@@ -398,6 +400,7 @@ bool std_findColorSpiral(int &x, int& y, int color, int sx, int sy, int ex, int 
         call(findColorSpiral);
         x = ((int*)(data->args))[0];
         y = ((int*)(data->args))[1];
+        return (bool)(((int*)(data->args))[2]);
     } else return false;
 }
 
@@ -414,26 +417,20 @@ bool std_findColorSpiralTol(int &x, int& y, int color, int sx, int sy, int ex, i
         call(findColorSpiralTol);
         x = ((int*)(data->args))[0];
         y = ((int*)(data->args))[1];
+        return (bool)(((int*)(data->args))[2]);
     } else return false;
 }
 
-void internal_constructor() {
+void internalConstructor() {
     memmap = 0;
     data = 0;
 }
 
-void internal_destructor() {
+void internalDestructor() {
     cleanup();
 }
 
-int main(int argc, char** argv) {
-    internal_constructor();
-    pairClient(atoi(argv[1]));
-    cout << std_getRefresh() << '\n';
-    internal_destructor();
-}
 
-/*
 #ifndef _WIN32
 
 int GetFunctionCount() {
@@ -494,4 +491,3 @@ bool DllMain(HINSTANCE instance, int reason, void* checks) {
 }
 
 #endif
-*/

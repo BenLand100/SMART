@@ -25,13 +25,9 @@ EXPORTS
     std_isMouseButtonHeld=std_isMouseButtonHeld@4
     std_sendKeys=std_sendKeys@4
     std_setDebug=std_setDebug@4
-    std_setJVMPath=std_setJVMPath@4
-    std_setMaxJVMMem=std_setMaxJVMMem@4
     std_setTransparentColor=std_setTransparentColor@4
     std_setGraphics=std_setGraphics@4
     std_setRefresh=std_setRefresh@4
-    std_setup=std_setup@20
     std_windMouse=std_windMouse@8
-    std_hardReset=std_hardReset@0
     std_setEnabled=std_setEnabled@4
-    std_setUserAgent=std_setUserAgent@4
+    std_pairClient=std_pairClient@4

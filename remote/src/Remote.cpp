@@ -162,19 +162,19 @@ void execfun() {
             *(int*)(data->args) = ((type_getColor)(functions[getColor-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1]);
             break;
         case findColor:
-            *(bool*)(data->args) = ((type_findColor)(functions[findColor-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],((int*)(data->args))[2],((int*)(data->args))[3],((int*)(data->args))[4],((int*)(data->args))[5],((int*)(data->args))[6]);
+            ((int*)(data->args))[2] = ((type_findColor)(functions[findColor-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],((int*)(data->args))[2],((int*)(data->args))[3],((int*)(data->args))[4],((int*)(data->args))[5],((int*)(data->args))[6]);
             //x&y autoupdated
             break;
         case findColorTol:
-            *(bool*)(data->args) = ((type_findColorTol)(functions[findColorTol-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],((int*)(data->args))[2],((int*)(data->args))[3],((int*)(data->args))[4],((int*)(data->args))[5],((int*)(data->args))[6],((int*)(data->args))[7]);
+            ((int*)(data->args))[2] = ((type_findColorTol)(functions[findColorTol-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],((int*)(data->args))[2],((int*)(data->args))[3],((int*)(data->args))[4],((int*)(data->args))[5],((int*)(data->args))[6],((int*)(data->args))[7]);
             //x&y autoupdated
             break;
         case findColorSpiral:
-            *(bool*)(data->args) = ((type_findColorSpiral)(functions[findColorSpiral-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],((int*)(data->args))[2],((int*)(data->args))[3],((int*)(data->args))[4],((int*)(data->args))[5],((int*)(data->args))[6]);
+            ((int*)(data->args))[2] = ((type_findColorSpiral)(functions[findColorSpiral-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],((int*)(data->args))[2],((int*)(data->args))[3],((int*)(data->args))[4],((int*)(data->args))[5],((int*)(data->args))[6]);
             //x&y autoupdated
             break;
         case findColorSpiralTol:
-            *(bool*)(data->args) = ((type_findColorSpiralTol)(functions[findColorSpiralTol-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],((int*)(data->args))[2],((int*)(data->args))[3],((int*)(data->args))[4],((int*)(data->args))[5],((int*)(data->args))[6],((int*)(data->args))[7]);
+            ((int*)(data->args))[2] = ((type_findColorSpiralTol)(functions[findColorSpiralTol-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],((int*)(data->args))[2],((int*)(data->args))[3],((int*)(data->args))[4],((int*)(data->args))[5],((int*)(data->args))[6],((int*)(data->args))[7]);
             //x&y autoupdated
             break;
         default:
