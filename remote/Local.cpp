@@ -34,8 +34,13 @@
 using namespace std;
 
 static int width,height;
+#ifndef _WIN32
 static int fd;
 static void* memmap;
+#else
+static HANDLE file;
+static HANDLE memmap;
+#endif
 static shm_data *data;
 
 void cleanup() {
@@ -44,7 +49,9 @@ void cleanup() {
         munmap(memmap,width*height*2+sizeof(shm_data));
         close(fd);
         #else
-        //Implement
+        UnmapViewOfFile(data);
+        CloseHandle(memmap);
+        CloseHandle(file);
         #endif
         memmap = NULL;
         data = NULL;
@@ -67,16 +74,24 @@ bool pairClient(int id) {
     sprintf(shmfile,"SMART.%i",id);
     #ifndef _WIN32
     fd = open(shmfile,O_RDWR);
-    #else
-    //implement
-    #endif
     if (fd != -1) {
+    #else
+    file = CreateFile(
+        shmfile,
+        GENERIC_READ|GENERIC_WRITE,
+        FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE,
+        NULL,
+        OPEN_EXISTING,FILE_ATTRIBUTE_TEMPORARY|FILE_FLAG_RANDOM_ACCESS|FILE_FLAG_DELETE_ON_CLOSE|FILE_FLAG_OVERLAPPED,
+        NULL);
+    if (file != INVALID_HANDLE_VALUE) {
+    #endif
         #ifndef _WIN32
         memmap = mmap(NULL,sizeof(shm_data),PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-        #else
-        //implement
-        #endif
         data = (shm_data*)memmap;
+        #else
+        memmap = CreateFileMapping(file,NULL,PAGE_EXECUTE_READWRITE,0,sizeof(shm_data),shmfile);
+        data = (shm_data*) MapViewOfFile(memmap,FILE_MAP_ALL_ACCESS,0,0,sizeof(shm_data));
+        #endif
         int client_time = data->time;
         int client_paired = data->paired;
         width = data->width;
@@ -84,15 +99,17 @@ bool pairClient(int id) {
         #ifndef _WIN32
         munmap(memmap,+sizeof(shm_data));
         #else
-        //implement
+        UnmapViewOfFile(data);
+        CloseHandle(memmap);
         #endif
         if (client_time != 0 && time(0) - client_time > TIMEOUT) {
             cout << "Failed to pair - Zombie client detected\n";
             #ifndef _WIN32
-            unlink(shmfile);
             close(fd);
+            unlink(shmfile);
             #else
-            //implement
+            CloseHandle(file);
+            DeleteFile(shmfile);
             #endif
             memmap = NULL;
             data = NULL;
@@ -103,7 +120,7 @@ bool pairClient(int id) {
             #ifndef _WIN32
             close(fd);
             #else
-            //implement
+            CloseHandle(file);
             #endif
             memmap = NULL;
             data = NULL;
@@ -111,14 +128,12 @@ bool pairClient(int id) {
         }
         #ifndef _WIN32
         memmap = mmap(NULL,2*width*height+sizeof(shm_data),PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-        #else
-        //implement
-        #endif
         data = (shm_data*)memmap;
-        #ifndef _WIN32
         data->paired = getpid();
         #else
-        //implement
+        memmap = CreateFileMapping(file,NULL,PAGE_EXECUTE_READWRITE,0,sizeof(shm_data)+2*width*height,shmfile);
+        data = (shm_data*)MapViewOfFile(memmap,FILE_MAP_ALL_ACCESS,0,0,sizeof(shm_data)+2*width*height);
+        data->paired = GetCurrentProcessId();
         #endif
     } else {
         cout << "Failed to pair - No client by that ID\n";
@@ -141,20 +156,19 @@ void call(int funid) {
     data->funid = funid;
     while (data->funid) { 
         #ifndef _WIN32
-        sleep(0); 
+        sleep(0); //s
         #else
-        //implement
+        Sleep(10); //ms
         #endif
         if (time(0) - data->time > TIMEOUT) {
             cout << "Client appears to have died: aborting link\n";
             char shmfile[256];
             sprintf(shmfile,"SMART.%i",data->id);
             cleanup();
-            unlink(shmfile);
             #ifndef _WIN32
             unlink(shmfile);
             #else
-            //implement
+            DeleteFile(shmfile);
             #endif
         }
     }

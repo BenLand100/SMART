@@ -29,7 +29,7 @@ void unload() __attribute__((destructor));
 
 #endif
 
-#ifdef WINDOWS
+#ifdef _WIN32
 
 #include <windows.h>
 

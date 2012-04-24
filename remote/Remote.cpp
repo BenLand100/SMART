@@ -202,21 +202,36 @@ int main(int argc, char** argv) {
    
     //Create the shared memory file
     char shmfile[256];
-    sprintf(shmfile,"SMART.%i",getpid());
     #ifndef _WIN32
+    sprintf(shmfile,"SMART.%i",getpid());
     int fd = open(shmfile,O_CREAT|O_RDWR,S_IRWXU|S_IRWXG|S_IRWXO); 
     lseek(fd,width*height*2+sizeof(shm_data),0);
     write(fd,"\0",1); //ensure proper size
     fsync(fd); //flush to disk
     memmap = mmap(NULL, width*height*2+sizeof(shm_data), PROT_READ|PROT_WRITE, MAP_FILE|MAP_SHARED, fd, 0);
+    data = (shm_data*)memmap;
     #else
-    //IMPLEMENT
+    sprintf(shmfile,"SMART.%i",(int)GetCurrentProcessId());
+    HANDLE file = CreateFile(
+        shmfile,
+        GENERIC_READ|GENERIC_WRITE,
+        FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE,
+        NULL,
+        CREATE_ALWAYS,FILE_ATTRIBUTE_TEMPORARY|FILE_FLAG_RANDOM_ACCESS|FILE_FLAG_DELETE_ON_CLOSE|FILE_FLAG_OVERLAPPED,
+        NULL);
+    SetFilePointer(file,sizeof(shm_data)+2*width*height,0,FILE_BEGIN);
+    SetEndOfFile(file);
+    memmap = CreateFileMapping(file,NULL,PAGE_EXECUTE_READWRITE,0,sizeof(shm_data)+2*width*height,shmfile);
+    data = (shm_data*) MapViewOfFile(memmap,FILE_MAP_ALL_ACCESS,0,0,sizeof(shm_data)+2*width*height);
     #endif
     cout << "Shared Memory mapped to " << memmap << "\n";
     
     //Init the shm_data structure
-    data = (shm_data*)memmap;
+    #ifndef _WIN32
     data->id = getpid();
+    #else
+    data->id = GetCurrentProcessId();
+    #endif
     data->paired = 0;
     data->width = width;
     data->height = height;
@@ -228,7 +243,7 @@ int main(int argc, char** argv) {
     #ifndef _WIN32
     fsync(fd); //Flush this to disk, probably not necessary
     #else
-    //IMPLEMENT
+    FlushFileBuffers(file);
     #endif
 
     //Let SMART use the shared memory for the images
@@ -238,21 +253,31 @@ int main(int argc, char** argv) {
     //Load the smart plugin and link functions
     initSMART();
 
+    #ifdef _WIN32
+    HANDLE paired = NULL;
+    #endif
+
     //Event loop: updates time, checks for function calls, and unpairs if the paired process dies
     //Terminates when the SMART client closes OR if we recieve a die flag from a paired process
     for (unsigned int i = 0; !data->die && ((type_isActive)functions[isActive-NoFunc])(); i++) {
         data->time = time(0);
         if (data->funid != 0) execfun();
         #ifndef _WIN32
-        sleep(0);
+        sleep(0); //s
         #else
-        //IMPLEMENT
+        Sleep(10); //ms
         #endif
-        if (!(i%1000000)) {
+        if (!(i%100)) {
             #ifndef _WIN32
             if (data->paired && kill(data->paired,0)) {
             #else
-            if (data->paired && true /*not dead*/) {//IMPLEMENT
+            if (!paired && data->paired) {
+                paired = OpenProcess(PROCESS_QUERY_INFORMATION,FALSE,data->paired);
+            }
+            DWORD code;
+            if (paired && (!GetExitCodeProcess(paired,&code) || code != STILL_ACTIVE)) {
+                CloseHandle(paired);
+                paired = NULL;
             #endif
                 cout << "Paired process terminate: reset\n";
                 data->paired = 0;
@@ -266,7 +291,11 @@ int main(int argc, char** argv) {
     close(fd);
     unlink(shmfile);
     #else
-    //IMPLEMENT
+    if (paired) CloseHandle(paired);
+    UnmapViewOfFile(data);
+    CloseHandle(memmap);
+    CloseHandle(file);
+    DeleteFile(shmfile);
     #endif
     
     return 1;
