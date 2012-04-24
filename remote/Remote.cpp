@@ -272,14 +272,17 @@ int main(int argc, char** argv) {
             if (data->paired && kill(data->paired,0)) {
             #else
             if (!paired && data->paired) {
-                paired = OpenProcess(PROCESS_QUERY_INFORMATION,FALSE,data->paired);
+                paired = OpenProcess(SYNCHRONIZE,FALSE,data->paired);
+                if (!paired) {
+                    cout << "Paired process no longer exists: reset\n";
+                    data->paired = 0;
+                }
             }
-            DWORD code;
-            if (paired && (!GetExitCodeProcess(paired,&code) || code != STILL_ACTIVE)) {
+            if (paired && (WaitForSingleObject(paired, 0)!= WAIT_TIMEOUT)) {
                 CloseHandle(paired);
                 paired = NULL;
             #endif
-                cout << "Paired process terminate: reset\n";
+                cout << "Paired process terminated: reset\n";
                 data->paired = 0;
             }
         }
@@ -298,5 +301,5 @@ int main(int argc, char** argv) {
     DeleteFile(shmfile);
     #endif
     
-    return 1;
+    exit(1); //Make sure the JVM 
 }
