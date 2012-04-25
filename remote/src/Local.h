@@ -20,6 +20,8 @@
 #ifndef _LOCAL_H
 #define	_LOCAL_H
 
+void call(int funid);
+
 #ifndef _WIN32
 
 #include <dlfcn.h>

@@ -32,3 +32,5 @@ EXPORTS
     std_setEnabled=std_setEnabled@4
     std_pairClient=std_pairClient@4
     std_spawnClient=std_spawnClient@36
+    std_getClients=std_getClients@12
+    std_countClients=std_countClients@4

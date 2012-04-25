@@ -185,6 +185,9 @@ void execfun() {
             ((int*)(data->args))[2] = ((type_findColorSpiralTol)(functions[findColorSpiralTol-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],((int*)(data->args))[2],((int*)(data->args))[3],((int*)(data->args))[4],((int*)(data->args))[5],((int*)(data->args))[6],((int*)(data->args))[7]);
             //x&y autoupdated
             break;
+        case Ping:
+            //do nothing
+            break;
         default:
             cout << "Invalid function id: " << data->funid << '\n';
     }
@@ -251,7 +254,7 @@ int main(int argc, char** argv) {
     data->imgstart = sizeof(shm_data);
     data->dbgstart = sizeof(shm_data)+width*height;
     #ifndef _WIN32
-    fsync(fd); //Flush this to disk, probably not necessary
+    fsync(fd);
     #else
     FlushFileBuffers(file);
     #endif
@@ -294,6 +297,11 @@ int main(int argc, char** argv) {
             #endif
                 cout << "Paired thread terminated: reset\n";
                 data->paired = 0;
+                #ifndef _WIN32
+                fsync(fd);
+                #else
+                FlushFileBuffers(file);
+                #endif
             }
         }
     }

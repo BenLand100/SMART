@@ -28,8 +28,15 @@
 #include <sys/syscall.h>
 #include <sys/mman.h>
 #include <fcntl.h>
+#include <dirent.h>
 #endif
 
+
+#if __SIZEOF_POINTER__ == 4
+    #define bits "32"
+#else
+    #define bits "64"
+#endif
 #define TIMEOUT 5
 
 using namespace std;
@@ -59,12 +66,131 @@ void cleanup() {
     }
 }
 
-#if __SIZEOF_POINTER__ == 4
-    #define bits "32"
-#else
-    #define bits "64"
-#endif
-    
+/**
+ * Finds the accessible clients, either all or only those unpaired.
+ * If **clients is non-null it will be filled with an array of the IDs.
+ * The array MUST BE FREED by the caller
+ *
+ * This will also clean up any zombies left hanging.
+ */
+int getClients(bool only_unpaired, int **clients) {
+    int count = 0;
+    if (clients) *clients = (int*)realloc(NULL,count*sizeof(int));
+    #ifndef _WIN32
+    DIR *dir = opendir(".");
+    struct dirent *dp;
+	while ((dp=readdir(dir)) != NULL) {
+		char *name = strstr(dp->d_name,"SMART.");
+		if (name == dp->d_name) {
+	        FILE *f = fopen(name, "rb");
+	        shm_data temp;
+	        fread(&temp, sizeof(shm_data), 1, f);
+	        fclose(f);
+	        if (temp.time && time(0) - temp.time > TIMEOUT) {
+                unlink(name);
+                continue;
+            }
+		    if (only_unpaired) {
+		        if (temp.paired) continue;
+		    }
+		    name += 6;
+		    count++;
+		    if (clients) {
+		        *clients = (int*)realloc(*clients,count*sizeof(int));
+		        (*clients)[count-1] = atoi(name);
+		    }
+		}
+	}
+	closedir(dir);
+	#else
+	WIN32_FIND_DATA find;
+	HANDLE hfind = FindFirstFile("SMART.*",&find);
+	while (hfind != INVALID_HANDLE_VALUE) {
+        shm_data temp;
+        char *name = find.cFileName;
+	    HANDLE file = CreateFile(
+            name,
+            GENERIC_READ|GENERIC_WRITE,
+            FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE,
+            NULL,
+            OPEN_EXISTING,FILE_ATTRIBUTE_TEMPORARY|FILE_FLAG_RANDOM_ACCESS|FILE_FLAG_DELETE_ON_CLOSE|FILE_FLAG_OVERLAPPED,
+            NULL);
+        DWORD sz;
+        ReadFile(file,&temp,sizeof(shm_data),&sz,NULL);
+        CloseHandle(file);
+        if (temp.time && time(0) - temp.time > TIMEOUT) {
+            DeleteFile(name);
+            if (!FindNextFile(hfind,&find)) {
+                FindClose(hfind);
+                break;
+            }
+            continue;
+        }
+	    if (only_unpaired && temp.paired) {
+            if (!FindNextFile(hfind,&find)) {
+                FindClose(hfind);
+                break;
+            }
+            continue;
+        }
+	    name += 6;
+	    count++;
+	    if (clients) {
+	        *clients = (int*)realloc(*clients,count*sizeof(int));
+	        (*clients)[count-1] = atoi(name);
+	    }
+	    if (!FindNextFile(hfind,&find)) {
+	        FindClose(hfind);
+	        break;
+	    }
+	}
+	#endif
+	return count;
+}
+
+/**
+ * Returns the number of clients accessible
+ * Either the total number or only the number of unpaired
+ */
+int std_countClients(bool only_unpaired) {
+    return getClients(only_unpaired,NULL);
+}
+
+/**
+ * Returns the IDs of clients accessible
+ * Either all clients or only the unpaired clients
+ * *clients must be PREALLOCATED to the count to be returned
+ */
+int std_getClients(bool only_unpaired, int maxc, int *clients) {
+    int *found;
+    int foundc = getClients(only_unpaired,&found);
+    memcpy(clients,found,(foundc < maxc ? foundc : maxc)*sizeof(int));
+    return foundc;
+}
+
+/**
+ * Returns the current paired client's ID 
+ */
+int std_getCurrent() {
+    return data ? data->id : 0;
+}
+
+/**
+ * Kills the client with the given ID
+ * !!!Fails if the client is paired with ANOTHER controller!!!
+ */
+void std_killClient(int id) {
+    int old = data ? data->id : 0;
+    if (old != id) std_pairClient(id);
+    if (data) {
+        data->die = 1;
+    }
+    std_pairClient(old);
+}
+
+/**
+ * Creates a remote SMART client and pairs to it, returning its ID
+ */
 int std_spawnClient(char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char *jvmpath, int maxmem) {
     if (!remote_path || !root || !params) return 0;
     char _width[256],_height[256];
@@ -100,6 +226,7 @@ int std_spawnClient(char* remote_path, char *root, char *params, int width, int 
     do {
         Sleep(1000);
     } while  (!std_pairClient(procinfo.dwProcessId));
+    call(Ping);
     return procinfo.dwProcessId;
     #else
     int v = fork();
@@ -107,6 +234,7 @@ int std_spawnClient(char* remote_path, char *root, char *params, int width, int 
         do {
             sleep(1);
         } while  (!std_pairClient(v));
+        call(Ping);
         return v;
     } else {
         char *exec = new char[strlen(remote_path)+20];
@@ -213,6 +341,7 @@ void* std_getDebugArray() {
     return data ? memmap + data->dbgstart : 0;
 }
 
+//Invokes a remote method
 void call(int funid) {
     //assume that anything calling this already checked if data is nonzero
     data->funid = funid;
