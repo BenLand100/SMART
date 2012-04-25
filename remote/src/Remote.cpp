@@ -272,38 +272,38 @@ int main(int argc, char** argv) {
 
     //Event loop: updates time, checks for function calls, and unpairs if the paired thread dies
     //Terminates when the SMART client closes OR if we recieve a die flag from a paired thread
+    //Might try making this sleep for a second, then update time/check pairing, and allow to be woken 
+    //sleep by a signal
     for (unsigned int i = 0; !data->die && ((type_isActive)functions[isActive-FirstFunc])(); i++) {
         data->time = time(0);
         if (data->funid != 0) execfun();
+        #ifndef _WIN32
+        if (data->paired && syscall(SYS_tkill,data->paired,0)) {
+        #else
+        if (!paired && data->paired) {
+            paired = OpenThread(SYNCHRONIZE,FALSE,data->paired);
+            if (!paired) {
+                cout << "Paired thread no longer exists: reset\n";
+                data->paired = 0;
+            }
+        }
+        if (paired && (WaitForSingleObject(paired, 0)!= WAIT_TIMEOUT)) {
+            CloseHandle(paired);
+            paired = NULL;
+        #endif
+            cout << "Paired thread terminated: reset\n";
+            data->paired = 0;
+            #ifndef _WIN32
+            fsync(fd);
+            #else
+            FlushFileBuffers(file);
+            #endif
+        }
         #ifndef _WIN32
         sched_yield();
         #else
         Sleep(10); //ms
         #endif
-        if (!(i%100)) {
-            #ifndef _WIN32
-            if (data->paired && syscall(SYS_tkill,data->paired,0)) {
-            #else
-            if (!paired && data->paired) {
-                paired = OpenThread(SYNCHRONIZE,FALSE,data->paired);
-                if (!paired) {
-                    cout << "Paired thread no longer exists: reset\n";
-                    data->paired = 0;
-                }
-            }
-            if (paired && (WaitForSingleObject(paired, 0)!= WAIT_TIMEOUT)) {
-                CloseHandle(paired);
-                paired = NULL;
-            #endif
-                cout << "Paired thread terminated: reset\n";
-                data->paired = 0;
-                #ifndef _WIN32
-                fsync(fd);
-                #else
-                FlushFileBuffers(file);
-                #endif
-            }
-        }
     }
     
     #ifndef _WIN32

@@ -345,9 +345,13 @@ void* std_getDebugArray() {
 void call(int funid) {
     //assume that anything calling this already checked if data is nonzero
     data->funid = funid;
+    #ifndef _WIN32
+    //syscall(SYS_tkill,data->listener,SIGALRM); //wake process
+    #else
+    #endif
     while (data->funid) { 
         #ifndef _WIN32
-        sleep(0); //s
+        sched_yield();
         #else
         Sleep(10); //ms
         #endif
