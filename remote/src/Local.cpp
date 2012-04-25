@@ -126,26 +126,26 @@ int getClients(bool only_unpaired, int **clients) {
             }
             continue;
         }
-	    if (only_unpaired && temp.paired) {
+        if (only_unpaired && temp.paired) {
             if (!FindNextFile(hfind,&find)) {
                 FindClose(hfind);
                 break;
             }
             continue;
         }
-	    name += 6;
-	    count++;
-	    if (clients) {
-	        *clients = (int*)realloc(*clients,count*sizeof(int));
-	        (*clients)[count-1] = atoi(name);
-	    }
-	    if (!FindNextFile(hfind,&find)) {
-	        FindClose(hfind);
-	        break;
-	    }
-	}
-	#endif
-	return count;
+        name += 6;
+        count++;
+        if (clients) {
+            *clients = (int*)realloc(*clients,count*sizeof(int));
+            (*clients)[count-1] = atoi(name);
+        }
+        if (!FindNextFile(hfind,&find)) {
+            FindClose(hfind);
+            break;
+        }
+    }
+    #endif
+    return count;
 }
 
 /**
