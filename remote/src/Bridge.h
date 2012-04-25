@@ -147,40 +147,40 @@ static char* exports[] = {
 /**
  * Comm protocol: use these numbers as funid, everything less or equal to 
  * NumImports is a direct export from SMART and must correspond to the name in
- * imports[def-NoFunc]
+ * imports[def-FirstFunc]
  */
 
-#define NoFunc              1
+#define FirstFunc           1
 
-#define getRefresh          NoFunc+0
-#define setRefresh          NoFunc+1
-#define setTransparentColor NoFunc+2
-#define setDebug            NoFunc+3
-#define setGraphics         NoFunc+4 
-#define setEnabled          NoFunc+5
-#define isActive            NoFunc+6
-#define isBlocking          NoFunc+7
-#define getMousePos         NoFunc+8
-#define holdMouse           NoFunc+9
-#define releaseMouse        NoFunc+10
-#define holdMousePlus       NoFunc+11
-#define releaseMousePlus    NoFunc+12
-#define moveMouse           NoFunc+13
-#define windMouse           NoFunc+14
-#define clickMouse          NoFunc+15
-#define clickMousePlus      NoFunc+16
-#define isMouseButtonHeld   NoFunc+17
-#define sendKeys            NoFunc+18
-#define holdKey             NoFunc+19
-#define releaseKey          NoFunc+20
-#define isKeyDown           NoFunc+21
-#define getColor            NoFunc+22
-#define findColor           NoFunc+23
-#define findColorTol        NoFunc+24
-#define findColorSpiral     NoFunc+25
-#define findColorSpiralTol  NoFunc+26
+#define getRefresh          FirstFunc+0
+#define setRefresh          FirstFunc+1
+#define setTransparentColor FirstFunc+2
+#define setDebug            FirstFunc+3
+#define setGraphics         FirstFunc+4 
+#define setEnabled          FirstFunc+5
+#define isActive            FirstFunc+6
+#define isBlocking          FirstFunc+7
+#define getMousePos         FirstFunc+8
+#define holdMouse           FirstFunc+9
+#define releaseMouse        FirstFunc+10
+#define holdMousePlus       FirstFunc+11
+#define releaseMousePlus    FirstFunc+12
+#define moveMouse           FirstFunc+13
+#define windMouse           FirstFunc+14
+#define clickMouse          FirstFunc+15
+#define clickMousePlus      FirstFunc+16
+#define isMouseButtonHeld   FirstFunc+17
+#define sendKeys            FirstFunc+18
+#define holdKey             FirstFunc+19
+#define releaseKey          FirstFunc+20
+#define isKeyDown           FirstFunc+21
+#define getColor            FirstFunc+22
+#define findColor           FirstFunc+23
+#define findColorTol        FirstFunc+24
+#define findColorSpiral     FirstFunc+25
+#define findColorSpiralTol  FirstFunc+26
 
-#define ExtraFuncs          NoFunc+27
+#define ExtraFuncs          FirstFunc+27
 
 #define Ping                ExtraFuncs+0
 

@@ -101,88 +101,88 @@ void initSMART() {
 void execfun() {
     switch (data->funid) {
         case getRefresh:
-            *(int*)(data->args) = ((type_getRefresh)(functions[getRefresh-NoFunc]))();
+            *(int*)(data->args) = ((type_getRefresh)(functions[getRefresh-FirstFunc]))();
             break;
         case setRefresh:
-            ((type_setRefresh)(functions[setRefresh-NoFunc]))(*(int*)(data->args));
+            ((type_setRefresh)(functions[setRefresh-FirstFunc]))(*(int*)(data->args));
             break;
         case setTransparentColor:
-            ((type_setTransparentColor)(functions[setTransparentColor-NoFunc]))(*(int*)(data->args));
+            ((type_setTransparentColor)(functions[setTransparentColor-FirstFunc]))(*(int*)(data->args));
             break;
         case setDebug:
-            ((type_setDebug)(functions[setDebug-NoFunc]))(*(bool*)(data->args));
+            ((type_setDebug)(functions[setDebug-FirstFunc]))(*(bool*)(data->args));
             break;
         case setGraphics:
-            ((type_setGraphics)(functions[setGraphics-NoFunc]))(*(bool*)(data->args));
+            ((type_setGraphics)(functions[setGraphics-FirstFunc]))(*(bool*)(data->args));
             break;
         case setEnabled:
-            ((type_setEnabled)(functions[setEnabled-NoFunc]))(*(bool*)(data->args));
+            ((type_setEnabled)(functions[setEnabled-FirstFunc]))(*(bool*)(data->args));
             break;
         case isActive:
-            *(bool*)(data->args) = ((type_isActive)(functions[isActive-NoFunc]))();
+            *(bool*)(data->args) = ((type_isActive)(functions[isActive-FirstFunc]))();
             break;
         case isBlocking:
-            *(bool*)(data->args) = ((type_isBlocking)(functions[isBlocking-NoFunc]))();
+            *(bool*)(data->args) = ((type_isBlocking)(functions[isBlocking-FirstFunc]))();
             break;
         case getMousePos:
-            ((type_getMousePos)(functions[getMousePos-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1]);
+            ((type_getMousePos)(functions[getMousePos-FirstFunc]))(((int*)(data->args))[0],((int*)(data->args))[1]);
             break;
         case holdMouse:
-            ((type_holdMouse)(functions[holdMouse-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],(bool)(((int*)(data->args))[2-NoFunc]));
+            ((type_holdMouse)(functions[holdMouse-FirstFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],(bool)(((int*)(data->args))[2-FirstFunc]));
             break;
         case releaseMouse:
-            ((type_releaseMouse)(functions[releaseMouse-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],(bool)(((int*)(data->args))[2-NoFunc]));
+            ((type_releaseMouse)(functions[releaseMouse-FirstFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],(bool)(((int*)(data->args))[2-FirstFunc]));
             break;
         case holdMousePlus:
-            ((type_holdMousePlus)(functions[holdMousePlus-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],((int*)(data->args))[2]);
+            ((type_holdMousePlus)(functions[holdMousePlus-FirstFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],((int*)(data->args))[2]);
             break;
         case releaseMousePlus:
-            ((type_releaseMousePlus)(functions[releaseMousePlus-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],((int*)(data->args))[2]);
+            ((type_releaseMousePlus)(functions[releaseMousePlus-FirstFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],((int*)(data->args))[2]);
             break;
         case moveMouse:
-            ((type_moveMouse)(functions[moveMouse-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1]);
+            ((type_moveMouse)(functions[moveMouse-FirstFunc]))(((int*)(data->args))[0],((int*)(data->args))[1]);
             break;
         case windMouse:
-            ((type_windMouse)(functions[windMouse-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1]);
+            ((type_windMouse)(functions[windMouse-FirstFunc]))(((int*)(data->args))[0],((int*)(data->args))[1]);
             break;
         case clickMouse:
-            ((type_clickMouse)(functions[clickMouse-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],(bool)(((int*)(data->args))[2-NoFunc]));
+            ((type_clickMouse)(functions[clickMouse-FirstFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],(bool)(((int*)(data->args))[2-FirstFunc]));
             break;
         case clickMousePlus:
-            ((type_clickMousePlus)(functions[clickMousePlus-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],((int*)(data->args))[2]);
+            ((type_clickMousePlus)(functions[clickMousePlus-FirstFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],((int*)(data->args))[2]);
             break;
         case isMouseButtonHeld:
-            *(bool*)(data->args) = ((type_isMouseButtonHeld)(functions[isMouseButtonHeld-NoFunc]))(*(int*)(data->args));
+            *(bool*)(data->args) = ((type_isMouseButtonHeld)(functions[isMouseButtonHeld-FirstFunc]))(*(int*)(data->args));
             break;
         case sendKeys:
-            ((type_sendKeys)(functions[sendKeys-NoFunc]))((char*)data->args);
+            ((type_sendKeys)(functions[sendKeys-FirstFunc]))((char*)data->args);
             break;
         case holdKey:
-            ((type_holdKey)(functions[holdKey-NoFunc]))(*(int*)data->args);
+            ((type_holdKey)(functions[holdKey-FirstFunc]))(*(int*)data->args);
             break;
         case releaseKey:
-            ((type_releaseKey)(functions[releaseKey-NoFunc]))(*(int*)data->args);
+            ((type_releaseKey)(functions[releaseKey-FirstFunc]))(*(int*)data->args);
             break;
         case isKeyDown:
-            *(bool*)(data->args) = ((type_isKeyDown)(functions[isKeyDown-NoFunc]))(*(int*)data->args);
+            *(bool*)(data->args) = ((type_isKeyDown)(functions[isKeyDown-FirstFunc]))(*(int*)data->args);
             break;
         case getColor:
-            *(int*)(data->args) = ((type_getColor)(functions[getColor-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1]);
+            *(int*)(data->args) = ((type_getColor)(functions[getColor-FirstFunc]))(((int*)(data->args))[0],((int*)(data->args))[1]);
             break;
         case findColor:
-            ((int*)(data->args))[2] = ((type_findColor)(functions[findColor-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],((int*)(data->args))[2],((int*)(data->args))[3],((int*)(data->args))[4],((int*)(data->args))[5],((int*)(data->args))[6]);
+            ((int*)(data->args))[2] = ((type_findColor)(functions[findColor-FirstFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],((int*)(data->args))[2],((int*)(data->args))[3],((int*)(data->args))[4],((int*)(data->args))[5],((int*)(data->args))[6]);
             //x&y autoupdated
             break;
         case findColorTol:
-            ((int*)(data->args))[2] = ((type_findColorTol)(functions[findColorTol-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],((int*)(data->args))[2],((int*)(data->args))[3],((int*)(data->args))[4],((int*)(data->args))[5],((int*)(data->args))[6],((int*)(data->args))[7]);
+            ((int*)(data->args))[2] = ((type_findColorTol)(functions[findColorTol-FirstFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],((int*)(data->args))[2],((int*)(data->args))[3],((int*)(data->args))[4],((int*)(data->args))[5],((int*)(data->args))[6],((int*)(data->args))[7]);
             //x&y autoupdated
             break;
         case findColorSpiral:
-            ((int*)(data->args))[2] = ((type_findColorSpiral)(functions[findColorSpiral-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],((int*)(data->args))[2],((int*)(data->args))[3],((int*)(data->args))[4],((int*)(data->args))[5],((int*)(data->args))[6]);
+            ((int*)(data->args))[2] = ((type_findColorSpiral)(functions[findColorSpiral-FirstFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],((int*)(data->args))[2],((int*)(data->args))[3],((int*)(data->args))[4],((int*)(data->args))[5],((int*)(data->args))[6]);
             //x&y autoupdated
             break;
         case findColorSpiralTol:
-            ((int*)(data->args))[2] = ((type_findColorSpiralTol)(functions[findColorSpiralTol-NoFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],((int*)(data->args))[2],((int*)(data->args))[3],((int*)(data->args))[4],((int*)(data->args))[5],((int*)(data->args))[6],((int*)(data->args))[7]);
+            ((int*)(data->args))[2] = ((type_findColorSpiralTol)(functions[findColorSpiralTol-FirstFunc]))(((int*)(data->args))[0],((int*)(data->args))[1],((int*)(data->args))[2],((int*)(data->args))[3],((int*)(data->args))[4],((int*)(data->args))[5],((int*)(data->args))[6],((int*)(data->args))[7]);
             //x&y autoupdated
             break;
         case Ping:
@@ -272,7 +272,7 @@ int main(int argc, char** argv) {
 
     //Event loop: updates time, checks for function calls, and unpairs if the paired thread dies
     //Terminates when the SMART client closes OR if we recieve a die flag from a paired thread
-    for (unsigned int i = 0; !data->die && ((type_isActive)functions[isActive-NoFunc])(); i++) {
+    for (unsigned int i = 0; !data->die && ((type_isActive)functions[isActive-FirstFunc])(); i++) {
         data->time = time(0);
         if (data->funid != 0) execfun();
         #ifndef _WIN32
