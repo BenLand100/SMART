@@ -1,0 +1,37 @@
+program RemoteSmartTest;
+{.loadlib libsmartremote}
+
+{**
+ * Pairs with some client. If force_new is false, it checks
+ * for running, unpaired clients and attempts to pair with
+ * one of them. If none of them were pairable (i.e. someone
+ * beat us to it / it was a zombie) or force_new is true,
+ * it then creates a new remote SMART client and pairs to it.
+ * The ID of the newly paired client is returned, or 0 for
+ * ultimate failure (this would be a serious bug and should
+ * never happen).
+ *}
+function InitSmart(force_new: boolean): integer;
+var
+  i, count: integer;
+begin
+  if not force_new then
+  begin
+    count:= SmartGetClients(true); //Gets a list of the current clients (true->unpaired only)
+    if count > 0 then
+    begin
+      for i:= 0 to count-1 do
+      begin
+        result:= SmartClientID(i); //Get the i'th client ID
+        if SmartPairClient(result) then //Pair with that client
+          exit; //Exit on success (could fail if it was a zombie)
+      end;
+    end;
+  end;
+  //Otherwise, start a new client (auto pairs)
+  result:= SmartSpawnClient('./Plugins/','http://world19.runescape.com/',',f5',765,503,'','','/usr/lib/jvm/sun-jre-bin-1.6/lib/amd64/server/libjvm.so',-1);
+end;
+
+begin
+  InitSmart(false);
+end.

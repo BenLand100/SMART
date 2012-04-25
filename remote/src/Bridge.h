@@ -68,8 +68,8 @@ typedef bool (*type_findColorSpiral)(int &x, int& y, int color, int sx, int sy, 
 typedef bool (*type_findColorSpiralTol)(int &x, int& y, int color, int sx, int sy, int ex, int ey, int tol) __attribute__((cdecl));
 
 //These methods are exported by Local
-extern "C" int std_countClients(bool only_unpaired) __attribute__((stdcall));
-extern "C" int std_getClients(bool only_unpaired, int count, int *clients) __attribute__((stdcall));
+extern "C" int std_clientID(int idx) __attribute__((stdcall));
+extern "C" int std_getClients(bool only_unpaired) __attribute__((stdcall));
 extern "C" int std_spawnClient(char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char *jvmpath, int maxmem) __attribute__((stdcall));
 extern "C" bool std_pairClient(int pid) __attribute__((stdcall));
 extern "C" int std_getCurrent() __attribute__((stdcall));
@@ -107,8 +107,8 @@ extern "C" bool std_findColorSpiralTol(int &x, int& y, int color, int sx, int sy
 //Exports for Local
 #define NumExports 34
 static char* exports[] = {
-    (char*)"std_countClients", (char*)"function SmartCountClients(only_unpaired: boolean): integer;",
-    (char*)"std_getClients", (char*)"function SmartGetClients(only_unpaired: boolean; maxc: integer; ids: array of integer): integer;",
+    (char*)"std_clientID", (char*)"function SmartClientID(idx: integer): integer;",
+    (char*)"std_getClients", (char*)"function SmartGetClients(only_unpaired: boolean): integer;",
     (char*)"std_spawnClient",(char*)"function SmartSpawnClient(remote_path, root, params: string; width, height: integer; initseq, useragent, jvmpath: string; maxmem: integer): integer;",
     (char*)"std_pairClient", (char*)"function SmartPairClient(pid: integer): boolean;",
     (char*)"std_killClient", (char*)"procedure SmartKillClient(pid: integer);",

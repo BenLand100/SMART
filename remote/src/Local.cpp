@@ -51,6 +51,13 @@ static HANDLE memmap;
 #endif
 static shm_data *data;
 
+typedef struct {
+    int count;
+    int *ids;
+} clients_dat;
+
+static clients_dat clients;
+
 void cleanup() {
     if (memmap) {
         #ifndef _WIN32
@@ -73,9 +80,9 @@ void cleanup() {
  *
  * This will also clean up any zombies left hanging.
  */
-int getClients(bool only_unpaired, int **clients) {
+int getClients(bool only_unpaired, int **_clients) {
     int count = 0;
-    if (clients) *clients = (int*)realloc(NULL,count*sizeof(int));
+    if (_clients) *_clients = NULL;
     #ifndef _WIN32
     DIR *dir = opendir(".");
     struct dirent *dp;
@@ -97,9 +104,9 @@ int getClients(bool only_unpaired, int **clients) {
 		    }
 		    name += 6;
 		    count++;
-		    if (clients) {
-		        *clients = (int*)realloc(*clients,count*sizeof(int));
-		        (*clients)[count-1] = atoi(name);
+		    if (_clients) {
+		        *_clients = (int*)realloc(*_clients,count*sizeof(int));
+		        (*_clients)[count-1] = atoi(name);
 		    }
             munmap(temp,sizeof(shm_data));
             close(fd);
@@ -143,9 +150,9 @@ int getClients(bool only_unpaired, int **clients) {
         }
         name += 6;
         count++;
-        if (clients) {
-            *clients = (int*)realloc(*clients,count*sizeof(int));
-            (*clients)[count-1] = atoi(name);
+        if (_clients) {
+            *_clients = (int*)realloc(*_clients,count*sizeof(int));
+            (*_clients)[count-1] = atoi(name);
         }
         UnmapViewOfFile(temp);
         CloseHandle(memmap);
@@ -160,25 +167,23 @@ int getClients(bool only_unpaired, int **clients) {
 }
 
 /**
- * Returns the number of clients accessible
- * Either the total number or only the number of unpaired
+ * Returns the number of clients in the structure
  */
-int std_countClients(bool only_unpaired) {
-    return getClients(only_unpaired,NULL);
+int std_clientID(int idx) {
+    
+    if (idx < clients.count && idx >= 0) {
+        return clients.ids[idx];
+    }
+    return 0;
 }
 
 /**
- * Returns the IDs of clients accessible
- * Either all clients or only the unpaired clients
- * *clients must be PREALLOCATED to the count to be returned
+ * Returns a pointer to a structure containing the found clients
  */
-int std_getClients(bool only_unpaired, int maxc, int *clients) {
-    int *found;
-    int foundc = getClients(only_unpaired,&found);
-    cout << "This might segfault\n";
-    //memcpy(clients,found,(foundc < maxc ? foundc : maxc)*sizeof(int));
-    cout << "Did it?\n";
-    return foundc;
+int std_getClients(bool only_unpaired) {
+    if (clients.ids) delete clients.ids;
+    clients.ids = 0;
+    return clients.count = getClients(only_unpaired,&clients.ids);
 }
 
 /**
@@ -636,12 +641,15 @@ bool std_findColorSpiralTol(int &x, int& y, int color, int sx, int sy, int ex, i
 }
 
 void internalConstructor() {
+    clients.ids = 0;
+    clients.count = std_getClients(true);
     memmap = 0;
     data = 0;
 }
 
 void internalDestructor() {
     cleanup();
+    if (clients.ids) delete clients.ids;
 }
 
 
