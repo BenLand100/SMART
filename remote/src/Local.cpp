@@ -82,16 +82,18 @@ int getClients(bool only_unpaired, int **clients) {
 	while ((dp=readdir(dir)) != NULL) {
 		char *name = strstr(dp->d_name,"SMART.");
 		if (name == dp->d_name) {
-	        FILE *f = fopen(name, "rb");
-	        shm_data temp;
-	        fread(&temp, sizeof(shm_data), 1, f);
-	        fclose(f);
-	        if (temp.time && time(0) - temp.time > TIMEOUT) {
+	        int fd = open(name,O_RDWR);
+            shm_data *temp = (shm_data*)mmap(NULL,sizeof(shm_data),PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+	        if (temp->time && time(0) - temp->time > TIMEOUT) {
+	            munmap(temp,sizeof(shm_data));
+	            close(fd);
                 unlink(name);
                 continue;
             }
-		    if (only_unpaired) {
-		        if (temp.paired) continue;
+		    if (only_unpaired && temp->paired) {
+	            munmap(temp,sizeof(shm_data));
+	            close(fd);
+	            continue;
 		    }
 		    name += 6;
 		    count++;
@@ -99,6 +101,8 @@ int getClients(bool only_unpaired, int **clients) {
 		        *clients = (int*)realloc(*clients,count*sizeof(int));
 		        (*clients)[count-1] = atoi(name);
 		    }
+            munmap(temp,sizeof(shm_data));
+            close(fd);
 		}
 	}
 	closedir(dir);
@@ -106,19 +110,20 @@ int getClients(bool only_unpaired, int **clients) {
 	WIN32_FIND_DATA find;
 	HANDLE hfind = FindFirstFile("SMART.*",&find);
 	while (hfind != INVALID_HANDLE_VALUE) {
-        shm_data temp;
         char *name = find.cFileName;
 	    HANDLE file = CreateFile(
             name,
             GENERIC_READ|GENERIC_WRITE,
             FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE,
             NULL,
-            OPEN_EXISTING,FILE_ATTRIBUTE_TEMPORARY|FILE_FLAG_RANDOM_ACCESS|FILE_FLAG_DELETE_ON_CLOSE|FILE_FLAG_OVERLAPPED,
+            OPEN_EXISTING,FILE_ATTRIBUTE_TEMPORARY|FILE_FLAG_RANDOM_ACCESS|FILE_FLAG_OVERLAPPED,
             NULL);
-        DWORD sz;
-        ReadFile(file,&temp,sizeof(shm_data),&sz,NULL);
-        CloseHandle(file);
-        if (temp.time && time(0) - temp.time > TIMEOUT) {
+        HANDLE memmap = CreateFileMapping(file,NULL,PAGE_EXECUTE_READWRITE,0,sizeof(shm_data),name);
+        shm_data *temp = (shm_data*)MapViewOfFile(memmap,FILE_MAP_ALL_ACCESS,0,0,sizeof(shm_data));
+        if (temp->time && time(0) - temp->time > TIMEOUT) {
+            UnmapViewOfFile(temp);
+            CloseHandle(memmap);
+            CloseHandle(file);
             DeleteFile(name);
             if (!FindNextFile(hfind,&find)) {
                 FindClose(hfind);
@@ -126,7 +131,10 @@ int getClients(bool only_unpaired, int **clients) {
             }
             continue;
         }
-        if (only_unpaired && temp.paired) {
+        if (only_unpaired && temp->paired) {
+            UnmapViewOfFile(temp);
+            CloseHandle(memmap);
+            CloseHandle(file);
             if (!FindNextFile(hfind,&find)) {
                 FindClose(hfind);
                 break;
@@ -139,6 +147,9 @@ int getClients(bool only_unpaired, int **clients) {
             *clients = (int*)realloc(*clients,count*sizeof(int));
             (*clients)[count-1] = atoi(name);
         }
+        UnmapViewOfFile(temp);
+        CloseHandle(memmap);
+        CloseHandle(file);
         if (!FindNextFile(hfind,&find)) {
             FindClose(hfind);
             break;
@@ -164,7 +175,9 @@ int std_countClients(bool only_unpaired) {
 int std_getClients(bool only_unpaired, int maxc, int *clients) {
     int *found;
     int foundc = getClients(only_unpaired,&found);
-    memcpy(clients,found,(foundc < maxc ? foundc : maxc)*sizeof(int));
+    cout << "This might segfault\n";
+    //memcpy(clients,found,(foundc < maxc ? foundc : maxc)*sizeof(int));
+    cout << "Did it?\n";
     return foundc;
 }
 
@@ -276,7 +289,7 @@ bool std_pairClient(int id) {
         GENERIC_READ|GENERIC_WRITE,
         FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE,
         NULL,
-        OPEN_EXISTING,FILE_ATTRIBUTE_TEMPORARY|FILE_FLAG_RANDOM_ACCESS|FILE_FLAG_DELETE_ON_CLOSE|FILE_FLAG_OVERLAPPED,
+        OPEN_EXISTING,FILE_ATTRIBUTE_TEMPORARY|FILE_FLAG_RANDOM_ACCESS|FILE_FLAG_OVERLAPPED,
         NULL);
     if (file != INVALID_HANDLE_VALUE) {
     #endif
