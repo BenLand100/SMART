@@ -84,16 +84,16 @@ all:
 everything: linux linux64 windows windows64
 
 linux: $(DIST)/$(LOCAL_NAME)32$(LIN_LIB_EXT) $(DIST)/$(REMOTE_NAME)32$(LIN_EXE_EXT)
-	@echo "Finished Building the Linux 32bit SMART distribution"
+	@echo "Finished Building the Linux 32bit distribution"
 	
 linux64: $(DIST)/$(LOCAL_NAME)64$(LIN_LIB_EXT)  $(DIST)/$(REMOTE_NAME)64$(LIN_EXE_EXT)
-	@echo "Finished Building the Linux 64bit SMART distribution"
+	@echo "Finished Building the Linux 64bit distribution"
 
 windows: $(DIST)/$(LOCAL_NAME)32$(WIN_LIB_EXT) $(DIST)/$(REMOTE_NAME)32$(WIN_EXE_EXT)
-	@echo "Finished Building the Windows 32bit SMART distribution"
+	@echo "Finished Building the Windows 32bit distribution"
 
 windows64: $(DIST)/$(LOCAL_NAME)64$(WIN_LIB_EXT) $(DIST)/$(REMOTE_NAME)64$(WIN_EXE_EXT)
-	@echo "Finished Building the Windows 64bit SMART distribution"
+	@echo "Finished Building the Windows 64bit distribution"
 	
 clean: 
 	@echo "Cleaning build files..."

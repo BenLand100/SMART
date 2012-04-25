@@ -31,3 +31,4 @@ EXPORTS
     std_windMouse=std_windMouse@8
     std_setEnabled=std_setEnabled@4
     std_pairClient=std_pairClient@4
+    std_spawnClient=std_spawnClient@36

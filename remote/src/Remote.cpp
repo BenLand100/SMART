@@ -25,6 +25,8 @@
 #include <cstdlib>
 #include <cstring>
 #ifndef _WIN32
+#include <sched.h>
+#include <sys/syscall.h>
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <signal.h>
@@ -32,6 +34,7 @@
 
 using namespace std;
 
+static char *path;
 static char *root,*params,*initseq,*useragent,*jvmpath,*maxmem;
 static int width,height;
 static void *img,*dbg;
@@ -45,17 +48,22 @@ shm_data *data;
  * to the current arguments
  */
 void initSMART() {
+    char lib[256];
     #ifndef _WIN32
         #if __SIZEOF_POINTER__ == 4
-            void* libsmart = dlopen("./libsmart32.so",RTLD_LAZY);
+            sprintf(lib,"%s/libsmart32.so",path);
+            void* libsmart = dlopen(lib,RTLD_LAZY);
         #else
-            void* libsmart = dlopen("./libsmart64.so",RTLD_LAZY);
+            sprintf(lib,"%s/libsmart64.so",path);
+            void* libsmart = dlopen(lib,RTLD_LAZY);
         #endif
     #else
         #if __SIZEOF_POINTER__ == 4
-            HMODULE libsmart = LoadLibrary("./libsmart32.dll");
+            sprintf(lib,"%s/libsmart32.dll",path);
+            HMODULE libsmart = LoadLibrary(lib);
         #else
-            HMODULE libsmart = LoadLibrary("./libsmart64.dll");
+            sprintf(lib,"%s/libsmart64.dll",path);
+            HMODULE libsmart = LoadLibrary(lib);
         #endif
     #endif
     cout << "Library: " << libsmart << '\n';
@@ -185,19 +193,21 @@ void execfun() {
 
 int main(int argc, char** argv) {
     //Read init args from arguments
-    if (argc != 9) exit(0);
+    if (argc != 10) exit(0);
     
-    root = argv[1];
-    params = argv[2];
-    width = atoi(argv[3]);
-    height = atoi(argv[4]);
-    initseq = argv[5];
+    path = argv[1];
+    if (strlen(path)==0) path = ".";    
+    root = argv[2];
+    params = argv[3];
+    width = atoi(argv[4]);
+    height = atoi(argv[5]);
+    initseq = argv[6];
     
-    useragent = argv[6]; 
+    useragent = argv[7]; 
     if (strlen(useragent)<=0) useragent = 0;
-    jvmpath = argv[7];
+    jvmpath = argv[8];
     if (strlen(jvmpath)<=0) jvmpath = 0;
-    maxmem = argv[8];
+    maxmem = argv[9];
     if (strlen(maxmem)<=0) maxmem = 0;
    
     //Create the shared memory file
@@ -257,24 +267,24 @@ int main(int argc, char** argv) {
     HANDLE paired = NULL;
     #endif
 
-    //Event loop: updates time, checks for function calls, and unpairs if the paired process dies
-    //Terminates when the SMART client closes OR if we recieve a die flag from a paired process
+    //Event loop: updates time, checks for function calls, and unpairs if the paired thread dies
+    //Terminates when the SMART client closes OR if we recieve a die flag from a paired thread
     for (unsigned int i = 0; !data->die && ((type_isActive)functions[isActive-NoFunc])(); i++) {
         data->time = time(0);
         if (data->funid != 0) execfun();
         #ifndef _WIN32
-        sleep(0); //s
+        sched_yield();
         #else
         Sleep(10); //ms
         #endif
         if (!(i%100)) {
             #ifndef _WIN32
-            if (data->paired && kill(data->paired,0)) {
+            if (data->paired && syscall(SYS_tkill,data->paired,0)) {
             #else
             if (!paired && data->paired) {
-                paired = OpenProcess(SYNCHRONIZE,FALSE,data->paired);
+                paired = OpenThread(SYNCHRONIZE,FALSE,data->paired);
                 if (!paired) {
-                    cout << "Paired process no longer exists: reset\n";
+                    cout << "Paired thread no longer exists: reset\n";
                     data->paired = 0;
                 }
             }
@@ -282,7 +292,7 @@ int main(int argc, char** argv) {
                 CloseHandle(paired);
                 paired = NULL;
             #endif
-                cout << "Paired process terminated: reset\n";
+                cout << "Paired thread terminated: reset\n";
                 data->paired = 0;
             }
         }

@@ -19,7 +19,7 @@
  
 typedef struct {
     int id;             //PID of the client
-    int paired;         //PID of the controller or ZERO if none
+    int paired;         //TID of the controller or ZERO if none
     int width,height;   //Size of the images that follow this structure in the SHM
     int time;           //Last time client active (zero if SMART hasn't initilized yet)
     int die;            //Set nonzero to have the client terminate
@@ -68,6 +68,7 @@ typedef bool (*type_findColorSpiral)(int &x, int& y, int color, int sx, int sy, 
 typedef bool (*type_findColorSpiralTol)(int &x, int& y, int color, int sx, int sy, int ex, int ey, int tol) __attribute__((cdecl));
 
 //These methods are exported by Local
+extern "C" int std_spawnClient(char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char *jvmpath, int maxmem) __attribute__((stdcall));
 extern "C" bool std_pairClient(int pid) __attribute__((stdcall));
 extern "C" void* std_getImageArray() __attribute__((stdcall));
 extern "C" void* std_getDebugArray() __attribute__((stdcall));
@@ -102,6 +103,7 @@ extern "C" bool std_findColorSpiralTol(int &x, int& y, int color, int sx, int sy
 //Exports for Local
 #define NumExports 30
 static char* exports[] = {
+    (char*)"std_spawnClient",(char*)"function SmartSpawnClient(remote_path, root, params: string; width, height: integer; initseq, useragent, jvmpath: string; maxmem: integer): integer;",
     (char*)"std_pairClient", (char*)"function SmartPairClient(pid: integer): boolean;",
     (char*)"std_getImageArray", (char*)"function SmartImageArray(): integer;",
     (char*)"std_getDebugArray", (char*)"function SmartDebugArray(): integer;",

@@ -20,11 +20,12 @@
 #include "Local.h"
 #include "Bridge.h"
 #include <time.h>
-#include <cstdio>
+#include <stdio.h>
 #include <cstring>
 #include <iostream>
 #include <stdlib.h>
 #ifndef _WIN32
+#include <sys/syscall.h>
 #include <sys/mman.h>
 #include <fcntl.h>
 #endif
@@ -56,6 +57,66 @@ void cleanup() {
         memmap = NULL;
         data = NULL;
     }
+}
+
+#if __SIZEOF_POINTER__ == 4
+    #define bits "32"
+#else
+    #define bits "64"
+#endif
+    
+int std_spawnClient(char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char *jvmpath, int maxmem) {
+    if (!remote_path || !root || !params) return 0;
+    char _width[256],_height[256];
+    sprintf(_width,"%i",width);
+    sprintf(_height,"%i",height);
+    char empty = '\0';
+    if (!initseq) initseq = &empty;
+    if (!useragent) useragent = &empty;
+    if (!jvmpath) jvmpath = &empty;
+    char _maxmem[256];
+    if (maxmem<=0) {
+        _maxmem[0]='\0';
+    } else {
+        sprintf(_maxmem,"%i",maxmem);
+    }
+    #ifdef _WIN32
+    int len = 2*strlen(remote_path)+strlen(root)+strlen(params)+strlen(_width)+strlen(_height)+strlen(initseq)+strlen(useragent)+strlen(jvmpath)+strlen(_maxmem);
+    char *args = new char[len+10*3+20];
+    sprintf(args,"\"%ssmartremote%s.exe\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\"",remote_path,bits,remote_path,root,params,_width,_height,initseq,useragent,jvmpath,_maxmem);
+    char *exec = new char[strlen(remote_path)+20];
+    sprintf(exec,"%ssmartremote%s.exe",remote_path,bits);
+    cout << exec << '\n';
+    PROCESS_INFORMATION procinfo;
+    STARTUPINFO startupinfo;
+    memset(&startupinfo, 0, sizeof(STARTUPINFO));
+    memset(&procinfo, 0, sizeof(PROCESS_INFORMATION));
+    startupinfo.cb = sizeof(STARTUPINFOW); 
+    CreateProcess(exec,args,NULL,NULL,FALSE,CREATE_DEFAULT_ERROR_MODE,NULL,NULL,&startupinfo,&procinfo);
+    CloseHandle(procinfo.hProcess);
+    CloseHandle(procinfo.hThread);
+    delete exec;
+    delete args;
+    do {
+        Sleep(1000);
+    } while  (!std_pairClient(procinfo.dwProcessId));
+    return procinfo.dwProcessId;
+    #else
+    int v = fork();
+    if (v) {
+        do {
+            sleep(1);
+        } while  (!std_pairClient(v));
+        return v;
+    } else {
+        char *exec = new char[strlen(remote_path)+20];
+        sprintf(exec,"%s/smartremote%s",remote_path,bits);
+        cout << exec << '\n';
+        execl(exec,exec,remote_path,root,params,_width,_height,initseq,useragent,jvmpath,_maxmem,NULL);
+        delete exec;
+        exit(1);
+    }
+    #endif
 }
 
 /**
@@ -129,12 +190,13 @@ bool std_pairClient(int id) {
         #ifndef _WIN32
         memmap = mmap(NULL,2*width*height+sizeof(shm_data),PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
         data = (shm_data*)memmap;
-        data->paired = getpid();
+        data->paired = syscall(SYS_gettid);
         #else
         memmap = CreateFileMapping(file,NULL,PAGE_EXECUTE_READWRITE,0,sizeof(shm_data)+2*width*height,shmfile);
         data = (shm_data*)MapViewOfFile(memmap,FILE_MAP_ALL_ACCESS,0,0,sizeof(shm_data)+2*width*height);
-        data->paired = GetCurrentProcessId();
+        data->paired = GetCurrentThreadId();
         #endif
+        return true;
     } else {
         cout << "Failed to pair - No client by that ID\n";
         return false;
@@ -160,7 +222,7 @@ void call(int funid) {
         #else
         Sleep(10); //ms
         #endif
-        if (time(0) - data->time > TIMEOUT) {
+        if (data->time && time(0) - data->time > TIMEOUT) {
             cout << "Client appears to have died: aborting link\n";
             char shmfile[256];
             sprintf(shmfile,"SMART.%i",data->id);
