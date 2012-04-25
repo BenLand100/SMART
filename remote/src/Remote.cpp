@@ -269,6 +269,7 @@ int main(int argc, char** argv) {
     #ifdef _WIN32
     HANDLE paired = NULL;
     #endif
+    
 
     //Event loop: updates time, checks for function calls, and unpairs if the paired thread dies
     //Terminates when the SMART client closes OR if we recieve a die flag from a paired thread
@@ -300,7 +301,7 @@ int main(int argc, char** argv) {
             #endif
         }
         #ifndef _WIN32
-        sched_yield();
+        usleep(10); //ms
         #else
         Sleep(10); //ms
         #endif

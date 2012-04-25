@@ -223,17 +223,23 @@ int std_spawnClient(char* remote_path, char *root, char *params, int width, int 
     CloseHandle(procinfo.hThread);
     delete exec;
     delete args;
+    int count = 0;
     do {
         Sleep(1000);
-    } while  (!std_pairClient(procinfo.dwProcessId));
+        count++;
+    } while  (!std_pairClient(procinfo.dwProcessId)&&count<10);
+    if (count >= 10) return false;
     call(Ping);
     return procinfo.dwProcessId;
     #else
     int v = fork();
     if (v) {
+        int count = 0;
         do {
             sleep(1);
-        } while  (!std_pairClient(v));
+            count++;
+        } while  (!std_pairClient(v) && count<10);
+        if (count >= 10) return 0;
         call(Ping);
         return v;
     } else {
