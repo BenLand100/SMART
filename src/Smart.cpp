@@ -61,6 +61,7 @@ PRGB image = 0;
 PRGB debug = 0;
 int client_width = 0;
 int client_height = 0;
+bool remote = false;
 
 #ifdef WINDOWS
 
@@ -149,29 +150,31 @@ void clearOld(){
         jre->DeleteGlobalRef(smart);
         smart = 0;
     }
-    #ifdef WINDOWS
-        if (imageHDC) DeleteDC(imageHDC);
-        if (imageHBITMAP) DeleteObject(imageHBITMAP);
-        if (debugHDC) DeleteDC(debugHDC);
-        if (debugHBITMAP) DeleteObject(debugHBITMAP);
-        imageHDC = 0;
-        imageHBITMAP = 0;
-        debugHDC = 0;
-        debugHBITMAP = 0;
-    #endif
-    #ifdef LINUX
-        if (debug) free(debug);
-        if (image) free(image);
-    #endif
-    debug = 0;
-    image = 0;
+    if (!remote) {
+        #ifdef WINDOWS
+            if (imageHDC) DeleteDC(imageHDC);
+            if (imageHBITMAP) DeleteObject(imageHBITMAP);
+            if (debugHDC) DeleteDC(debugHDC);
+            if (debugHBITMAP) DeleteObject(debugHBITMAP);
+            imageHDC = 0;
+            imageHBITMAP = 0;
+            debugHDC = 0;
+            debugHBITMAP = 0;
+        #endif
+        #ifdef LINUX
+            if (debug) free(debug);
+            if (image) free(image);
+        #endif
+        debug = 0;
+        image = 0;
+    }
 }
 
 //Caches all needed refrences to java classes and methods
 void findClasses() {
     loadClasses();
     _client.clazz = (jclass) jre->NewGlobalRef(jre->FindClass("smart/Client"));
-    _client.init = jre->GetMethodID(_client.clazz, "<init>", "(Ljava/nio/ByteBuffer;Ljava/nio/ByteBuffer;IILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
+    _client.init = jre->GetMethodID(_client.clazz, "<init>", "(Ljava/nio/ByteBuffer;Ljava/nio/ByteBuffer;IILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V");
     _client.clickmouse = jre->GetMethodID(_client.clazz, "clickMouse", "(III)V");
     _client.getmousepos = jre->GetMethodID(_client.clazz, "getMousePos", "()Ljava/awt/Point;");
     _client.holdkey = jre->GetMethodID(_client.clazz, "holdKey", "(I)V");
@@ -249,7 +252,7 @@ void freeClasses() {
     unloadClasses();
 }
 
-void setupRemote(char* root, char* params, int width, int height, void* _image, void* _debug, char* initseq) {
+void setupRemote(char* root, char* params, int width, int height, void* _image, void* _debug, char* initseq, int ID) {
     cout << "SmartSetup Entered\n";
     if (jre) vm->AttachCurrentThreadAsDaemon((void**)&jre, 0);
     if (strcmp(root, curserver) || strcmp(params, curparams) || width != client_width || height != client_height) {
@@ -273,7 +276,7 @@ void setupRemote(char* root, char* params, int width, int height, void* _image, 
         strcpy(curparams, params);
         client_height = height;
         client_width = width;
-        if (image == NULL || debug == NULL || image == 0 || debug == 0) {
+        if (_image == NULL || _debug == NULL || _image == 0 || _debug == 0) {
             #ifdef WINDOWS
             cout << "Allocating image HDC(s)\n";
             BITMAPINFO info;
@@ -299,6 +302,8 @@ void setupRemote(char* root, char* params, int width, int height, void* _image, 
             debug = (PRGB) malloc(client_width*client_height*4);
             #endif
         } else {
+            cout << "Using preallocated image swap area(s)\n";
+            remote = true;
             image = (PRGB)_image;
             debug = (PRGB)_debug;
         }
@@ -309,7 +314,7 @@ void setupRemote(char* root, char* params, int width, int height, void* _image, 
         jobject paramsstr = jre->NewStringUTF(params);
         jobject initseqstr = jre->NewStringUTF(initseq);
         jobject useragentstr = jre->NewStringUTF(useragent);
-        jobject temp = jre->NewObject(_client.clazz, _client.init, imgBuffer, debugBuffer, client_width, client_height, rootstr, paramsstr,initseqstr,useragentstr);
+        jobject temp = jre->NewObject(_client.clazz, _client.init, imgBuffer, debugBuffer, client_width, client_height, rootstr, paramsstr,initseqstr,useragentstr,ID);
         smart = jre->NewGlobalRef(temp);
         jre->DeleteLocalRef(temp);
         jre->DeleteLocalRef(imgBuffer);
@@ -328,7 +333,7 @@ void setupRemote(char* root, char* params, int width, int height, void* _image, 
             jobject paramsstr = jre->NewStringUTF(params);
             jobject initseqstr = jre->NewStringUTF(initseq);
             jobject useragentstr = jre->NewStringUTF(useragent);
-            jobject temp = jre->NewObject(_client.clazz, _client.init, imgBuffer, debugBuffer, client_width, client_height, rootstr, paramsstr,initseqstr,useragentstr);
+            jobject temp = jre->NewObject(_client.clazz, _client.init, imgBuffer, debugBuffer, client_width, client_height, rootstr, paramsstr,initseqstr,useragentstr,ID);
             smart = jre->NewGlobalRef(temp);
             jre->DeleteLocalRef(temp);
             jre->DeleteLocalRef(imgBuffer);
@@ -345,7 +350,7 @@ void setupRemote(char* root, char* params, int width, int height, void* _image, 
 //Entrypoint for SMART operation --- sets a new state or reuses an old one if compatible
 //loads the JVM if necessary, and initilizes anything that might need it
 void setup(char* root, char* params, int width, int height, char* initseq) {
-    setupRemote(root,params,width,height,0,0,initseq);
+    setupRemote(root,params,width,height,0,0,initseq,0);
 }
 
 //Will completely kill the JVM and as a consequence, the RS client.
@@ -367,6 +372,7 @@ void hardReset() {
 
 //Called at Library loading to ensure a 'neat' state since initilizers might not always get run
 void internalConstructor() {
+    remote = false;
     curserver = (char*) malloc(1);
     *curserver = 0;
     curparams = (char*) malloc(1);

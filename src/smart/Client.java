@@ -78,7 +78,7 @@ import sun.applet.AppletClassLoader;
 public class Client implements ActionListener, ChangeListener {
     
     public static final String VERSION = "7.1";
-    public static final String TITLE = "Public SMARTv" + VERSION + " - SMART Minimizing Autoing Resource Thing - By BenLand100";
+    public static final String TITLE = "SMARTv" + VERSION + " - SMART Minimizing Autoing Resource Thing - By BenLand100";
     public static final String USER_AGENT; //default for an (old) firefox version is set below
     static {
         String osname = System.getProperty("os.name");
@@ -119,7 +119,7 @@ public class Client implements ActionListener, ChangeListener {
     public static void main(String... args) throws Exception {
         int w = 765;
         int h = 503;
-        new Client(ByteBuffer.allocate(w * h * 4), ByteBuffer.allocate(w * h * 4), w, h, "http://world79.runescape.com/",",f5","",null);
+        new Client(ByteBuffer.allocate(w * h * 4), ByteBuffer.allocate(w * h * 4), w, h, "http://world79.runescape.com/",",f5","",null,0);
     }
     
     private int width = 825;
@@ -150,6 +150,7 @@ public class Client implements ActionListener, ChangeListener {
     private Canvas canvas;
     private String initseq = null;
     private String useragent = null;
+    private int ID;
 
     /**
      * Since some applets might create a new Canvas every time the applet is focused,
@@ -202,8 +203,9 @@ public class Client implements ActionListener, ChangeListener {
      * This method can take some time, but returns as SOON as the applet is loaded, i.e. does not wait
      * for the applet to finish setting itself up.
      */
-    public Client(ByteBuffer imgBuffer, ByteBuffer debugBuffer, int w, int h, String root, String params, String initseq, String useragent) {
+    public Client(ByteBuffer imgBuffer, ByteBuffer debugBuffer, int w, int h, String root, String params, String initseq, String useragent, int ID) {
         try {
+            this.ID = ID;
             if (initseq != null && initseq.length() > 0) {
                 this.initseq = initseq;
             }
@@ -499,7 +501,7 @@ public class Client implements ActionListener, ChangeListener {
      */
     private void initFrame() {
         System.out.println("Setting up Frame");
-        clientFrame = new JFrame(TITLE);
+        clientFrame = new JFrame(TITLE + (ID!=0 ? (" ["+ID+"]") : ""));
         clientFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         clientFrame.addWindowListener(new WindowAdapter() {
             @Override
@@ -606,6 +608,7 @@ public class Client implements ActionListener, ChangeListener {
         HashMap<String, String> paramMap = new HashMap<String, String>();
         paramMap.put("width", parseArg(search(jsInfoPage, widthRegex, 1)));
         paramMap.put("height", parseArg(search(jsInfoPage, heightRegex, 1)));
+
 
         Matcher matcher = Pattern.compile("<param name\\=([^ ]*) value\\=([^>]*)>").matcher(jsInfoPage);
         while (matcher.find()) {

@@ -106,7 +106,7 @@ void initSMART() {
     if (useragent) setAgent(useragent);
     if (jvmpath) setPath(jvmpath);
     if (maxmem) setMem(atoi(maxmem));
-    setup(root,params,width,height,img,dbg,initseq);
+    setup(root,params,width,height,img,dbg,initseq,data->id);
 }
 
 /**
@@ -232,10 +232,10 @@ int main(int argc, char** argv) {
     #ifndef _WIN32
     sprintf(shmfile,"SMART.%i",getpid());
     int fd = open(shmfile,O_CREAT|O_RDWR,S_IRWXU|S_IRWXG|S_IRWXO); 
-    lseek(fd,width*height*2+sizeof(shm_data),0);
+    lseek(fd,width*height*2*4+sizeof(shm_data),0);
     write(fd,"\0",1); //ensure proper size
     fsync(fd); //flush to disk
-    memmap = mmap(NULL, width*height*2+sizeof(shm_data), PROT_READ|PROT_WRITE, MAP_FILE|MAP_SHARED, fd, 0);
+    memmap = mmap(NULL, width*height*4*2+sizeof(shm_data), PROT_READ|PROT_WRITE, MAP_FILE|MAP_SHARED, fd, 0);
     data = (shm_data*)memmap;
     #else
     sprintf(shmfile,"SMART.%i",(int)GetCurrentProcessId());
@@ -246,12 +246,14 @@ int main(int argc, char** argv) {
         NULL,
         CREATE_ALWAYS,FILE_ATTRIBUTE_TEMPORARY|FILE_FLAG_RANDOM_ACCESS|FILE_FLAG_DELETE_ON_CLOSE|FILE_FLAG_OVERLAPPED,
         NULL);
-    SetFilePointer(file,sizeof(shm_data)+2*width*height,0,FILE_BEGIN);
+    SetFilePointer(file,sizeof(shm_data)+2*width*height*4,0,FILE_BEGIN);
     SetEndOfFile(file);
-    memmap = CreateFileMapping(file,NULL,PAGE_EXECUTE_READWRITE,0,sizeof(shm_data)+2*width*height,shmfile);
-    data = (shm_data*) MapViewOfFile(memmap,FILE_MAP_ALL_ACCESS,0,0,sizeof(shm_data)+2*width*height);
+    memmap = CreateFileMapping(file,NULL,PAGE_EXECUTE_READWRITE,0,sizeof(shm_data)+4*2*width*height,shmfile);
+    data = (shm_data*) MapViewOfFile(memmap,FILE_MAP_ALL_ACCESS,0,0,sizeof(shm_data)+4*2*width*height);
     #endif
     cout << "Shared Memory mapped to " << memmap << "\n";
+    
+    memset(data,0x00,sizeof(shm_data)+4*2*width*height);
     
     //Init the shm_data structure
     #ifndef _WIN32
@@ -265,8 +267,8 @@ int main(int argc, char** argv) {
     data->time = 0;
     data->die = 0;
     data->funid = 0;
-    data->imgstart = sizeof(shm_data);
-    data->dbgstart = sizeof(shm_data)+width*height;
+    data->imgoff = sizeof(shm_data);
+    data->imgoff = sizeof(shm_data)+4*width*height;
     #ifndef _WIN32
     fsync(fd);
     #else
@@ -274,8 +276,8 @@ int main(int argc, char** argv) {
     #endif
 
     //Let SMART use the shared memory for the images
-    img = ((char*)data + data->imgstart);
-    dbg = ((char*)data + data->dbgstart);
+    img = (((char*)data) + data->imgoff);
+    dbg = (((char*)data) + data->dbgoff);
     
     //Load the smart plugin and link functions
     initSMART();
@@ -284,7 +286,6 @@ int main(int argc, char** argv) {
     HANDLE paired = NULL;
     #endif
     
-
     //Event loop: updates time, checks for function calls, and unpairs if the paired thread dies
     //Terminates when the SMART client closes OR if we recieve a die flag from a paired thread
     //Might try making this sleep for a second, then update time/check pairing, and allow to be woken 
@@ -330,7 +331,7 @@ int main(int argc, char** argv) {
     
     #ifndef _WIN32
     //Free memory and delete SMART.[pid] on terminate
-    munmap(memmap,width*height*2+sizeof(shm_data));
+    munmap(memmap,width*height*2*4+sizeof(shm_data));
     close(fd);
     unlink(shmfile);
     #else

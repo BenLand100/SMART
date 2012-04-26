@@ -44,7 +44,7 @@ void freeClient(SMARTClient *client) {
             client->data->paired = 0;
         }
         #ifndef _WIN32
-        munmap(client->memmap,client->width*client->height*2+sizeof(shm_data));
+        munmap(client->memmap,client->width*client->height*2*4+sizeof(shm_data));
         close(client->fd);
         #else
         UnmapViewOfFile(client->data);
@@ -157,17 +157,18 @@ SMARTClient* pairClient(int id) {
             return NULL;
         }
         #ifndef _WIN32
-        client->memmap = mmap(NULL,2*client_width*client_height+sizeof(shm_data),PROT_READ|PROT_WRITE, MAP_SHARED, client->fd, 0);
+        client->memmap = mmap(NULL,2*client_width*client_height*4+sizeof(shm_data),PROT_READ|PROT_WRITE, MAP_SHARED, client->fd, 0);
         client->data = (shm_data*)client->memmap;
         #else
-        client->memmap = CreateFileMapping(client->file,NULL,PAGE_EXECUTE_READWRITE,0,sizeof(shm_data)+2*client_width*client_height,shmfile);
-        client->data = (shm_data*)MapViewOfFile(client->memmap,FILE_MAP_ALL_ACCESS,0,0,sizeof(shm_data)+2*client_width*client_height);
+        client->memmap = CreateFileMapping(client->file,NULL,PAGE_EXECUTE_READWRITE,0,sizeof(shm_data)+2*client_width*client_height*4,shmfile);
+        client->data = (shm_data*)MapViewOfFile(client->memmap,FILE_MAP_ALL_ACCESS,0,0,sizeof(shm_data)+2*client_width*client_height*4);
         #endif
         if (client->data->paired == tid) {
             client->data->refcount++;
+            cout << "Incrementing pairing refcount\n";
         } else { 
             client->data->paired = tid;
-            client->data->refcount = 0;
+            client->data->refcount = 1;
         }
         return client;
     } else {
@@ -392,12 +393,12 @@ bool std_pairClient(int id) {
  
 //Returns a pointer into shared memory where the image resides
 void* std_getImageArray() {
-    return local ? (char*)local->data + local->data->imgstart : 0;
+    return local ? (char*)local->data + local->data->imgoff : 0;
 }
 
 //Returns a pointer into shared memory where the debug image resides
 void* std_getDebugArray() {
-    return local ? (char*)local->data + local->data->dbgstart : 0;
+    return local ? (char*)local->data + local->data->dbgoff : 0;
 }
 
 int std_getRefresh() {
@@ -573,12 +574,10 @@ bool std_isKeyDown(int code) {
 }
 
 int std_getColor(int x, int y) {
-    if (local) {
-        ((int*)(local->data->args))[0] = x;
-        ((int*)(local->data->args))[1] = y;
-        callClient(local,getColor);
-        return *(int*)(local->data->args);
-    } else return -1;
+    ((int*)(local->data->args))[0] = x;
+    ((int*)(local->data->args))[1] = y;
+    callClient(local,getColor);
+    return *(int*)(local->data->args);
 }
 
 bool std_findColor(int &x, int& y, int color, int sx, int sy, int ex, int ey) {
@@ -699,6 +698,7 @@ SMARTClient* spawnFromString(char* initarg) {
 }
 
 Target EIOS_RequestTarget(char *initargs) {
+    cout << "EIOS Paired\n";
     if (initargs != 0 && strlen(initargs) > 0) {
         SMARTClient *client = spawnFromString(initargs); //This seems silly, could use std_SpawnClient instead
         if (!client) client = pairClient(atoi(initargs));
@@ -708,6 +708,7 @@ Target EIOS_RequestTarget(char *initargs) {
 } 
 
 void EIOS_ReleaseTarget(Target t) {
+    cout << "EIOS Unpaired\n";
     freeClient(t);
 } 
 
@@ -719,7 +720,8 @@ void EIOS_GetTargetDimensions(Target t, int* width, int* height) {
 } 
 
 rgb* EIOS_GetImageBuffer(Target t) {
-    return t ? (rgb*)((char*)t->data + t->data->imgstart) : 0;
+    cout << "EIOS requested image buffer\n";
+    return t ? (rgb*)(((char*)t->data) + t->data->imgoff) : 0;
 } 
 
 void EIOS_UpdateImageBuffer(Target t) {
@@ -735,6 +737,11 @@ void EIOS_GetMousePosition(Target t, int* x, int* y) {
 } 
 
 void EIOS_MoveMouse(Target t, int x, int y) {
+    if (local) {
+        ((int*)(t->data->args))[0] = x;
+        ((int*)(t->data->args))[1] = y;
+        callClient(t,moveMouse);
+    }
 } 
 
 void EIOS_HoldMouse(Target t, int x, int y, int button) {

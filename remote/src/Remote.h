@@ -21,7 +21,7 @@
 #define	_REMOTE _H
 
 //SMART exports used to setup the client
-typedef void (*SetupRemote)(char*,char*,long,long,void*,void*,char*) __attribute__((cdecl));
+typedef void (*SetupRemote)(char*,char*,long,long,void*,void*,char*,int) __attribute__((cdecl));
 typedef void (*SetUserAgent)(char*) __attribute__((cdecl));
 typedef void (*SetJVMPath)(char*) __attribute__((cdecl));
 typedef void (*SetMaxJVMMem)(int) __attribute__((cdecl));

@@ -27,8 +27,8 @@ typedef struct {
     int width,height;   //Size of the images that follow this structure in the SHM
     int time;           //Last time client active (zero if SMART hasn't initilized yet)
     int die;            //Set nonzero to have the client terminate
-    int imgstart;       //Offset in the SHM where the image is stored
-    int dbgstart;       //Offset in the SHM where the debug image is stored
+    int imgoff;         //Offset in the SHM where the image is stored
+    int dbgoff;         //Offset in the SHM where the debug image is stored
     
     /**
      * Comm protocol - Controller sets arguments then sets funid to the ID 

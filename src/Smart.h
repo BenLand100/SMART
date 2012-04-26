@@ -122,7 +122,7 @@ extern "C" bool isBlocking() __attribute__((cdecl));
 extern "C" int getRefresh() __attribute__((cdecl));
 extern "C" void setRefresh(int x) __attribute__((cdecl));
 extern "C" void setup(char*,char*,int,int,char*) __attribute__((cdecl));
-extern "C" void setupRemote(char*,char*,int,int,void*,void*,char*) __attribute__((cdecl));
+extern "C" void setupRemote(char*,char*,int,int,void*,void*,char*,int) __attribute__((cdecl));
 extern "C" void hardReset() __attribute__((cdecl));
 extern "C" void setUserAgent(char*) __attribute__((cdecl));
 
