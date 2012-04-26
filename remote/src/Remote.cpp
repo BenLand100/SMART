@@ -274,8 +274,8 @@ int main(int argc, char** argv) {
     #endif
 
     //Let SMART use the shared memory for the images
-    img = (data + data->imgstart);
-    dbg = (data + data->dbgstart);
+    img = ((char*)data + data->imgstart);
+    dbg = ((char*)data + data->dbgstart);
     
     //Load the smart plugin and link functions
     initSMART();

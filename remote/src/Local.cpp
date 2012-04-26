@@ -380,12 +380,12 @@ bool std_pairClient(int id) {
  
 //Returns a pointer into shared memory where the image resides
 void* std_getImageArray() {
-    return local ? local->data + local->data->imgstart : 0;
+    return local ? (char*)local->data + local->data->imgstart : 0;
 }
 
 //Returns a pointer into shared memory where the debug image resides
 void* std_getDebugArray() {
-    return local ? local->data + local->data->dbgstart : 0;
+    return local ? (char*)local->data + local->data->dbgstart : 0;
 }
 
 int std_getRefresh() {
@@ -396,21 +396,21 @@ int std_getRefresh() {
 }
 
 void std_setRefresh(int x) {
-    if (local->data) {
+    if (local) {
         *(int*)(local->data->args) = x;
         callClient(local,setRefresh);
     }
 }
 
 void std_setTransparentColor(int color) {
-    if (local->data) {
+    if (local) {
         *(int*)(local->data->args) = color;
         callClient(local,setTransparentColor);
     }
 }
 
 void std_setDebug(bool enabled) {
-    if (local->data) {
+    if (local) {
         *(bool*)(local->data->args) = enabled;
         callClient(local,setDebug);
     }
@@ -418,35 +418,35 @@ void std_setDebug(bool enabled) {
 
 
 void std_setGraphics(bool enabled) {
-    if (local->data) {
+    if (local) {
         *(bool*)(local->data->args) = enabled;
         callClient(local,setGraphics);
     }
 }
 
 void std_setEnabled(bool enabled) {
-    if (local->data) {
+    if (local) {
         *(bool*)(local->data->args) = enabled;
         callClient(local,setEnabled);
     }
 }
 
 bool std_isActive() {
-    if (local->data) {
+    if (local) {
         callClient(local,isActive);
         return *(bool*)(local->data->args);
     } else return false;
 }
 
 bool std_isBlocking() {
-    if (local->data) {
+    if (local) {
         callClient(local,isBlocking);
         return *(bool*)(local->data->args);
     } else return false;
 }
 
 void std_getMousePos(int &x, int &y) {
-    if (local->data) {
+    if (local) {
         callClient(local,getMousePos);
         x = ((int*)(local->data->args))[0];
         y = ((int*)(local->data->args))[1];
@@ -454,7 +454,7 @@ void std_getMousePos(int &x, int &y) {
 }
 
 void std_holdMouse(int x, int y, bool left) {
-    if (local->data) {
+    if (local) {
         ((int*)(local->data->args))[0] = x;
         ((int*)(local->data->args))[1] = y;
         ((int*)(local->data->args))[2] = left; //not a mistake
@@ -463,7 +463,7 @@ void std_holdMouse(int x, int y, bool left) {
 }
 
 void std_releaseMouse(int x, int y, bool left) {
-    if (local->data) {
+    if (local) {
         ((int*)(local->data->args))[0] = x;
         ((int*)(local->data->args))[1] = y;
         ((int*)(local->data->args))[2] = left; //not a mistake
@@ -472,7 +472,7 @@ void std_releaseMouse(int x, int y, bool left) {
 }
 
 void std_holdMousePlus(int x, int y, int button) {
-    if (local->data) {
+    if (local) {
         ((int*)(local->data->args))[0] = x;
         ((int*)(local->data->args))[1] = y;
         ((int*)(local->data->args))[2] = button;
@@ -481,7 +481,7 @@ void std_holdMousePlus(int x, int y, int button) {
 }
 
 void std_releaseMousePlus(int x, int y, int button) {
-    if (local->data) {
+    if (local) {
         ((int*)(local->data->args))[0] = x;
         ((int*)(local->data->args))[1] = y;
         ((int*)(local->data->args))[2] = button;
@@ -490,7 +490,7 @@ void std_releaseMousePlus(int x, int y, int button) {
 }
 
 void std_moveMouse(int x, int y) {
-    if (local->data) {
+    if (local) {
         ((int*)(local->data->args))[0] = x;
         ((int*)(local->data->args))[1] = y;
         callClient(local,moveMouse);
@@ -498,7 +498,7 @@ void std_moveMouse(int x, int y) {
 }
 
 void std_windMouse(int x, int y) {
-    if (local->data) {
+    if (local) {
         ((int*)(local->data->args))[0] = x;
         ((int*)(local->data->args))[1] = y;
         callClient(local,windMouse);
@@ -506,7 +506,7 @@ void std_windMouse(int x, int y) {
 }
 
 void std_clickMouse(int x, int y, bool left) {
-    if (local->data) {
+    if (local) {
         ((int*)(local->data->args))[0] = x;
         ((int*)(local->data->args))[1] = y;
         ((int*)(local->data->args))[2] = left; //not a mistake
@@ -515,7 +515,7 @@ void std_clickMouse(int x, int y, bool left) {
 }
 
 void std_clickMousePlus(int x, int y, int button) {
-    if (local->data) {
+    if (local) {
         ((int*)(local->data->args))[0] = x;
         ((int*)(local->data->args))[1] = y;
         ((int*)(local->data->args))[2] = button;
@@ -524,7 +524,7 @@ void std_clickMousePlus(int x, int y, int button) {
 }
 
 bool std_isMouseButtonHeld(int button) {
-    if (local->data) {
+    if (local) {
         *(int*)(local->data->args) = button;
         callClient(local,isMouseButtonHeld);
         return *(bool*)(local->data->args);
@@ -532,28 +532,28 @@ bool std_isMouseButtonHeld(int button) {
 }
 
 void std_sendKeys(char *text) {
-    if (local->data) {
+    if (local) {
         strcpy((char*)local->data->args,text);
         callClient(local,sendKeys);
     }
 }
 
 void std_holdKey(int code) {
-    if (local->data) {
+    if (local) {
         *(int*)(local->data->args) = code;
         callClient(local,holdKey);
     }
 }
 
 void std_releaseKey(int code) {
-    if (local->data) {
+    if (local) {
         *(int*)(local->data->args) = code;
         callClient(local,releaseKey);
     }
 }
 
 bool std_isKeyDown(int code) {
-    if (local->data) {
+    if (local) {
         *(int*)(local->data->args) = code;
         callClient(local,isKeyDown);
         return *(bool*)(local->data->args);
@@ -561,7 +561,7 @@ bool std_isKeyDown(int code) {
 }
 
 int std_getColor(int x, int y) {
-    if (local->data) {
+    if (local) {
         ((int*)(local->data->args))[0] = x;
         ((int*)(local->data->args))[1] = y;
         callClient(local,getColor);
@@ -570,7 +570,7 @@ int std_getColor(int x, int y) {
 }
 
 bool std_findColor(int &x, int& y, int color, int sx, int sy, int ex, int ey) {
-    if (local->data) {
+    if (local) {
         ((int*)(local->data->args))[0] = x;
         ((int*)(local->data->args))[1] = y;
         ((int*)(local->data->args))[2] = color;
@@ -586,7 +586,7 @@ bool std_findColor(int &x, int& y, int color, int sx, int sy, int ex, int ey) {
 }
 
 bool std_findColorTol(int &x, int& y, int color, int sx, int sy, int ex, int ey, int tol) {
-    if (local->data) {
+    if (local) {
         ((int*)(local->data->args))[0] = x;
         ((int*)(local->data->args))[1] = y;
         ((int*)(local->data->args))[2] = color;
@@ -603,7 +603,7 @@ bool std_findColorTol(int &x, int& y, int color, int sx, int sy, int ex, int ey,
 }
 
 bool std_findColorSpiral(int &x, int& y, int color, int sx, int sy, int ex, int ey) {
-    if (local->data) {
+    if (local) {
         ((int*)(local->data->args))[0] = x;
         ((int*)(local->data->args))[1] = y;
         ((int*)(local->data->args))[2] = color;
@@ -619,7 +619,7 @@ bool std_findColorSpiral(int &x, int& y, int color, int sx, int sy, int ex, int 
 }
 
 bool std_findColorSpiralTol(int &x, int& y, int color, int sx, int sy, int ex, int ey, int tol) {
-    if (local->data){
+    if (local){
         ((int*)(local->data->args))[0] = x;
         ((int*)(local->data->args))[1] = y;
         ((int*)(local->data->args))[2] = color;
@@ -636,47 +636,149 @@ bool std_findColorSpiralTol(int &x, int& y, int color, int sx, int sy, int ex, i
 }
 
 
+SMARTClient* spawnFromString(char* initarg) {
+    int len = strlen(initarg);
+    char *path,*root,*params,*initseq,*useragent,*jvmpath;
+    int width,height,maxmem;
+    char *buffer = new char[len+1];
+    int ida=0,idb=0,idx;
+    while (ida < len && (buffer[idb++]=initarg[ida++]) != ','); buffer[idb-1]=0;
+    if (initarg[ida++] != '"') return NULL;
+    int version = atoi(&buffer[0]);
+    if (version == 0) {
+        path = &buffer[idb];
+        while (ida < len && (buffer[idb++]=initarg[ida++]) != '"'); buffer[idb-1]=0;
+        if (initarg[ida++] != ',') return NULL;
+        if (initarg[ida++] != '"') return NULL;
+        root = &buffer[idb];
+        while (ida < len && (buffer[idb++]=initarg[ida++]) != '"'); buffer[idb-1]=0;
+        if (initarg[ida++] != ',') return NULL;
+        if (initarg[ida++] != '"') return NULL;
+        params = &buffer[idb];
+        while (ida < len && (buffer[idb++]=initarg[ida++]) != '"'); buffer[idb-1]=0;
+        if (initarg[ida++] != ',') return NULL;
+        idx = idb;
+        while (ida < len && (buffer[idb++]=initarg[ida++]) != ','); buffer[idb-1]=0;
+        if (initarg[ida-1] != ',') return NULL;
+        width = atoi(&buffer[idx]);
+        idx = idb;
+        while (ida < len && (buffer[idb++]=initarg[ida++]) != ','); buffer[idb-1]=0;
+        if (initarg[ida-1] != ',') return NULL;
+        height = atoi(&buffer[idx]);
+        if (initarg[ida++] != '"') return NULL;
+        initseq = &buffer[idb];
+        while (ida < len && (buffer[idb++]=initarg[ida++]) != '"'); buffer[idb-1]=0;
+        if (initarg[ida++] != ',') return NULL;
+        if (initarg[ida++] != '"') return NULL;
+        useragent = &buffer[idb];
+        while (ida < len && (buffer[idb++]=initarg[ida++]) != '"'); buffer[idb-1]=0;
+        if (initarg[ida++] != ',') return NULL;
+        if (initarg[ida++] != '"') return NULL;
+        jvmpath = &buffer[idb];
+        while (ida < len && (buffer[idb++]=initarg[ida++]) != '"'); buffer[idb-1]=0;
+        if (initarg[ida++] != ',') return NULL;
+        idx = idb;
+        while (ida < len && (buffer[idb++]=initarg[ida++]) != ','); buffer[idb-1]=0;
+        if (initarg[ida-1] != ',') return NULL;
+        maxmem = atoi(&buffer[idx]);
+        return spawnClient(path,root,params,width,height,initseq,useragent,jvmpath,maxmem);
+    }
+    return NULL;
+}
+
 Target EIOS_RequestTarget(char *initargs) {
+    if (initargs != 0 && strlen(initargs) > 0) {
+        SMARTClient *client = spawnFromString(initargs);
+        if (!client) client = pairClient(atoi(initargs));
+        return client;
+    }
+    return NULL; //This result signifies a failure
 } 
 
 void EIOS_ReleaseTarget(Target t) {
+    freeClient(t);
 } 
 
 void EIOS_GetTargetDimensions(Target t, int* width, int* height) {
+    if (t) {
+        *width = t->data->width;
+        *height = t->data->height;
+    }
 } 
 
 rgb* EIOS_GetImageBuffer(Target t) {
+    return t ? (rgb*)((char*)t->data + t->data->imgstart) : 0;
 } 
 
 void EIOS_UpdateImageBuffer(Target t) {
+    return; //Do nothing, buffer is always updated
 } 
 
 void EIOS_GetMousePosition(Target t, int* x, int* y) {
+    if (t) {
+        callClient(t,getMousePos);
+        *x = ((int*)(t->data->args))[0];
+        *y = ((int*)(t->data->args))[1];
+    }
 } 
 
 void EIOS_MoveMouse(Target t, int x, int y) {
 } 
 
 void EIOS_HoldMouse(Target t, int x, int y, int button) {
-} 
+    if (local) {
+        ((int*)(t->data->args))[0] = x;
+        ((int*)(t->data->args))[1] = y;
+        ((int*)(t->data->args))[2] = button;
+        callClient(t,holdMousePlus);
+    }
+}
 
 void EIOS_ReleaseMouse(Target t, int x, int y, int button) {
-} 
+    if (t) {
+        ((int*)(t->data->args))[0] = x;
+        ((int*)(t->data->args))[1] = y;
+        ((int*)(t->data->args))[2] = button;
+        callClient(t,releaseMousePlus);
+    }
+}
 
 bool EIOS_IsMouseHeld(Target t, int button) {
+    if (t) {
+        *(int*)(t->data->args) = button;
+        callClient(t,isMouseButtonHeld);
+        return *(bool*)(t->data->args);
+    } else return false;
 } 
 
-void EIOS_SendString(Target t, char* str) {
-} 
+void EIOS_SendString(Target t, char* str) {    
+    if (t) {
+        strcpy((char*)t->data->args,str);
+        callClient(t,sendKeys);
+    }
+}
 
 void EIOS_HoldKey(Target t, int key) {
-} 
+    if (t) {
+        *(int*)(t->data->args) = key;
+        callClient(t,holdKey);
+    }
+}
 
 void EIOS_ReleaseKey(Target t, int key) {
-} 
+    if (t) {
+        *(int*)(t->data->args) = key;
+        callClient(t,releaseKey);
+    }
+}
 
 bool EIOS_IsKeyHeld(Target t, int key) {
-} 
+    if (t) {
+        *(int*)(t->data->args) = key;
+        callClient(t,isKeyDown);
+        return *(bool*)(t->data->args);
+    } else return false;
+}
 
 void internalConstructor() {
     clients.ids = 0;
