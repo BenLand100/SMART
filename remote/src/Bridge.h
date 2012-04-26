@@ -17,6 +17,9 @@
  *  along with SMART-Remote. If not, see <http://www.gnu.org/licenses/>.
  */
  
+#ifndef _BRIDGE_H
+#define _BRIDGE_H
+ 
 typedef struct {
     int id;             //PID of the client
     int paired;         //TID of the controller or ZERO if none
@@ -76,5 +79,4 @@ typedef struct {
 
 #define Ping                ExtraFuncs+0
 
-
-
+#endif

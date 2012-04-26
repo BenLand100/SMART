@@ -20,7 +20,42 @@
 #ifndef _LOCAL_H
 #define	_LOCAL_H
 
-typedef void* Target;
+#include "Bridge.h"
+
+#ifndef _WIN32
+#include <dlfcn.h>
+void load() __attribute__((constructor));
+void unload() __attribute__((destructor));
+#else
+#include <windows.h>
+extern "C" bool DllMain(HINSTANCE, int, void*) __attribute__((stdcall));
+#endif
+
+#if __SIZEOF_POINTER__ == 4
+    #define bits "32"
+#else
+    #define bits "64"
+#endif
+#define TIMEOUT 5
+
+typedef struct {
+    int width,height;
+    #ifndef _WIN32
+    int fd;
+    void* memmap;
+    #else
+    HANDLE file;
+    HANDLE memmap;
+    #endif
+    shm_data *data;
+} SMARTClient;
+
+typedef struct {
+    int count;
+    int *ids;
+} clients_dat;
+
+typedef SMARTClient* Target;
 typedef union { 
 	struct { char b, g, r, a; }; 
 	unsigned int color; 
@@ -119,24 +154,6 @@ static char* exports[] = {
     (char*)"std_findColorSpiral", (char*)"function SmartFindColorSpiral(var x, y: integer; color, sx, sy, ex, ey: integer): boolean;",
     (char*)"std_findColorSpiralTol", (char*)"function SmartFindColorSpiralTolerance(var x, y: integer; color, sx, sy, ex, ey, tol: integer): boolean;",
 };
-
-
-#ifndef _WIN32
-
-#include <dlfcn.h>
-
-void load() __attribute__((constructor));
-void unload() __attribute__((destructor));
-
-#endif
-
-#ifdef _WIN32
-
-#include <windows.h>
-
-extern "C" bool DllMain(HINSTANCE, int, void*) __attribute__((stdcall));
-
-#endif
 
 extern "C" int GetFunctionCount() __attribute__((stdcall));
 extern "C" int GetFunctionInfo(int, void*&, char*&) __attribute__((stdcall));

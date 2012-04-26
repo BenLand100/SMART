@@ -31,46 +31,204 @@
 #include <dirent.h>
 #endif
 
-
-#if __SIZEOF_POINTER__ == 4
-    #define bits "32"
-#else
-    #define bits "64"
-#endif
-#define TIMEOUT 5
-
 using namespace std;
 
-static int width,height;
-#ifndef _WIN32
-static int fd;
-static void* memmap;
-#else
-static HANDLE file;
-static HANDLE memmap;
-#endif
-static shm_data *data;
-
-typedef struct {
-    int count;
-    int *ids;
-} clients_dat;
+static SMARTClient *local;
 
 static clients_dat clients;
 
-void cleanup() {
-    if (memmap) {
+void freeClient(SMARTClient *client) {
+    if (!client) return;
+    if (client->memmap) {
         #ifndef _WIN32
-        munmap(memmap,width*height*2+sizeof(shm_data));
-        close(fd);
+        munmap(client->memmap,client->width*client->height*2+sizeof(shm_data));
+        close(client->fd);
         #else
-        UnmapViewOfFile(data);
-        CloseHandle(memmap);
-        CloseHandle(file);
+        UnmapViewOfFile(client->data);
+        CloseHandle(client->memmap);
+        CloseHandle(client->file);
         #endif
-        memmap = NULL;
-        data = NULL;
+        client->memmap = NULL;
+        client->data = NULL;
     }
+    delete client;
+}
+
+/**
+ * Kills the client 
+ */
+void killClient(SMARTClient *client) {
+    if (client->data) {
+        client->data->die = 1;
+    }
+}
+
+/**
+ * Invokes a remote method. Might free your client if the client died.
+ * Assumes arguments are already set and results are set according to the comm protocol
+ */
+void callClient(SMARTClient *client, int funid) {
+    client->data->funid = funid;
+    while (client->data->funid) { 
+        #ifndef _WIN32
+        usleep(10); //ms
+        #else
+        Sleep(10); //ms
+        #endif
+        if (client->data->time && time(0) - client->data->time > TIMEOUT) {
+            cout << "Client appears to have died: aborting\n";
+            break;
+        }
+    }
+}
+
+/**
+ * Pairing logic: 
+ * 1) Try to open the file SMART.[pid]
+ * 2) If file does not exist, abort
+ * 3) Read the shm_data structure at the beginning of the file
+ * 4) If data->time is older than TIMEOUT, assume zombie, destroy file, and abort
+ * 5) If data->paired is nonzero, assume paired and abort
+ * 6) Remap file with proper size of image and debug included
+ * 7) Set data->paired to our PID
+ */
+SMARTClient* pairClient(int id) {
+    SMARTClient *client = new SMARTClient;
+    char shmfile[256];
+    sprintf(shmfile,"SMART.%i",id);
+    #ifndef _WIN32
+    client->fd = open(shmfile,O_RDWR);
+    if (client->fd != -1) {
+    #else
+    client->file = CreateFile(
+        shmfile,
+        GENERIC_READ|GENERIC_WRITE,
+        FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE,
+        NULL,
+        OPEN_EXISTING,FILE_ATTRIBUTE_TEMPORARY|FILE_FLAG_RANDOM_ACCESS|FILE_FLAG_OVERLAPPED,
+        NULL);
+    if (client->file != INVALID_HANDLE_VALUE) {
+    #endif
+        #ifndef _WIN32
+        client->memmap = mmap(NULL,sizeof(shm_data),PROT_READ|PROT_WRITE, MAP_SHARED, client->fd, 0);
+        client->data = (shm_data*)client->memmap;
+        #else
+        client->memmap = CreateFileMapping(client->file,NULL,PAGE_EXECUTE_READWRITE,0,sizeof(shm_data),shmfile);
+        client->data = (shm_data*)MapViewOfFile(client->memmap,FILE_MAP_ALL_ACCESS,0,0,sizeof(shm_data));
+        #endif
+        int client_time = client->data->time;
+        int client_paired = client->data->paired;
+        int client_width = client->data->width;
+        int client_height = client->data->height;
+        #ifndef _WIN32
+        munmap(client->memmap,+sizeof(shm_data));
+        #else
+        UnmapViewOfFile(client->data);
+        CloseHandle(client->memmap);
+        #endif
+        if (client_time != 0 && time(0) - client_time > TIMEOUT) {
+            cout << "Failed to pair - Zombie client detected\n";
+            #ifndef _WIN32
+            close(client->fd);
+            unlink(shmfile);
+            #else
+            CloseHandle(client->file);
+            DeleteFile(shmfile);
+            #endif
+            delete client;
+            return NULL;
+        }
+        if (client_paired) { 
+            cout << "Failed to pair - Client appears to be paired\n";
+            #ifndef _WIN32
+            close(client->fd);
+            #else
+            CloseHandle(client->file);
+            #endif
+            delete client;
+            return NULL;
+        }
+        #ifndef _WIN32
+        client->memmap = mmap(NULL,2*client_width*client_height+sizeof(shm_data),PROT_READ|PROT_WRITE, MAP_SHARED, client->fd, 0);
+        client->data = (shm_data*)client->memmap;
+        client->data->paired = syscall(SYS_gettid);
+        #else
+        client->memmap = CreateFileMapping(client->file,NULL,PAGE_EXECUTE_READWRITE,0,sizeof(shm_data)+2*client_width*client_height,shmfile);
+        client->data = (shm_data*)MapViewOfFile(client->memmap,FILE_MAP_ALL_ACCESS,0,0,sizeof(shm_data)+2*client_width*client_height);
+        client->data->paired = GetCurrentThreadId();
+        #endif
+        return client;
+    } else {
+        cout << "Failed to pair - No client by that ID\n";
+        delete client;
+        return NULL;
+    }
+}
+
+/**
+ * Creates a remote SMART client and pairs to it
+ */
+SMARTClient* spawnClient(char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char *jvmpath, int maxmem) {
+    SMARTClient *client;
+    if (!remote_path || !root || !params) return 0;
+    char _width[256],_height[256];
+    sprintf(_width,"%i",width);
+    sprintf(_height,"%i",height);
+    char empty = '\0';
+    if (!initseq) initseq = &empty;
+    if (!useragent) useragent = &empty;
+    if (!jvmpath) jvmpath = &empty;
+    char _maxmem[256];
+    if (maxmem<=0) {
+        _maxmem[0]='\0';
+    } else {
+        sprintf(_maxmem,"%i",maxmem);
+    }
+    #ifdef _WIN32
+    int len = 2*strlen(remote_path)+strlen(root)+strlen(params)+strlen(_width)+strlen(_height)+strlen(initseq)+strlen(useragent)+strlen(jvmpath)+strlen(_maxmem);
+    char *args = new char[len+10*3+20];
+    sprintf(args,"\"%ssmartremote%s.exe\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\"",remote_path,bits,remote_path,root,params,_width,_height,initseq,useragent,jvmpath,_maxmem);
+    char *exec = new char[strlen(remote_path)+20];
+    sprintf(exec,"%ssmartremote%s.exe",remote_path,bits);
+    cout << exec << '\n';
+    PROCESS_INFORMATION procinfo;
+    STARTUPINFO startupinfo;
+    memset(&startupinfo, 0, sizeof(STARTUPINFO));
+    memset(&procinfo, 0, sizeof(PROCESS_INFORMATION));
+    startupinfo.cb = sizeof(STARTUPINFOW); 
+    CreateProcess(exec,args,NULL,NULL,FALSE,CREATE_DEFAULT_ERROR_MODE,NULL,NULL,&startupinfo,&procinfo);
+    CloseHandle(procinfo.hProcess);
+    CloseHandle(procinfo.hThread);
+    delete exec;
+    delete args;
+    int count = 0;
+    do {
+        Sleep(1000);
+        count++;
+    } while  (!(client=pairClient(procinfo.dwProcessId))&&count<10);
+    if (count >= 10) return NULL;
+    callClient(client,Ping);
+    return client;
+    #else
+    int v = fork();
+    if (v) {
+        int count = 0;
+        do {
+            sleep(1);
+            count++;
+        } while  (!(client=pairClient(v)) && count<10);
+        if (count >= 10) return NULL;
+        callClient(client,Ping);
+        return client;
+    } else {
+        char *exec = new char[strlen(remote_path)+20];
+        sprintf(exec,"%s/smartremote%s",remote_path,bits);
+        cout << exec << '\n';
+        execl(exec,exec,remote_path,root,params,_width,_height,initseq,useragent,jvmpath,_maxmem,NULL);
+        delete exec;
+        exit(1);
+    }
+    #endif
 }
 
 /**
@@ -170,7 +328,6 @@ int getClients(bool only_unpaired, int **_clients) {
  * Returns the number of clients in the structure
  */
 int std_clientID(int idx) {
-    
     if (idx < clients.count && idx >= 0) {
         return clients.ids[idx];
     }
@@ -190,7 +347,7 @@ int std_getClients(bool only_unpaired) {
  * Returns the current paired client's ID 
  */
 int std_getCurrent() {
-    return data ? data->id : 0;
+    return local ? local->data->id : 0;
 }
 
 /**
@@ -198,460 +355,339 @@ int std_getCurrent() {
  * !!!Fails if the client is paired with ANOTHER controller!!!
  */
 void std_killClient(int id) {
-    int old = data ? data->id : 0;
-    if (old != id) std_pairClient(id);
-    if (data) {
-        data->die = 1;
-    }
-    std_pairClient(old);
+    SMARTClient *client = pairClient(id);
+    killClient(client);
+    freeClient(client);
 }
 
 /**
- * Creates a remote SMART client and pairs to it, returning its ID
+ * Creates a remote SMART client and pairs to it, returning its ID or 0 if failed
  */
 int std_spawnClient(char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char *jvmpath, int maxmem) {
-    if (!remote_path || !root || !params) return 0;
-    char _width[256],_height[256];
-    sprintf(_width,"%i",width);
-    sprintf(_height,"%i",height);
-    char empty = '\0';
-    if (!initseq) initseq = &empty;
-    if (!useragent) useragent = &empty;
-    if (!jvmpath) jvmpath = &empty;
-    char _maxmem[256];
-    if (maxmem<=0) {
-        _maxmem[0]='\0';
-    } else {
-        sprintf(_maxmem,"%i",maxmem);
-    }
-    #ifdef _WIN32
-    int len = 2*strlen(remote_path)+strlen(root)+strlen(params)+strlen(_width)+strlen(_height)+strlen(initseq)+strlen(useragent)+strlen(jvmpath)+strlen(_maxmem);
-    char *args = new char[len+10*3+20];
-    sprintf(args,"\"%ssmartremote%s.exe\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\"",remote_path,bits,remote_path,root,params,_width,_height,initseq,useragent,jvmpath,_maxmem);
-    char *exec = new char[strlen(remote_path)+20];
-    sprintf(exec,"%ssmartremote%s.exe",remote_path,bits);
-    cout << exec << '\n';
-    PROCESS_INFORMATION procinfo;
-    STARTUPINFO startupinfo;
-    memset(&startupinfo, 0, sizeof(STARTUPINFO));
-    memset(&procinfo, 0, sizeof(PROCESS_INFORMATION));
-    startupinfo.cb = sizeof(STARTUPINFOW); 
-    CreateProcess(exec,args,NULL,NULL,FALSE,CREATE_DEFAULT_ERROR_MODE,NULL,NULL,&startupinfo,&procinfo);
-    CloseHandle(procinfo.hProcess);
-    CloseHandle(procinfo.hThread);
-    delete exec;
-    delete args;
-    int count = 0;
-    do {
-        Sleep(1000);
-        count++;
-    } while  (!std_pairClient(procinfo.dwProcessId)&&count<10);
-    if (count >= 10) return false;
-    call(Ping);
-    return procinfo.dwProcessId;
-    #else
-    int v = fork();
-    if (v) {
-        int count = 0;
-        do {
-            sleep(1);
-            count++;
-        } while  (!std_pairClient(v) && count<10);
-        if (count >= 10) return 0;
-        call(Ping);
-        return v;
-    } else {
-        char *exec = new char[strlen(remote_path)+20];
-        sprintf(exec,"%s/smartremote%s",remote_path,bits);
-        cout << exec << '\n';
-        execl(exec,exec,remote_path,root,params,_width,_height,initseq,useragent,jvmpath,_maxmem,NULL);
-        delete exec;
-        exit(1);
-    }
-    #endif
+    freeClient(local);
+    local = spawnClient(remote_path,root,params,width,height,initseq,useragent,jvmpath,maxmem);
+    return local ? local->data->id : 0;
 }
 
 /**
- * Pairing logic: 
- * 1) Try to open the file SMART.[pid]
- * 2) If file does not exist, abort
- * 3) Read the shm_data structure at the beginning of the file
- * 4) If data->time is older than TIMEOUT, assume zombie, destroy file, and abort
- * 5) If data->paired is nonzero, assume paired and abort
- * 6) Remap file with proper size of image and debug included
- * 7) Set data->paired to our PID
+ * Pairs to an existing client, returning its ID or 0 if failed
  */
 bool std_pairClient(int id) {
-    cleanup();
-    char shmfile[256];
-    sprintf(shmfile,"SMART.%i",id);
-    #ifndef _WIN32
-    fd = open(shmfile,O_RDWR);
-    if (fd != -1) {
-    #else
-    file = CreateFile(
-        shmfile,
-        GENERIC_READ|GENERIC_WRITE,
-        FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE,
-        NULL,
-        OPEN_EXISTING,FILE_ATTRIBUTE_TEMPORARY|FILE_FLAG_RANDOM_ACCESS|FILE_FLAG_OVERLAPPED,
-        NULL);
-    if (file != INVALID_HANDLE_VALUE) {
-    #endif
-        #ifndef _WIN32
-        memmap = mmap(NULL,sizeof(shm_data),PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-        data = (shm_data*)memmap;
-        #else
-        memmap = CreateFileMapping(file,NULL,PAGE_EXECUTE_READWRITE,0,sizeof(shm_data),shmfile);
-        data = (shm_data*) MapViewOfFile(memmap,FILE_MAP_ALL_ACCESS,0,0,sizeof(shm_data));
-        #endif
-        int client_time = data->time;
-        int client_paired = data->paired;
-        width = data->width;
-        height = data->height;
-        #ifndef _WIN32
-        munmap(memmap,+sizeof(shm_data));
-        #else
-        UnmapViewOfFile(data);
-        CloseHandle(memmap);
-        #endif
-        if (client_time != 0 && time(0) - client_time > TIMEOUT) {
-            cout << "Failed to pair - Zombie client detected\n";
-            #ifndef _WIN32
-            close(fd);
-            unlink(shmfile);
-            #else
-            CloseHandle(file);
-            DeleteFile(shmfile);
-            #endif
-            memmap = NULL;
-            data = NULL;
-            return false;
-        }
-        if (client_paired) { 
-            cout << "Failed to pair - Client appears to be paired\n";
-            #ifndef _WIN32
-            close(fd);
-            #else
-            CloseHandle(file);
-            #endif
-            memmap = NULL;
-            data = NULL;
-            return false;
-        }
-        #ifndef _WIN32
-        memmap = mmap(NULL,2*width*height+sizeof(shm_data),PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-        data = (shm_data*)memmap;
-        data->paired = syscall(SYS_gettid);
-        #else
-        memmap = CreateFileMapping(file,NULL,PAGE_EXECUTE_READWRITE,0,sizeof(shm_data)+2*width*height,shmfile);
-        data = (shm_data*)MapViewOfFile(memmap,FILE_MAP_ALL_ACCESS,0,0,sizeof(shm_data)+2*width*height);
-        data->paired = GetCurrentThreadId();
-        #endif
-        return true;
-    } else {
-        cout << "Failed to pair - No client by that ID\n";
-        return false;
-    }
+    freeClient(local);
+    local = pairClient(id);
+    return local ? local->data->id : 0;
 }
  
 //Returns a pointer into shared memory where the image resides
 void* std_getImageArray() {
-    return data ? data + data->imgstart : 0;
+    return local ? local->data + local->data->imgstart : 0;
 }
 
 //Returns a pointer into shared memory where the debug image resides
 void* std_getDebugArray() {
-    return data ? data + data->dbgstart : 0;
-}
-
-//Invokes a remote method
-void call(int funid) {
-    //assume that anything calling this already checked if data is nonzero
-    data->funid = funid;
-    #ifndef _WIN32
-    //syscall(SYS_tkill,data->listener,SIGALRM); //wake process
-    #else
-    #endif
-    while (data->funid) { 
-        #ifndef _WIN32
-        sched_yield();
-        #else
-        Sleep(10); //ms
-        #endif
-        if (data->time && time(0) - data->time > TIMEOUT) {
-            cout << "Client appears to have died: aborting link\n";
-            char shmfile[256];
-            sprintf(shmfile,"SMART.%i",data->id);
-            cleanup();
-            #ifndef _WIN32
-            unlink(shmfile);
-            #else
-            DeleteFile(shmfile);
-            #endif
-        }
-    }
+    return local ? local->data + local->data->dbgstart : 0;
 }
 
 int std_getRefresh() {
-    if (data) {
-        call(getRefresh);
-        return *(int*)(data->args);
+    if (local) {
+        callClient(local,getRefresh);
+        return *(int*)(local->data->args);
     } return -1;
 }
 
 void std_setRefresh(int x) {
-    if (data) {
-        *(int*)(data->args) = x;
-        call(setRefresh);
+    if (local->data) {
+        *(int*)(local->data->args) = x;
+        callClient(local,setRefresh);
     }
 }
 
 void std_setTransparentColor(int color) {
-    if (data) {
-        *(int*)(data->args) = color;
-        call(setTransparentColor);
+    if (local->data) {
+        *(int*)(local->data->args) = color;
+        callClient(local,setTransparentColor);
     }
 }
 
 void std_setDebug(bool enabled) {
-    if (data) {
-        *(bool*)(data->args) = enabled;
-        call(setDebug);
+    if (local->data) {
+        *(bool*)(local->data->args) = enabled;
+        callClient(local,setDebug);
     }
 }
 
 
 void std_setGraphics(bool enabled) {
-    if (data) {
-        *(bool*)(data->args) = enabled;
-        call(setGraphics);
+    if (local->data) {
+        *(bool*)(local->data->args) = enabled;
+        callClient(local,setGraphics);
     }
 }
 
 void std_setEnabled(bool enabled) {
-    if (data) {
-        *(bool*)(data->args) = enabled;
-        call(setEnabled);
+    if (local->data) {
+        *(bool*)(local->data->args) = enabled;
+        callClient(local,setEnabled);
     }
 }
 
 bool std_isActive() {
-    if (data) {
-        call(isActive);
-        return *(bool*)(data->args);
+    if (local->data) {
+        callClient(local,isActive);
+        return *(bool*)(local->data->args);
     } else return false;
 }
 
 bool std_isBlocking() {
-    if (data) {
-        call(isBlocking);
-        return *(bool*)(data->args);
+    if (local->data) {
+        callClient(local,isBlocking);
+        return *(bool*)(local->data->args);
     } else return false;
 }
 
 void std_getMousePos(int &x, int &y) {
-    if (data) {
-        call(getMousePos);
-        x = ((int*)(data->args))[0];
-        y = ((int*)(data->args))[1];
+    if (local->data) {
+        callClient(local,getMousePos);
+        x = ((int*)(local->data->args))[0];
+        y = ((int*)(local->data->args))[1];
     }
 }
 
 void std_holdMouse(int x, int y, bool left) {
-    if (data) {
-        ((int*)(data->args))[0] = x;
-        ((int*)(data->args))[1] = y;
-        ((int*)(data->args))[2] = left; //not a mistake
-        call(holdMouse);
+    if (local->data) {
+        ((int*)(local->data->args))[0] = x;
+        ((int*)(local->data->args))[1] = y;
+        ((int*)(local->data->args))[2] = left; //not a mistake
+        callClient(local,holdMouse);
     }
 }
 
 void std_releaseMouse(int x, int y, bool left) {
-    if (data) {
-        ((int*)(data->args))[0] = x;
-        ((int*)(data->args))[1] = y;
-        ((int*)(data->args))[2] = left; //not a mistake
-        call(releaseMouse);
+    if (local->data) {
+        ((int*)(local->data->args))[0] = x;
+        ((int*)(local->data->args))[1] = y;
+        ((int*)(local->data->args))[2] = left; //not a mistake
+        callClient(local,releaseMouse);
     }
 }
 
 void std_holdMousePlus(int x, int y, int button) {
-    if (data) {
-        ((int*)(data->args))[0] = x;
-        ((int*)(data->args))[1] = y;
-        ((int*)(data->args))[2] = button;
-        call(holdMousePlus);
+    if (local->data) {
+        ((int*)(local->data->args))[0] = x;
+        ((int*)(local->data->args))[1] = y;
+        ((int*)(local->data->args))[2] = button;
+        callClient(local,holdMousePlus);
     }
 }
 
 void std_releaseMousePlus(int x, int y, int button) {
-    if (data) {
-        ((int*)(data->args))[0] = x;
-        ((int*)(data->args))[1] = y;
-        ((int*)(data->args))[2] = button;
-        call(releaseMousePlus);
+    if (local->data) {
+        ((int*)(local->data->args))[0] = x;
+        ((int*)(local->data->args))[1] = y;
+        ((int*)(local->data->args))[2] = button;
+        callClient(local,releaseMousePlus);
     }
 }
 
 void std_moveMouse(int x, int y) {
-    if (data) {
-        ((int*)(data->args))[0] = x;
-        ((int*)(data->args))[1] = y;
-        call(moveMouse);
+    if (local->data) {
+        ((int*)(local->data->args))[0] = x;
+        ((int*)(local->data->args))[1] = y;
+        callClient(local,moveMouse);
     }
 }
 
 void std_windMouse(int x, int y) {
-    if (data) {
-        ((int*)(data->args))[0] = x;
-        ((int*)(data->args))[1] = y;
-        call(windMouse);
+    if (local->data) {
+        ((int*)(local->data->args))[0] = x;
+        ((int*)(local->data->args))[1] = y;
+        callClient(local,windMouse);
     }
 }
 
 void std_clickMouse(int x, int y, bool left) {
-    if (data) {
-        ((int*)(data->args))[0] = x;
-        ((int*)(data->args))[1] = y;
-        ((int*)(data->args))[2] = left; //not a mistake
-        call(clickMouse);
+    if (local->data) {
+        ((int*)(local->data->args))[0] = x;
+        ((int*)(local->data->args))[1] = y;
+        ((int*)(local->data->args))[2] = left; //not a mistake
+        callClient(local,clickMouse);
     }
 }
 
 void std_clickMousePlus(int x, int y, int button) {
-    if (data) {
-        ((int*)(data->args))[0] = x;
-        ((int*)(data->args))[1] = y;
-        ((int*)(data->args))[2] = button;
-        call(clickMousePlus);
+    if (local->data) {
+        ((int*)(local->data->args))[0] = x;
+        ((int*)(local->data->args))[1] = y;
+        ((int*)(local->data->args))[2] = button;
+        callClient(local,clickMousePlus);
     }
 }
 
 bool std_isMouseButtonHeld(int button) {
-    if (data) {
-        *(int*)(data->args) = button;
-        call(isMouseButtonHeld);
-        return *(bool*)(data->args);
+    if (local->data) {
+        *(int*)(local->data->args) = button;
+        callClient(local,isMouseButtonHeld);
+        return *(bool*)(local->data->args);
     } else return false;
 }
 
 void std_sendKeys(char *text) {
-    if (data) {
-        strcpy((char*)data->args,text);
-        call(sendKeys);
+    if (local->data) {
+        strcpy((char*)local->data->args,text);
+        callClient(local,sendKeys);
     }
 }
 
 void std_holdKey(int code) {
-    if (data) {
-        *(int*)(data->args) = code;
-        call(holdKey);
+    if (local->data) {
+        *(int*)(local->data->args) = code;
+        callClient(local,holdKey);
     }
 }
 
 void std_releaseKey(int code) {
-    if (data) {
-        *(int*)(data->args) = code;
-        call(releaseKey);
+    if (local->data) {
+        *(int*)(local->data->args) = code;
+        callClient(local,releaseKey);
     }
 }
 
 bool std_isKeyDown(int code) {
-    if (data) {
-        *(int*)(data->args) = code;
-        call(isKeyDown);
-        return *(bool*)(data->args);
+    if (local->data) {
+        *(int*)(local->data->args) = code;
+        callClient(local,isKeyDown);
+        return *(bool*)(local->data->args);
     } else return false;
 }
 
 int std_getColor(int x, int y) {
-    if (data) {
-        ((int*)(data->args))[0] = x;
-        ((int*)(data->args))[1] = y;
-        call(getColor);
-        return *(int*)(data->args);
+    if (local->data) {
+        ((int*)(local->data->args))[0] = x;
+        ((int*)(local->data->args))[1] = y;
+        callClient(local,getColor);
+        return *(int*)(local->data->args);
     } else return -1;
 }
 
 bool std_findColor(int &x, int& y, int color, int sx, int sy, int ex, int ey) {
-    if (data) {
-        ((int*)(data->args))[0] = x;
-        ((int*)(data->args))[1] = y;
-        ((int*)(data->args))[2] = color;
-        ((int*)(data->args))[3] = sx;
-        ((int*)(data->args))[4] = sy;
-        ((int*)(data->args))[5] = ex;
-        ((int*)(data->args))[6] = ey;
-        call(findColor);
-        x = ((int*)(data->args))[0];
-        y = ((int*)(data->args))[1];
-        return (bool)(((int*)(data->args))[2]);
+    if (local->data) {
+        ((int*)(local->data->args))[0] = x;
+        ((int*)(local->data->args))[1] = y;
+        ((int*)(local->data->args))[2] = color;
+        ((int*)(local->data->args))[3] = sx;
+        ((int*)(local->data->args))[4] = sy;
+        ((int*)(local->data->args))[5] = ex;
+        ((int*)(local->data->args))[6] = ey;
+        callClient(local,findColor);
+        x = ((int*)(local->data->args))[0];
+        y = ((int*)(local->data->args))[1];
+        return (bool)(((int*)(local->data->args))[2]);
     } else return false;
 }
 
 bool std_findColorTol(int &x, int& y, int color, int sx, int sy, int ex, int ey, int tol) {
-    if (data) {
-        ((int*)(data->args))[0] = x;
-        ((int*)(data->args))[1] = y;
-        ((int*)(data->args))[2] = color;
-        ((int*)(data->args))[3] = sx;
-        ((int*)(data->args))[4] = sy;
-        ((int*)(data->args))[5] = ex;
-        ((int*)(data->args))[6] = ey;
-        ((int*)(data->args))[7] = tol;
-        call(findColorTol);
-        x = ((int*)(data->args))[0];
-        y = ((int*)(data->args))[1];
-        return (bool)(((int*)(data->args))[2]);
+    if (local->data) {
+        ((int*)(local->data->args))[0] = x;
+        ((int*)(local->data->args))[1] = y;
+        ((int*)(local->data->args))[2] = color;
+        ((int*)(local->data->args))[3] = sx;
+        ((int*)(local->data->args))[4] = sy;
+        ((int*)(local->data->args))[5] = ex;
+        ((int*)(local->data->args))[6] = ey;
+        ((int*)(local->data->args))[7] = tol;
+        callClient(local,findColorTol);
+        x = ((int*)(local->data->args))[0];
+        y = ((int*)(local->data->args))[1];
+        return (bool)(((int*)(local->data->args))[2]);
     } else return false;
 }
 
 bool std_findColorSpiral(int &x, int& y, int color, int sx, int sy, int ex, int ey) {
-    if (data) {
-        ((int*)(data->args))[0] = x;
-        ((int*)(data->args))[1] = y;
-        ((int*)(data->args))[2] = color;
-        ((int*)(data->args))[3] = sx;
-        ((int*)(data->args))[4] = sy;
-        ((int*)(data->args))[5] = ex;
-        ((int*)(data->args))[6] = ey;
-        call(findColorSpiral);
-        x = ((int*)(data->args))[0];
-        y = ((int*)(data->args))[1];
-        return (bool)(((int*)(data->args))[2]);
+    if (local->data) {
+        ((int*)(local->data->args))[0] = x;
+        ((int*)(local->data->args))[1] = y;
+        ((int*)(local->data->args))[2] = color;
+        ((int*)(local->data->args))[3] = sx;
+        ((int*)(local->data->args))[4] = sy;
+        ((int*)(local->data->args))[5] = ex;
+        ((int*)(local->data->args))[6] = ey;
+        callClient(local,findColorSpiral);
+        x = ((int*)(local->data->args))[0];
+        y = ((int*)(local->data->args))[1];
+        return (bool)(((int*)(local->data->args))[2]);
     } else return false;
 }
 
 bool std_findColorSpiralTol(int &x, int& y, int color, int sx, int sy, int ex, int ey, int tol) {
-    if (data){
-        ((int*)(data->args))[0] = x;
-        ((int*)(data->args))[1] = y;
-        ((int*)(data->args))[2] = color;
-        ((int*)(data->args))[3] = sx;
-        ((int*)(data->args))[4] = sy;
-        ((int*)(data->args))[5] = ex;
-        ((int*)(data->args))[6] = ey;
-        ((int*)(data->args))[7] = tol;
-        call(findColorSpiralTol);
-        x = ((int*)(data->args))[0];
-        y = ((int*)(data->args))[1];
-        return (bool)(((int*)(data->args))[2]);
+    if (local->data){
+        ((int*)(local->data->args))[0] = x;
+        ((int*)(local->data->args))[1] = y;
+        ((int*)(local->data->args))[2] = color;
+        ((int*)(local->data->args))[3] = sx;
+        ((int*)(local->data->args))[4] = sy;
+        ((int*)(local->data->args))[5] = ex;
+        ((int*)(local->data->args))[6] = ey;
+        ((int*)(local->data->args))[7] = tol;
+        callClient(local,findColorSpiralTol);
+        x = ((int*)(local->data->args))[0];
+        y = ((int*)(local->data->args))[1];
+        return (bool)(((int*)(local->data->args))[2]);
     } else return false;
 }
+
+
+Target EIOS_RequestTarget(char *initargs) {
+} 
+
+void EIOS_ReleaseTarget(Target t) {
+} 
+
+void EIOS_GetTargetDimensions(Target t, int* width, int* height) {
+} 
+
+rgb* EIOS_GetImageBuffer(Target t) {
+} 
+
+void EIOS_UpdateImageBuffer(Target t) {
+} 
+
+void EIOS_GetMousePosition(Target t, int* x, int* y) {
+} 
+
+void EIOS_MoveMouse(Target t, int x, int y) {
+} 
+
+void EIOS_HoldMouse(Target t, int x, int y, int button) {
+} 
+
+void EIOS_ReleaseMouse(Target t, int x, int y, int button) {
+} 
+
+bool EIOS_IsMouseHeld(Target t, int button) {
+} 
+
+void EIOS_SendString(Target t, char* str) {
+} 
+
+void EIOS_HoldKey(Target t, int key) {
+} 
+
+void EIOS_ReleaseKey(Target t, int key) {
+} 
+
+bool EIOS_IsKeyHeld(Target t, int key) {
+} 
 
 void internalConstructor() {
     clients.ids = 0;
     clients.count = std_getClients(true);
-    memmap = 0;
-    data = 0;
+    local = NULL;
 }
 
 void internalDestructor() {
-    cleanup();
+    freeClient(local);
     if (clients.ids) delete clients.ids;
 }
-
 
 #ifndef _WIN32
 
