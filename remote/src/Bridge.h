@@ -23,6 +23,7 @@
 typedef struct {
     int id;             //PID of the client
     int paired;         //TID of the controller or ZERO if none
+    int refcount;       //Number of times the parent has paired
     int width,height;   //Size of the images that follow this structure in the SHM
     int time;           //Last time client active (zero if SMART hasn't initilized yet)
     int die;            //Set nonzero to have the client terminate

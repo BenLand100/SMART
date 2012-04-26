@@ -300,7 +300,13 @@ int main(int argc, char** argv) {
             if (!paired) {
                 cout << "Paired thread no longer exists: reset\n";
                 data->paired = 0;
+                data->refcount = 0; 
             }
+        }
+        if (paired && !data->paired) {
+            cout << "Controller unpaired cleanly\n";
+            CloseHandle(paired);
+            paired = NULL;
         }
         if (paired && (WaitForSingleObject(paired, 0)!= WAIT_TIMEOUT)) {
             CloseHandle(paired);
@@ -308,6 +314,7 @@ int main(int argc, char** argv) {
         #endif
             cout << "Paired thread terminated: reset\n";
             data->paired = 0;
+            data->refcount = 0;
             #ifndef _WIN32
             fsync(fd);
             #else

@@ -40,6 +40,9 @@ static clients_dat clients;
 void freeClient(SMARTClient *client) {
     if (!client) return;
     if (client->memmap) {
+        if (--client->data->refcount == 0) {
+            client->data->paired = 0;
+        }
         #ifndef _WIN32
         munmap(client->memmap,client->width*client->height*2+sizeof(shm_data));
         close(client->fd);
@@ -138,7 +141,12 @@ SMARTClient* pairClient(int id) {
             delete client;
             return NULL;
         }
-        if (client_paired) { 
+        #ifndef _WIN32
+        int tid = syscall(SYS_gettid);
+        #else
+        int tid = GetCurrentThreadId();
+        #endif
+        if (client_paired && client_paired != tid) { 
             cout << "Failed to pair - Client appears to be paired\n";
             #ifndef _WIN32
             close(client->fd);
@@ -151,12 +159,16 @@ SMARTClient* pairClient(int id) {
         #ifndef _WIN32
         client->memmap = mmap(NULL,2*client_width*client_height+sizeof(shm_data),PROT_READ|PROT_WRITE, MAP_SHARED, client->fd, 0);
         client->data = (shm_data*)client->memmap;
-        client->data->paired = syscall(SYS_gettid);
         #else
         client->memmap = CreateFileMapping(client->file,NULL,PAGE_EXECUTE_READWRITE,0,sizeof(shm_data)+2*client_width*client_height,shmfile);
         client->data = (shm_data*)MapViewOfFile(client->memmap,FILE_MAP_ALL_ACCESS,0,0,sizeof(shm_data)+2*client_width*client_height);
-        client->data->paired = GetCurrentThreadId();
         #endif
+        if (client->data->paired == tid) {
+            client->data->refcount++;
+        } else { 
+            client->data->paired = tid;
+            client->data->refcount = 0;
+        }
         return client;
     } else {
         cout << "Failed to pair - No client by that ID\n";
@@ -688,7 +700,7 @@ SMARTClient* spawnFromString(char* initarg) {
 
 Target EIOS_RequestTarget(char *initargs) {
     if (initargs != 0 && strlen(initargs) > 0) {
-        SMARTClient *client = spawnFromString(initargs);
+        SMARTClient *client = spawnFromString(initargs); //This seems silly, could use std_SpawnClient instead
         if (!client) client = pairClient(atoi(initargs));
         return client;
     }
