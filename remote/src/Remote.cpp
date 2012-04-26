@@ -67,11 +67,13 @@ void initSMART() {
         #endif
     #endif
     cout << "Library: " << libsmart << '\n';
-    functions = (void**)malloc(sizeof(void*)*NumExports);
+    if (!libsmart) exit(1); //ABORT EVERYTHING THE LIBRARY WASN'T FOUND
+    functions = (void**)malloc(sizeof(void*)*NumImports);
     SetupRemote setup;
     SetUserAgent setAgent;
     SetJVMPath setPath;
     SetMaxJVMMem setMem;
+    bool failed = false;
     #ifndef _WIN32
         setup = (SetupRemote)dlsym(libsmart, "setupRemote");
         setAgent = (SetUserAgent)dlsym(libsmart, "setUserAgent");
@@ -79,6 +81,10 @@ void initSMART() {
         setMem = (SetMaxJVMMem)dlsym(libsmart, "setMaxJVMMem");
         for (int i = 0; i < NumImports; i++) {
             functions[i] = (void*)dlsym(libsmart, imports[i]);
+            if (!functions[i]) {
+                cout << "Failed to import " << imports[i] << '\n';
+                failed = true;
+            }
         }
     #else
         setup = (SetupRemote)GetProcAddress(libsmart, "setupRemote");
@@ -87,8 +93,16 @@ void initSMART() {
         setMem = (SetMaxJVMMem)GetProcAddress(libsmart, "setMaxJVMMem");
         for (int i = 0; i < NumImports; i++) {
             functions[i] = (void*)GetProcAddress(libsmart, imports[i]);
+            if (!functions[i]) {
+                cout << "Failed to import " << imports[i] << '\n';
+                failed = true;
+            }
         }
     #endif
+    if (failed || !setup || !setAgent || !setPath || !setMem) {
+        cout << "SMART methods failed to import, aborting.\n";
+        exit(1);
+    }
     if (useragent) setAgent(useragent);
     if (jvmpath) setPath(jvmpath);
     if (maxmem) setMem(atoi(maxmem));
@@ -199,7 +213,7 @@ int main(int argc, char** argv) {
     if (argc != 10) exit(0);
     
     path = argv[1];
-    if (strlen(path)==0) path = ".";    
+    if (strlen(path)==0) path = (char*)".";    
     root = argv[2];
     params = argv[3];
     width = atoi(argv[4]);
@@ -260,8 +274,8 @@ int main(int argc, char** argv) {
     #endif
 
     //Let SMART use the shared memory for the images
-    img = memmap + data->imgstart;
-    dbg = memmap + data->dbgstart;
+    img = (data + data->imgstart);
+    dbg = (data + data->dbgstart);
     
     //Load the smart plugin and link functions
     initSMART();

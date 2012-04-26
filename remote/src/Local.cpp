@@ -357,12 +357,12 @@ bool std_pairClient(int id) {
  
 //Returns a pointer into shared memory where the image resides
 void* std_getImageArray() {
-    return data ? memmap + data->imgstart : 0;
+    return data ? data + data->imgstart : 0;
 }
 
 //Returns a pointer into shared memory where the debug image resides
 void* std_getDebugArray() {
-    return data ? memmap + data->dbgstart : 0;
+    return data ? data + data->dbgstart : 0;
 }
 
 //Invokes a remote method
