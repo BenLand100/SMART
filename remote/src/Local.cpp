@@ -574,10 +574,12 @@ bool std_isKeyDown(int code) {
 }
 
 int std_getColor(int x, int y) {
-    ((int*)(local->data->args))[0] = x;
-    ((int*)(local->data->args))[1] = y;
-    callClient(local,getColor);
-    return *(int*)(local->data->args);
+    if (local) {
+        ((int*)(local->data->args))[0] = x;
+        ((int*)(local->data->args))[1] = y;
+        callClient(local,getColor);
+        return *(int*)(local->data->args);
+    } else return false;
 }
 
 bool std_findColor(int &x, int& y, int color, int sx, int sy, int ex, int ey) {
