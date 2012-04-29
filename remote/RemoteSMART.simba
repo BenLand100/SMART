@@ -1,5 +1,5 @@
 program RemoteSmartTest;
-{.loadlib libsmartremote}
+{$loadlib libsmartremote}
 
 {**
  * Pairs with some client. If force_new is false, it checks

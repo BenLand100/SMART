@@ -145,22 +145,26 @@ SMARTCLASSES= \
 all:
 	@echo "Syntax for SMART makefile:\n    For Windows distributions: make windows windows64\n    For Linux distributions: make linux linux64\n    For SCAR distributions: make scar\n    For All distributions: make everything\n    For test apps: make test\n    To clean build files: make clean"
 	
-everything: linux linux64 windows windows64 scar
+everything: linux linux64 windows windows64
 
 linux: $(DIST)/$(LIN_NAME)
 	@echo "Finished Building the Linux 32bit SMART distribution"
+	@make -C remote DIST=../dist BUILD=../build linux
 	
 linux64: $(DIST)/$(LIN64_NAME)
 	@echo "Finished Building the Linux 64bit SMART distribution"
+	@make -C remote DIST=../dist BUILD=../build linux64
 	
 scar: $(DIST)/$(SCAR_NAME)
 	@echo "Finished Building the SCAR SMART distribution"
 
 windows: $(DIST)/$(WIN_NAME)
 	@echo "Finished Building the Windows 32bit SMART distribution"
+	@make -C remote DIST=../dist BUILD=../build windows
 
 windows64: $(DIST)/$(WIN64_NAME)
 	@echo "Finished Building the Windows 64bit SMART distribution"
+	@make -C remote DIST=../dist BUILD=../build windows64
 	
 test: test-apps/test-windows.cpp test-apps/test-linux.cpp test-apps/test-scar.cpp
 	@mkdir -p $(DIST)
