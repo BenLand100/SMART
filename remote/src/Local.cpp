@@ -367,10 +367,12 @@ int std_getCurrent() {
  * Kills the client with the given ID
  * !!!Fails if the client is paired with ANOTHER controller!!!
  */
-void std_killClient(int id) {
+bool std_killClient(int id) {
     SMARTClient *client = pairClient(id);
+    if (!client) return false;
     killClient(client);
     freeClient(client);
+    return true;
 }
 
 /**

@@ -122,7 +122,7 @@ static char* exports[] = {
     (char*)"std_getClients", (char*)"function SmartGetClients(only_unpaired: boolean): integer;",
     (char*)"std_spawnClient",(char*)"function SmartSpawnClient(remote_path, root, params: string; width, height: integer; initseq, useragent, jvmpath: string; maxmem: integer): integer;",
     (char*)"std_pairClient", (char*)"function SmartPairClient(pid: integer): boolean;",
-    (char*)"std_killClient", (char*)"procedure SmartKillClient(pid: integer);",
+    (char*)"std_killClient", (char*)"function SmartKillClient(pid: integer): boolean;",
     (char*)"std_getCurrent", (char*)"function SmartCurrentClient(): integer;",
     (char*)"std_getImageArray", (char*)"function SmartImageArray(): integer;",
     (char*)"std_getDebugArray", (char*)"function SmartDebugArray(): integer;",
