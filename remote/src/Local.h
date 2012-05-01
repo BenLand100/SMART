@@ -84,7 +84,7 @@ extern "C" int std_getClients(bool only_unpaired) __attribute__((stdcall));
 extern "C" int std_spawnClient(char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char *jvmpath, int maxmem) __attribute__((stdcall));
 extern "C" bool std_pairClient(int pid) __attribute__((stdcall));
 extern "C" int std_getCurrent() __attribute__((stdcall));
-extern "C" void std_killClient(int id) __attribute__((stdcall));
+extern "C" bool std_killClient(int id) __attribute__((stdcall));
 extern "C" void* std_getImageArray() __attribute__((stdcall));
 extern "C" void* std_getDebugArray() __attribute__((stdcall));
 extern "C" int std_getRefresh() __attribute__((stdcall));

@@ -30,6 +30,7 @@
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <unistd.h>
 #endif
 
 using namespace std;
