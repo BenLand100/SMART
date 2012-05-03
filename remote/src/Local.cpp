@@ -116,7 +116,7 @@ SMARTClient* pairClient(int id) {
         client->memmap = mmap(NULL,sizeof(shm_data),PROT_READ|PROT_WRITE, MAP_SHARED, client->fd, 0);
         client->data = (shm_data*)client->memmap;
         #else
-        client->memmap = CreateFileMapping(client->file,NULL,PAGE_EXECUTE_READWRITE,0,sizeof(shm_data),shmfile);
+        client->memmap = CreateFileMapping(client->file,NULL,PAGE_READWRITE,0,sizeof(shm_data),shmfile);
         client->data = (shm_data*)MapViewOfFile(client->memmap,FILE_MAP_ALL_ACCESS,0,0,sizeof(shm_data));
         #endif
         int client_time = client->data->time;
@@ -160,7 +160,7 @@ SMARTClient* pairClient(int id) {
         client->memmap = mmap(NULL,2*client_width*client_height*4+sizeof(shm_data),PROT_READ|PROT_WRITE, MAP_SHARED, client->fd, 0);
         client->data = (shm_data*)client->memmap;
         #else
-        client->memmap = CreateFileMapping(client->file,NULL,PAGE_EXECUTE_READWRITE,0,sizeof(shm_data)+2*client_width*client_height*4,shmfile);
+        client->memmap = CreateFileMapping(client->file,NULL,PAGE_READWRITE,0,sizeof(shm_data)+2*client_width*client_height*4,shmfile);
         client->data = (shm_data*)MapViewOfFile(client->memmap,FILE_MAP_ALL_ACCESS,0,0,sizeof(shm_data)+2*client_width*client_height*4);
         #endif
         if (client->data->paired == tid) {
