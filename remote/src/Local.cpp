@@ -115,9 +115,21 @@ SMARTClient* pairClient(int id) {
         #ifndef _WIN32
         client->memmap = mmap(NULL,sizeof(shm_data),PROT_READ|PROT_WRITE, MAP_SHARED, client->fd, 0);
         client->data = (shm_data*)client->memmap;
+        if (!client->data) {
+            cout << "Could not map shared memory (pre)\n";
+            return NULL;   
+        }
         #else
         client->memmap = CreateFileMapping(client->file,NULL,PAGE_READWRITE,0,sizeof(shm_data),shmfile);
+        if (client->memmap == INVALID_HANDLE_VALUE) {
+            cout << "Could not map shared file (pre)\n";
+            return NULL;   
+        }
         client->data = (shm_data*)MapViewOfFile(client->memmap,FILE_MAP_ALL_ACCESS,0,0,sizeof(shm_data));
+        if (!client->data) {
+            cout << "Could not map shared memory (pre)\n";
+            return NULL;   
+        }
         #endif
         int client_time = client->data->time;
         int client_paired = client->data->paired;
@@ -159,9 +171,21 @@ SMARTClient* pairClient(int id) {
         #ifndef _WIN32
         client->memmap = mmap(NULL,2*client_width*client_height*4+sizeof(shm_data),PROT_READ|PROT_WRITE, MAP_SHARED, client->fd, 0);
         client->data = (shm_data*)client->memmap;
+        if (!client->data) {
+            cout << "Could not map shared memory (post)\n";
+            return NULL;   
+        }
         #else
         client->memmap = CreateFileMapping(client->file,NULL,PAGE_READWRITE,0,sizeof(shm_data)+2*client_width*client_height*4,shmfile);
+        if (client->memmap == INVALID_HANDLE_VALUE) {
+            cout << "Could not map shared file (post)\n";
+            return NULL;   
+        }
         client->data = (shm_data*)MapViewOfFile(client->memmap,FILE_MAP_ALL_ACCESS,0,0,sizeof(shm_data)+2*client_width*client_height*4);
+        if (!client->data) {
+            cout << "Could not map shared memory (post)\n";
+            return NULL;   
+        }
         #endif
         if (client->data->paired == tid) {
             client->data->refcount++;
