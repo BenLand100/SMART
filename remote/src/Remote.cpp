@@ -249,7 +249,7 @@ int main(int argc, char** argv) {
         NULL);
     SetFilePointer(file,sizeof(shm_data)+2*width*height*4,0,FILE_BEGIN);
     SetEndOfFile(file);
-    memmap = CreateFileMapping(file,NULL,PAGE_EXECUTE_READWRITE,0,sizeof(shm_data)+4*2*width*height,shmfile);
+    memmap = CreateFileMapping(file,NULL,PAGE_READWRITE,0,sizeof(shm_data)+4*2*width*height,shmfile);
     data = (shm_data*) MapViewOfFile(memmap,FILE_MAP_ALL_ACCESS,0,0,sizeof(shm_data)+4*2*width*height);
     #endif
     cout << "Shared Memory mapped to " << memmap << "\n";
