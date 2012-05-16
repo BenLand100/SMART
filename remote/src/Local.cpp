@@ -320,7 +320,7 @@ int getClients(bool only_unpaired, int **_clients) {
             NULL,
             OPEN_EXISTING,FILE_ATTRIBUTE_TEMPORARY|FILE_FLAG_RANDOM_ACCESS|FILE_FLAG_OVERLAPPED,
             NULL);
-        HANDLE memmap = CreateFileMapping(file,NULL,PAGE_EXECUTE_READWRITE,0,sizeof(shm_data),name);
+        HANDLE memmap = CreateFileMapping(file,NULL,PAGE_READWRITE,0,sizeof(shm_data),name);
         shm_data *temp = (shm_data*)MapViewOfFile(memmap,FILE_MAP_ALL_ACCESS,0,0,sizeof(shm_data));
         if (temp->time && time(0) - temp->time > TIMEOUT) {
             UnmapViewOfFile(temp);
