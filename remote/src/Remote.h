@@ -21,41 +21,41 @@
 #define	_REMOTE _H
 
 //SMART exports used to setup the client
-typedef void (*SetupRemote)(char*,char*,long,long,void*,void*,char*,int) __attribute__((cdecl));
-typedef void (*SetUserAgent)(char*) __attribute__((cdecl));
-typedef void (*SetJVMPath)(char*) __attribute__((cdecl));
-typedef void (*SetMaxJVMMem)(int) __attribute__((cdecl));
+typedef void (*SetupRemote)(char*,char*,long,long,void*,void*,char*,int);
+typedef void (*SetUserAgent)(char*);
+typedef void (*SetJVMPath)(char*);
+typedef void (*SetMaxJVMMem)(int);
 
 //Remote uses these typedefs to invoke SMART exports
-typedef void* (*type_getImageArray)() __attribute__((cdecl));
-typedef void* (*type_getDebugArray)() __attribute__((cdecl));
-typedef int (*type_getRefresh)() __attribute__((cdecl));
-typedef void (*type_setRefresh)(int x) __attribute__((cdecl));
-typedef void (*type_setTransparentColor)(int color) __attribute__((cdecl));
-typedef void (*type_setDebug)(bool enabled) __attribute__((cdecl));
-typedef void (*type_setGraphics)(bool enabled) __attribute__((cdecl));
-typedef void (*type_setEnabled)(bool enabled) __attribute__((cdecl));
-typedef bool (*type_isActive)() __attribute__((cdecl));
-typedef bool (*type_isBlocking)() __attribute__((cdecl));
-typedef void (*type_getMousePos)(int &x, int &y) __attribute__((cdecl));
-typedef void (*type_holdMouse)(int x, int y, bool left) __attribute__((cdecl));
-typedef void (*type_releaseMouse)(int x, int y, bool left) __attribute__((cdecl));
-typedef void (*type_holdMousePlus)(int x, int y, int button) __attribute__((cdecl));
-typedef void (*type_releaseMousePlus)(int x, int y, int button) __attribute__((cdecl));
-typedef void (*type_moveMouse)(int x, int y) __attribute__((cdecl));
-typedef void (*type_windMouse)(int x, int y) __attribute__((cdecl));
-typedef void (*type_clickMouse)(int x, int y, bool left) __attribute__((cdecl));
-typedef void (*type_clickMousePlus)(int x, int y, int button) __attribute__((cdecl));
-typedef bool (*type_isMouseButtonHeld)(int button) __attribute__((cdecl));
-typedef void (*type_sendKeys)(char *text) __attribute__((cdecl));
-typedef void (*type_holdKey)(int code) __attribute__((cdecl));
-typedef void (*type_releaseKey)(int code) __attribute__((cdecl));
-typedef bool (*type_isKeyDown)(int code) __attribute__((cdecl));
-typedef int (*type_getColor)(int x, int y) __attribute__((cdecl));
-typedef bool (*type_findColor)(int &x, int& y, int color, int sx, int sy, int ex, int ey) __attribute__((cdecl));
-typedef bool (*type_findColorTol)(int &x, int& y, int color, int sx, int sy, int ex, int ey, int tol) __attribute__((cdecl));
-typedef bool (*type_findColorSpiral)(int &x, int& y, int color, int sx, int sy, int ex, int ey) __attribute__((cdecl));
-typedef bool (*type_findColorSpiralTol)(int &x, int& y, int color, int sx, int sy, int ex, int ey, int tol) __attribute__((cdecl));
+typedef void* (*type_getImageArray)();
+typedef void* (*type_getDebugArray)();
+typedef int (*type_getRefresh)();
+typedef void (*type_setRefresh)(int x);
+typedef void (*type_setTransparentColor)(int color);
+typedef void (*type_setDebug)(bool enabled);
+typedef void (*type_setGraphics)(bool enabled);
+typedef void (*type_setEnabled)(bool enabled);
+typedef bool (*type_isActive)();
+typedef bool (*type_isBlocking)();
+typedef void (*type_getMousePos)(int &x, int &y);
+typedef void (*type_holdMouse)(int x, int y, bool left);
+typedef void (*type_releaseMouse)(int x, int y, bool left);
+typedef void (*type_holdMousePlus)(int x, int y, int button);
+typedef void (*type_releaseMousePlus)(int x, int y, int button);
+typedef void (*type_moveMouse)(int x, int y);
+typedef void (*type_windMouse)(int x, int y);
+typedef void (*type_clickMouse)(int x, int y, bool left);
+typedef void (*type_clickMousePlus)(int x, int y, int button);
+typedef bool (*type_isMouseButtonHeld)(int button);
+typedef void (*type_sendKeys)(char *text);
+typedef void (*type_holdKey)(int code);
+typedef void (*type_releaseKey)(int code);
+typedef bool (*type_isKeyDown)(int code);
+typedef int (*type_getColor)(int x, int y);
+typedef bool (*type_findColor)(int &x, int& y, int color, int sx, int sy, int ex, int ey);
+typedef bool (*type_findColorTol)(int &x, int& y, int color, int sx, int sy, int ex, int ey, int tol);
+typedef bool (*type_findColorSpiral)(int &x, int& y, int color, int sx, int sy, int ex, int ey);
+typedef bool (*type_findColorSpiralTol)(int &x, int& y, int color, int sx, int sy, int ex, int ey, int tol);
 
 //Imports for Remote
 #define NumImports 27

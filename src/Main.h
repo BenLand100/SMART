@@ -37,9 +37,11 @@ extern "C" bool DllMain(HINSTANCE, int, void*) __attribute__((stdcall));
 
 #endif
 
-//These are intended for use with the SCAR/Simba plugin loaders, and nothing else.
-extern "C" int GetFunctionCount() __attribute__((stdcall));
-extern "C" int GetFunctionInfo(int, void*&, char*&) __attribute__((stdcall));
+//These are intended for use with the Simba plugin loader >= 0.99, and nothing else.
+
+extern "C" int GetPluginABIVersion();
+extern "C" int GetFunctionCount();
+extern "C" int GetFunctionInfo(int, void*&, char*&);
 
 #endif	/* _MAIN_H */
 

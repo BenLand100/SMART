@@ -37,16 +37,16 @@ inline HSL toHSL(RGB&);
 inline bool cmpColors(RGB&, RGB&, int);
 PRGB setTarget(PRGB newTarget, int w, int h);
 
-extern "C" int  getColor(int, int) __attribute__((cdecl));
-extern "C" bool findColor(int&, int&, int, int, int, int, int) __attribute__((cdecl));
-extern "C" bool findColorTol(int&, int&, int, int, int, int, int, int) __attribute__((cdecl));
-extern "C" bool findColorSpiral(int&, int&, int, int, int, int, int) __attribute__((cdecl));
-extern "C" bool findColorSpiralTol(int&, int&, int, int, int, int, int, int) __attribute__((cdecl));
+extern "C" int  getColor(int, int);
+extern "C" bool findColor(int&, int&, int, int, int, int, int);
+extern "C" bool findColorTol(int&, int&, int, int, int, int, int, int);
+extern "C" bool findColorSpiral(int&, int&, int, int, int, int, int);
+extern "C" bool findColorSpiralTol(int&, int&, int, int, int, int, int, int);
 /*
 Unused and thus no reason to make cross compatible --- but still faster than anything else so leave in
-extern "C" bool findBitmapTolIn(int, int&, int&, int, int, int, int, int) __attribute__((cdecl));
-extern "C" bool findBitmapTol(int, int&, int&, int, int, int, int) __attribute__((cdecl));
-extern "C" bool findBitmap(int, int&, int&) __attribute__((cdecl));
+extern "C" bool findBitmapTolIn(int, int&, int&, int, int, int, int, int);
+extern "C" bool findBitmapTol(int, int&, int&, int, int, int, int);
+extern "C" bool findBitmap(int, int&, int&);
 */
 #endif	/* _COLOR_H */
 

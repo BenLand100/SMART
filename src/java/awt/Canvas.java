@@ -115,7 +115,7 @@ public class Canvas extends Component implements Accessible {
     }
     
     public Graphics getGraphics() {
-        try { Thread.sleep(refresh); } catch (Exception e) { }
+        if (buffer != null) try { Thread.sleep(refresh); } catch (Exception e) { }
         return buffer == null ?  super.getGraphics() : buffer.getGraphics();
     }
     

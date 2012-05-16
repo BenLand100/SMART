@@ -25,7 +25,6 @@ JAVA=java
 
 DIST=dist
 BUILD=build
-SCAR_NAME=Embedded_SMART.dll
 WIN_NAME=libsmart32.dll
 WIN64_NAME=libsmart64.dll
 LIN_NAME=libsmart32.so
@@ -35,14 +34,12 @@ WIN_COMPILE_ARGS=-DWINDOWS -Wall -O0 -s -c
 WIN64_COMPILE_ARGS=-DWINDOWS -Wall -O0 -s -c
 LIN_COMPILE_ARGS=-fPIC -DLINUX -Wall -O3 -s -c
 LIN64_COMPILE_ARGS=-fPIC -DLINUX -Wall -O3 -s -c
-SCAR_COMPILE_ARGS=-DWINDOWS -DNEWSCAR -Wall -O0 -s -c
 
 SRC_DIR=src
 LIN_BUILD_DIR=$(BUILD)/linux32
 LIN64_BUILD_DIR=$(BUILD)/linux64
 WIN_BUILD_DIR=$(BUILD)/windows32
 WIN64_BUILD_DIR=$(BUILD)/windows64
-SCAR_BUILD_DIR=$(BUILD)/scar
 JAVA_BUILD_DIR=$(BUILD)/java
 
 CPPSOURCEFILES= \
@@ -53,7 +50,6 @@ CPPSOURCEFILES= \
 	$(SRC_DIR)/Reflection.cpp \
 	$(SRC_DIR)/JVM.cpp \
 	$(SRC_DIR)/Smart.cpp \
-	$(SRC_DIR)/STD_Wrapper.cpp \
 	$(SRC_DIR)/EIOS.cpp
 	
 CPPHEADERFILES= \
@@ -66,7 +62,6 @@ CPPHEADERFILES= \
 	$(SRC_DIR)/Reflection.h \
 	$(SRC_DIR)/JVM.h \
 	$(SRC_DIR)/Smart.h \
-	$(SRC_DIR)/STD_Wrapper.h \
 	$(SRC_DIR)/EIOS.h
 	
 WINOBJFILES= \
@@ -77,7 +72,6 @@ WINOBJFILES= \
 	$(WIN_BUILD_DIR)/Reflection.o \
 	$(WIN_BUILD_DIR)/JVM.o \
 	$(WIN_BUILD_DIR)/Smart.o \
-	$(WIN_BUILD_DIR)/STD_Wrapper.o \
 	$(WIN_BUILD_DIR)/EIOS.o
 	
 WIN64OBJFILES= \
@@ -88,19 +82,7 @@ WIN64OBJFILES= \
 	$(WIN64_BUILD_DIR)/Reflection.o \
 	$(WIN64_BUILD_DIR)/JVM.o \
 	$(WIN64_BUILD_DIR)/Smart.o \
-	$(WIN64_BUILD_DIR)/STD_Wrapper.o \
 	$(WIN64_BUILD_DIR)/EIOS.o
-
-SCAROBJFILES= \
-	$(SCAR_BUILD_DIR)/Main.o \
-	$(SCAR_BUILD_DIR)/Color.o \
-	$(SCAR_BUILD_DIR)/ClassLoader.o \
-	$(SCAR_BUILD_DIR)/Input.o \
-	$(SCAR_BUILD_DIR)/Reflection.o \
-	$(SCAR_BUILD_DIR)/JVM.o \
-	$(SCAR_BUILD_DIR)/Smart.o \
-	$(SCAR_BUILD_DIR)/STD_Wrapper.o \
-	$(SCAR_BUILD_DIR)/EIOS.o
 	
 LINOBJFILES= \
 	$(LIN_BUILD_DIR)/Main.o \
@@ -110,7 +92,6 @@ LINOBJFILES= \
 	$(LIN_BUILD_DIR)/Reflection.o \
 	$(LIN_BUILD_DIR)/JVM.o \
 	$(LIN_BUILD_DIR)/Smart.o \
-	$(LIN_BUILD_DIR)/STD_Wrapper.o \
 	$(LIN_BUILD_DIR)/EIOS.o
 	
 LIN64OBJFILES= \
@@ -121,7 +102,6 @@ LIN64OBJFILES= \
 	$(LIN64_BUILD_DIR)/Reflection.o \
 	$(LIN64_BUILD_DIR)/JVM.o \
 	$(LIN64_BUILD_DIR)/Smart.o \
-	$(LIN64_BUILD_DIR)/STD_Wrapper.o \
 	$(LIN64_BUILD_DIR)/EIOS.o
 	
 SMARTSOURCES= \
@@ -154,9 +134,6 @@ linux: $(DIST)/$(LIN_NAME)
 linux64: $(DIST)/$(LIN64_NAME)
 	@echo "Finished Building the Linux 64bit SMART distribution"
 	@make -C remote DIST=../dist BUILD=../build linux64
-	
-scar: $(DIST)/$(SCAR_NAME)
-	@echo "Finished Building the SCAR SMART distribution"
 
 windows: $(DIST)/$(WIN_NAME)
 	@echo "Finished Building the Windows 32bit SMART distribution"
@@ -227,13 +204,8 @@ ${LIN_BUILD_DIR}/Smart.o: $(SRC_DIR)/Smart.cpp $(CPPHEADERFILES)
 	@mkdir -p $(LIN_BUILD_DIR)
 	@$(LIN_GPP) $(LIN_COMPILE_ARGS) -o $(LIN_BUILD_DIR)/Smart.o $(SRC_DIR)/Smart.cpp
 
-${LIN_BUILD_DIR}/STD_Wrapper.o: $(SRC_DIR)/STD_Wrapper.cpp $(CPPHEADERFILES)
-	@echo "Compiling STD_Wrapper.cpp"
-	@mkdir -p $(LIN_BUILD_DIR)
-	@$(LIN_GPP) $(LIN_COMPILE_ARGS) -o $(LIN_BUILD_DIR)/STD_Wrapper.o $(SRC_DIR)/STD_Wrapper.cpp
-
 ${LIN_BUILD_DIR}/EIOS.o: $(SRC_DIR)/EIOS.cpp $(CPPHEADERFILES)
-	@echo "Compiling STD_Wrapper.cpp"
+	@echo "Compiling EIOS.cpp"
 	@mkdir -p $(LIN_BUILD_DIR)
 	@$(LIN_GPP) $(LIN_COMPILE_ARGS) -o $(LIN_BUILD_DIR)/EIOS.o $(SRC_DIR)/EIOS.cpp
 	
@@ -279,13 +251,8 @@ ${LIN64_BUILD_DIR}/Smart.o: $(SRC_DIR)/Smart.cpp $(CPPHEADERFILES)
 	@mkdir -p $(LIN64_BUILD_DIR)
 	@$(LIN64_GPP) $(LIN64_COMPILE_ARGS) -o $(LIN64_BUILD_DIR)/Smart.o $(SRC_DIR)/Smart.cpp
 
-${LIN64_BUILD_DIR}/STD_Wrapper.o: $(SRC_DIR)/STD_Wrapper.cpp $(CPPHEADERFILES)
-	@echo "Compiling STD_Wrapper.cpp"
-	@mkdir -p $(LIN64_BUILD_DIR)
-	@$(LIN64_GPP) $(LIN64_COMPILE_ARGS) -o $(LIN64_BUILD_DIR)/STD_Wrapper.o $(SRC_DIR)/STD_Wrapper.cpp
-
 ${LIN64_BUILD_DIR}/EIOS.o: $(SRC_DIR)/EIOS.cpp $(CPPHEADERFILES)
-	@echo "Compiling STD_Wrapper.cpp"
+	@echo "Compiling EIOS.cpp"
 	@mkdir -p $(LIN64_BUILD_DIR)
 	@$(LIN64_GPP) $(LIN64_COMPILE_ARGS) -o $(LIN64_BUILD_DIR)/EIOS.o $(SRC_DIR)/EIOS.cpp
 
@@ -330,11 +297,6 @@ ${WIN_BUILD_DIR}/Smart.o: $(SRC_DIR)/Smart.cpp $(CPPHEADERFILES)
 	@echo "Compiling Smart.cpp"
 	@mkdir -p $(WIN_BUILD_DIR)
 	@$(WIN_GPP) $(WIN_COMPILE_ARGS) -o $(WIN_BUILD_DIR)/Smart.o $(SRC_DIR)/Smart.cpp
-
-${WIN_BUILD_DIR}/STD_Wrapper.o: $(SRC_DIR)/STD_Wrapper.cpp $(CPPHEADERFILES)
-	@echo "Compiling STD_Wrapper.cpp"
-	@mkdir -p $(WIN_BUILD_DIR)
-	@$(WIN_GPP) $(WIN_COMPILE_ARGS) -o $(WIN_BUILD_DIR)/STD_Wrapper.o $(SRC_DIR)/STD_Wrapper.cpp
 	
 ${WIN_BUILD_DIR}/EIOS.o: $(SRC_DIR)/EIOS.cpp $(CPPHEADERFILES)
 	@echo "Compiling EIOS.cpp"
@@ -382,69 +344,11 @@ ${WIN64_BUILD_DIR}/Smart.o: $(SRC_DIR)/Smart.cpp $(CPPHEADERFILES)
 	@echo "Compiling Smart.cpp"
 	@mkdir -p $(WIN64_BUILD_DIR)
 	@$(WIN64_GPP) $(WIN64_COMPILE_ARGS) -o $(WIN64_BUILD_DIR)/Smart.o $(SRC_DIR)/Smart.cpp
-
-${WIN64_BUILD_DIR}/STD_Wrapper.o: $(SRC_DIR)/STD_Wrapper.cpp $(CPPHEADERFILES)
-	@echo "Compiling STD_Wrapper.cpp"
-	@mkdir -p $(WIN64_BUILD_DIR)
-	@$(WIN64_GPP) $(WIN64_COMPILE_ARGS) -o $(WIN64_BUILD_DIR)/STD_Wrapper.o $(SRC_DIR)/STD_Wrapper.cpp
 	
 ${WIN64_BUILD_DIR}/EIOS.o: $(SRC_DIR)/EIOS.cpp $(CPPHEADERFILES)
 	@echo "Compiling EIOS.cpp"
 	@mkdir -p $(WIN64_BUILD_DIR)
 	@$(WIN64_GPP) $(WIN64_COMPILE_ARGS) -o $(WIN64_BUILD_DIR)/EIOS.o $(SRC_DIR)/EIOS.cpp
-
-#### SCAR BUILDING DIRECTIVES ####
-
-$(DIST)/$(SCAR_NAME): $(SCAROBJFILES)
-	@echo "Linking object files..."
-	@mkdir -p $(DIST)
-	@$(WIN_GPP) -Wl,$(SRC_DIR)/libsmart.def -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(SCAR_NAME) $(SCAROBJFILES)
-
-$(SCAR_BUILD_DIR)/Main.o: $(SRC_DIR)/Main.cpp $(CPPHEADERFILES)
-	@echo "Compiling Main.cpp"
-	@mkdir -p $(SCAR_BUILD_DIR)
-	@$(WIN_GPP) $(SCAR_COMPILE_ARGS) -o $(SCAR_BUILD_DIR)/Main.o $(SRC_DIR)/Main.cpp
-
-${SCAR_BUILD_DIR}/Color.o: $(SRC_DIR)/Color.cpp $(CPPHEADERFILES)
-	@echo "Compiling Color.cpp"
-	@mkdir -p $(SCAR_BUILD_DIR)
-	@$(WIN_GPP) $(SCAR_COMPILE_ARGS) -o $(SCAR_BUILD_DIR)/Color.o $(SRC_DIR)/Color.cpp
-
-${SCAR_BUILD_DIR}/ClassLoader.o: $(SRC_DIR)/ClassLoader.cpp $(SRC_DIR)/classes.data $(CPPHEADERFILES)
-	@echo "Compiling Classloader.cpp"
-	@mkdir -p $(SCAR_BUILD_DIR)
-	@$(WIN_GPP) $(SCAR_COMPILE_ARGS) -o $(SCAR_BUILD_DIR)/ClassLoader.o $(SRC_DIR)/ClassLoader.cpp
-
-${SCAR_BUILD_DIR}/Input.o: $(SRC_DIR)/Input.cpp $(CPPHEADERFILES)
-	@echo "Compiling Input.cpp"
-	@mkdir -p $(SCAR_BUILD_DIR)
-	@$(WIN_GPP) $(SCAR_COMPILE_ARGS) -o $(SCAR_BUILD_DIR)/Input.o $(SRC_DIR)/Input.cpp
-
-${SCAR_BUILD_DIR}/Reflection.o: $(SRC_DIR)/Reflection.cpp $(CPPHEADERFILES)
-	@echo "Compiling Reflection.cpp"
-	@mkdir -p $(SCAR_BUILD_DIR)
-	@$(WIN_GPP) $(SCAR_COMPILE_ARGS) -o $(SCAR_BUILD_DIR)/Reflection.o $(SRC_DIR)/Reflection.cpp
-
-${SCAR_BUILD_DIR}/JVM.o: $(SRC_DIR)/JVM.cpp $(CPPHEADERFILES)
-	@echo "Compiling JVM.cpp"
-	@mkdir -p $(SCAR_BUILD_DIR)
-	@$(WIN_GPP) $(SCAR_COMPILE_ARGS) -o $(SCAR_BUILD_DIR)/JVM.o $(SRC_DIR)/JVM.cpp
-
-${SCAR_BUILD_DIR}/Smart.o: $(SRC_DIR)/Smart.cpp $(CPPHEADERFILES)
-	@echo "Compiling Smart.cpp"
-	@mkdir -p $(SCAR_BUILD_DIR)
-	@$(WIN_GPP) $(SCAR_COMPILE_ARGS) -o $(SCAR_BUILD_DIR)/Smart.o $(SRC_DIR)/Smart.cpp
-
-${SCAR_BUILD_DIR}/STD_Wrapper.o: $(SRC_DIR)/STD_Wrapper.cpp $(CPPHEADERFILES)
-	@echo "Compiling STD_Wrapper.cpp"
-	@mkdir -p $(SCAR_BUILD_DIR)
-	@$(WIN_GPP) $(SCAR_COMPILE_ARGS) -o $(SCAR_BUILD_DIR)/STD_Wrapper.o $(SRC_DIR)/STD_Wrapper.cpp
-	
-${SCAR_BUILD_DIR}/EIOS.o: $(SRC_DIR)/EIOS.cpp $(CPPHEADERFILES)
-	@echo "Compiling EIOS.cpp"
-	@mkdir -p $(SCAR_BUILD_DIR)
-	@$(WIN_GPP) $(SCAR_COMPILE_ARGS) -o $(SCAR_BUILD_DIR)/EIOS.o $(SRC_DIR)/EIOS.cpp
-
 
 #### JAVA/Cypher BUILDING DIRECTIVES ####
 

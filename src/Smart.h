@@ -108,23 +108,23 @@ void internalDestructor();
 void getDimensions(int *w, int *h);
 
 #ifdef WINDOWS
-extern "C" void* getImageHDC() __attribute__((cdecl));
-extern "C" void* getDebugHDC() __attribute__((cdecl));
+extern "C" void* getImageHDC();
+extern "C" void* getDebugHDC();
 #endif
-extern "C" void* getImageArray() __attribute__((cdecl));
-extern "C" void setTransparentColor(jint color) __attribute__((cdecl));
-extern "C" void setDebug(bool on) __attribute__((cdecl));
-extern "C" void setGraphics(bool on) __attribute__((cdecl));
-extern "C" void setEnabled(bool on) __attribute__((cdecl));
-extern "C" void* getDebugArray() __attribute__((cdecl));
-extern "C" bool isActive() __attribute__((cdecl));
-extern "C" bool isBlocking() __attribute__((cdecl));
-extern "C" int getRefresh() __attribute__((cdecl));
-extern "C" void setRefresh(int x) __attribute__((cdecl));
-extern "C" void setup(char*,char*,int,int,char*) __attribute__((cdecl));
-extern "C" void setupRemote(char*,char*,int,int,void*,void*,char*,int) __attribute__((cdecl));
-extern "C" void hardReset() __attribute__((cdecl));
-extern "C" void setUserAgent(char*) __attribute__((cdecl));
+extern "C" void* getImageArray();
+extern "C" void setTransparentColor(jint color);
+extern "C" void setDebug(bool on);
+extern "C" void setGraphics(bool on);
+extern "C" void setEnabled(bool on);
+extern "C" void* getDebugArray();
+extern "C" bool isActive();
+extern "C" bool isBlocking();
+extern "C" int getRefresh();
+extern "C" void setRefresh(int x);
+extern "C" void setup(char*,char*,int,int,char*);
+extern "C" void setupRemote(char*,char*,int,int,void*,void*,char*,int);
+extern "C" void hardReset();
+extern "C" void setUserAgent(char*);
 
 
 #endif	/* _SMART_H */

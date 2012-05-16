@@ -364,7 +364,7 @@ int getClients(bool only_unpaired, int **_clients) {
 /**
  * Returns the number of clients in the structure
  */
-int std_clientID(int idx) {
+int exp_clientID(int idx) {
     if (idx < clients.count && idx >= 0) {
         return clients.ids[idx];
     }
@@ -374,7 +374,7 @@ int std_clientID(int idx) {
 /**
  * Returns a pointer to a structure containing the found clients
  */
-int std_getClients(bool only_unpaired) {
+int exp_getClients(bool only_unpaired) {
     if (clients.ids) delete clients.ids;
     clients.ids = 0;
     return clients.count = getClients(only_unpaired,&clients.ids);
@@ -383,7 +383,7 @@ int std_getClients(bool only_unpaired) {
 /**
  * Returns the current paired client's ID 
  */
-int std_getCurrent() {
+int exp_getCurrent() {
     return local ? local->data->id : 0;
 }
 
@@ -391,7 +391,7 @@ int std_getCurrent() {
  * Kills the client with the given ID
  * !!!Fails if the client is paired with ANOTHER controller!!!
  */
-bool std_killClient(int id) {
+bool exp_killClient(int id) {
     SMARTClient *client = pairClient(id);
     if (!client) return false;
     killClient(client);
@@ -402,7 +402,7 @@ bool std_killClient(int id) {
 /**
  * Creates a remote SMART client and pairs to it, returning its ID or 0 if failed
  */
-int std_spawnClient(char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char *jvmpath, int maxmem) {
+int exp_spawnClient(char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char *jvmpath, int maxmem) {
     freeClient(local);
     local = spawnClient(remote_path,root,params,width,height,initseq,useragent,jvmpath,maxmem);
     return local ? local->data->id : 0;
@@ -411,44 +411,44 @@ int std_spawnClient(char* remote_path, char *root, char *params, int width, int 
 /**
  * Pairs to an existing client, returning its ID or 0 if failed
  */
-bool std_pairClient(int id) {
+bool exp_pairClient(int id) {
     freeClient(local);
     local = pairClient(id);
     return local ? local->data->id : 0;
 }
  
 //Returns a pointer into shared memory where the image resides
-void* std_getImageArray() {
+void* exp_getImageArray() {
     return local ? (char*)local->data + local->data->imgoff : 0;
 }
 
 //Returns a pointer into shared memory where the debug image resides
-void* std_getDebugArray() {
+void* exp_getDebugArray() {
     return local ? (char*)local->data + local->data->dbgoff : 0;
 }
 
-int std_getRefresh() {
+int exp_getRefresh() {
     if (local) {
         callClient(local,getRefresh);
         return *(int*)(local->data->args);
     } return -1;
 }
 
-void std_setRefresh(int x) {
+void exp_setRefresh(int x) {
     if (local) {
         *(int*)(local->data->args) = x;
         callClient(local,setRefresh);
     }
 }
 
-void std_setTransparentColor(int color) {
+void exp_setTransparentColor(int color) {
     if (local) {
         *(int*)(local->data->args) = color;
         callClient(local,setTransparentColor);
     }
 }
 
-void std_setDebug(bool enabled) {
+void exp_setDebug(bool enabled) {
     if (local) {
         *(bool*)(local->data->args) = enabled;
         callClient(local,setDebug);
@@ -456,35 +456,35 @@ void std_setDebug(bool enabled) {
 }
 
 
-void std_setGraphics(bool enabled) {
+void exp_setGraphics(bool enabled) {
     if (local) {
         *(bool*)(local->data->args) = enabled;
         callClient(local,setGraphics);
     }
 }
 
-void std_setEnabled(bool enabled) {
+void exp_setEnabled(bool enabled) {
     if (local) {
         *(bool*)(local->data->args) = enabled;
         callClient(local,setEnabled);
     }
 }
 
-bool std_isActive() {
+bool exp_isActive() {
     if (local) {
         callClient(local,isActive);
         return *(bool*)(local->data->args);
     } else return false;
 }
 
-bool std_isBlocking() {
+bool exp_isBlocking() {
     if (local) {
         callClient(local,isBlocking);
         return *(bool*)(local->data->args);
     } else return false;
 }
 
-void std_getMousePos(int &x, int &y) {
+void exp_getMousePos(int &x, int &y) {
     if (local) {
         callClient(local,getMousePos);
         x = ((int*)(local->data->args))[0];
@@ -492,7 +492,7 @@ void std_getMousePos(int &x, int &y) {
     }
 }
 
-void std_holdMouse(int x, int y, bool left) {
+void exp_holdMouse(int x, int y, bool left) {
     if (local) {
         ((int*)(local->data->args))[0] = x;
         ((int*)(local->data->args))[1] = y;
@@ -501,7 +501,7 @@ void std_holdMouse(int x, int y, bool left) {
     }
 }
 
-void std_releaseMouse(int x, int y, bool left) {
+void exp_releaseMouse(int x, int y, bool left) {
     if (local) {
         ((int*)(local->data->args))[0] = x;
         ((int*)(local->data->args))[1] = y;
@@ -510,7 +510,7 @@ void std_releaseMouse(int x, int y, bool left) {
     }
 }
 
-void std_holdMousePlus(int x, int y, int button) {
+void exp_holdMousePlus(int x, int y, int button) {
     if (local) {
         ((int*)(local->data->args))[0] = x;
         ((int*)(local->data->args))[1] = y;
@@ -519,7 +519,7 @@ void std_holdMousePlus(int x, int y, int button) {
     }
 }
 
-void std_releaseMousePlus(int x, int y, int button) {
+void exp_releaseMousePlus(int x, int y, int button) {
     if (local) {
         ((int*)(local->data->args))[0] = x;
         ((int*)(local->data->args))[1] = y;
@@ -528,7 +528,7 @@ void std_releaseMousePlus(int x, int y, int button) {
     }
 }
 
-void std_moveMouse(int x, int y) {
+void exp_moveMouse(int x, int y) {
     if (local) {
         ((int*)(local->data->args))[0] = x;
         ((int*)(local->data->args))[1] = y;
@@ -536,7 +536,7 @@ void std_moveMouse(int x, int y) {
     }
 }
 
-void std_windMouse(int x, int y) {
+void exp_windMouse(int x, int y) {
     if (local) {
         ((int*)(local->data->args))[0] = x;
         ((int*)(local->data->args))[1] = y;
@@ -544,7 +544,7 @@ void std_windMouse(int x, int y) {
     }
 }
 
-void std_clickMouse(int x, int y, bool left) {
+void exp_clickMouse(int x, int y, bool left) {
     if (local) {
         ((int*)(local->data->args))[0] = x;
         ((int*)(local->data->args))[1] = y;
@@ -553,7 +553,7 @@ void std_clickMouse(int x, int y, bool left) {
     }
 }
 
-void std_clickMousePlus(int x, int y, int button) {
+void exp_clickMousePlus(int x, int y, int button) {
     if (local) {
         ((int*)(local->data->args))[0] = x;
         ((int*)(local->data->args))[1] = y;
@@ -562,7 +562,7 @@ void std_clickMousePlus(int x, int y, int button) {
     }
 }
 
-bool std_isMouseButtonHeld(int button) {
+bool exp_isMouseButtonHeld(int button) {
     if (local) {
         *(int*)(local->data->args) = button;
         callClient(local,isMouseButtonHeld);
@@ -570,28 +570,28 @@ bool std_isMouseButtonHeld(int button) {
     } else return false;
 }
 
-void std_sendKeys(char *text) {
+void exp_sendKeys(char *text) {
     if (local) {
         strcpy((char*)local->data->args,text);
         callClient(local,sendKeys);
     }
 }
 
-void std_holdKey(int code) {
+void exp_holdKey(int code) {
     if (local) {
         *(int*)(local->data->args) = code;
         callClient(local,holdKey);
     }
 }
 
-void std_releaseKey(int code) {
+void exp_releaseKey(int code) {
     if (local) {
         *(int*)(local->data->args) = code;
         callClient(local,releaseKey);
     }
 }
 
-bool std_isKeyDown(int code) {
+bool exp_isKeyDown(int code) {
     if (local) {
         *(int*)(local->data->args) = code;
         callClient(local,isKeyDown);
@@ -599,7 +599,7 @@ bool std_isKeyDown(int code) {
     } else return false;
 }
 
-int std_getColor(int x, int y) {
+int exp_getColor(int x, int y) {
     if (local) {
         ((int*)(local->data->args))[0] = x;
         ((int*)(local->data->args))[1] = y;
@@ -608,7 +608,7 @@ int std_getColor(int x, int y) {
     } else return false;
 }
 
-bool std_findColor(int &x, int& y, int color, int sx, int sy, int ex, int ey) {
+bool exp_findColor(int &x, int& y, int color, int sx, int sy, int ex, int ey) {
     if (local) {
         ((int*)(local->data->args))[0] = x;
         ((int*)(local->data->args))[1] = y;
@@ -624,7 +624,7 @@ bool std_findColor(int &x, int& y, int color, int sx, int sy, int ex, int ey) {
     } else return false;
 }
 
-bool std_findColorTol(int &x, int& y, int color, int sx, int sy, int ex, int ey, int tol) {
+bool exp_findColorTol(int &x, int& y, int color, int sx, int sy, int ex, int ey, int tol) {
     if (local) {
         ((int*)(local->data->args))[0] = x;
         ((int*)(local->data->args))[1] = y;
@@ -641,7 +641,7 @@ bool std_findColorTol(int &x, int& y, int color, int sx, int sy, int ex, int ey,
     } else return false;
 }
 
-bool std_findColorSpiral(int &x, int& y, int color, int sx, int sy, int ex, int ey) {
+bool exp_findColorSpiral(int &x, int& y, int color, int sx, int sy, int ex, int ey) {
     if (local) {
         ((int*)(local->data->args))[0] = x;
         ((int*)(local->data->args))[1] = y;
@@ -657,7 +657,7 @@ bool std_findColorSpiral(int &x, int& y, int color, int sx, int sy, int ex, int 
     } else return false;
 }
 
-bool std_findColorSpiralTol(int &x, int& y, int color, int sx, int sy, int ex, int ey, int tol) {
+bool exp_findColorSpiralTol(int &x, int& y, int color, int sx, int sy, int ex, int ey, int tol) {
     if (local){
         ((int*)(local->data->args))[0] = x;
         ((int*)(local->data->args))[1] = y;
@@ -728,7 +728,7 @@ SMARTClient* spawnFromString(char* initarg) {
 Target EIOS_RequestTarget(char *initargs) {
     cout << "EIOS Paired\n";
     if (initargs != 0 && strlen(initargs) > 0) {
-        SMARTClient *client = spawnFromString(initargs); //This seems silly, could use std_SpawnClient instead
+        SMARTClient *client = spawnFromString(initargs); //This seems silly, could use exp_SpawnClient instead
         if (!client) client = pairClient(atoi(initargs));
         return client;
     }
@@ -829,7 +829,7 @@ bool EIOS_IsKeyHeld(Target t, int key) {
 
 void internalConstructor() {
     clients.ids = 0;
-    clients.count = std_getClients(true);
+    clients.count = exp_getClients(true);
     local = NULL;
 }
 
@@ -839,6 +839,10 @@ void internalDestructor() {
 }
 
 #ifndef _WIN32
+
+int GetPluginABIVersion() {
+	return 2; //cdecl everything
+}
 
 int GetFunctionCount() {
     return NumExports;
@@ -866,6 +870,10 @@ void unload(void) {
 #ifdef _WIN32
 
 HMODULE dllinst;
+
+int GetPluginABIVersion() {
+	return 2; //cdecl everything
+}
 
 int GetFunctionCount() {
     return NumExports;
