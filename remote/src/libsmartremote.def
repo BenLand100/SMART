@@ -32,6 +32,8 @@ EXPORTS
     exp_windMouse
     exp_setEnabled
     exp_pairClient
+    exp_killClient
+    exp_getCurrent
     exp_spawnClient
     exp_getClients
     exp_clientID

@@ -84,7 +84,7 @@ extern "C" int exp_getClients(bool only_unpaired);
 extern "C" int exp_spawnClient(char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char *jvmpath, int maxmem);
 extern "C" bool exp_pairClient(int pid);
 extern "C" int exp_getCurrent();
-extern "C" bool exp_killClient(int id);
+extern "C" bool exp_killClient(int pid);
 extern "C" void* exp_getImageArray();
 extern "C" void* exp_getDebugArray();
 extern "C" int exp_getRefresh();
@@ -116,7 +116,7 @@ extern "C" bool exp_findColorSpiral(int &x, int& y, int color, int sx, int sy, i
 extern "C" bool exp_findColorSpiralTol(int &x, int& y, int color, int sx, int sy, int ex, int ey, int tol);
 
 //Exports for Local
-#define NumExports 34
+#define NumExports 35
 static char* exports[] = {
     (char*)"exp_clientID", (char*)"function SmartClientID(idx: integer): integer;",
     (char*)"exp_getClients", (char*)"function SmartGetClients(only_unpaired: boolean): integer;",

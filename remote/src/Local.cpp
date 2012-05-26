@@ -391,8 +391,9 @@ int exp_getCurrent() {
  * Kills the client with the given ID
  * !!!Fails if the client is paired with ANOTHER controller!!!
  */
-bool exp_killClient(int id) {
-    SMARTClient *client = pairClient(id);
+bool exp_killClient(int pid) {
+    cout << "Killing client " << pid << '\n';
+    SMARTClient *client = pairClient(pid);
     if (!client) return false;
     killClient(client);
     freeClient(client);
@@ -841,7 +842,7 @@ void internalDestructor() {
 #ifndef _WIN32
 
 int GetPluginABIVersion() {
-	return 2; //cdecl everything
+	return 3; //cdecl everything
 }
 
 int GetFunctionCount() {
@@ -865,14 +866,12 @@ void unload(void) {
     internalDestructor();
 }
 
-#endif
-
-#ifdef _WIN32
+#else
 
 HMODULE dllinst;
 
 int GetPluginABIVersion() {
-	return 2; //cdecl everything
+	return 3; //cdecl everything
 }
 
 int GetFunctionCount() {
