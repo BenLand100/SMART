@@ -343,5 +343,5 @@ int main(int argc, char** argv) {
     DeleteFile(shmfile);
     #endif
     
-    exit(1); //Make sure the JVM 
+    exit(1); //Make sure the JVM exits
 }

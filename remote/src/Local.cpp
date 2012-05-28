@@ -839,15 +839,16 @@ void internalDestructor() {
     if (clients.ids) delete clients.ids;
 }
 
-#ifndef _WIN32
+
+int GetFunctionCount() {
+    return NumExports;
+}
 
 int GetPluginABIVersion() {
 	return 2; //cdecl everything
 }
 
-int GetFunctionCount() {
-    return NumExports;
-}
+#ifndef _WIN32
 
 int GetFunctionInfo(int index, void*& address, char*& def) {
     if (index < NumExports) {
@@ -869,14 +870,6 @@ void unload(void) {
 #else
 
 HMODULE dllinst;
-
-int GetPluginABIVersion() {
-	return 2; //cdecl everything
-}
-
-int GetFunctionCount() {
-    return NumExports;
-}
 
 int GetFunctionInfo(int index, void*& address, char*& def) {
     if (index < NumExports) {

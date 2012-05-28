@@ -38,6 +38,10 @@ extern "C" bool DllMain(HINSTANCE, int, void*) __attribute__((stdcall));
 #endif
 #define TIMEOUT 5
 
+extern "C" int GetPluginABIVersion();
+extern "C" int GetFunctionCount();
+extern "C" int GetFunctionInfo(int, void*&, char*&);
+
 typedef struct {
     int width,height;
     #ifndef _WIN32
@@ -154,10 +158,6 @@ static char* exports[] = {
     (char*)"exp_findColorSpiral", (char*)"function SmartFindColorSpiral(var x, y: integer; color, sx, sy, ex, ey: integer): boolean;",
     (char*)"exp_findColorSpiralTol", (char*)"function SmartFindColorSpiralTolerance(var x, y: integer; color, sx, sy, ex, ey, tol: integer): boolean;",
 };
-
-extern "C" int GetPluginABIVersion();
-extern "C" int GetFunctionCount();
-extern "C" int GetFunctionInfo(int, void*&, char*&);
 
 #endif	/* _LOCAL_H */
 
