@@ -121,7 +121,7 @@ static char* exports[] = {
 #define NumExports 82
 
 int GetPluginABIVersion() {
-	return 3; //cdecl everything
+	return 2; //cdecl everything
 }
 
 int GetFunctionCount() {
@@ -160,7 +160,7 @@ void unload(void) {
 HMODULE dllinst;
 
 int GetPluginABIVersion() {
-	return 3; //cdecl everything
+	return 2; //cdecl everything
 }
 
 int GetFunctionCount() {

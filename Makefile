@@ -154,6 +154,10 @@ test: test-apps/test-windows.cpp test-apps/test-linux.cpp test-apps/test-scar.cp
 	@$(WIN64_GPP) -Wall -o $(DIST)/test-eios-win64.exe test-apps/test-eios.cpp
 	@$(LIN_GPP) -Wall -fPIC -ldl -o $(DIST)/test-eios-lin32 test-apps/test-eios.cpp
 	@$(LIN64_GPP) -Wall -fPIC -ldl -o $(DIST)/test-eios-lin64 test-apps/test-eios.cpp
+	@$(WIN_GPP) -Wall -o $(DIST)/test-remote-win32.exe test-apps/test-remote.cpp
+	@$(WIN64_GPP) -Wall -o $(DIST)/test-remote-win64.exe test-apps/test-remote.cpp
+	@$(LIN_GPP) -Wall -fPIC -ldl -o $(DIST)/test-remote-lin32 test-apps/test-remote.cpp
+	@$(LIN64_GPP) -Wall -fPIC -ldl -o $(DIST)/test-remote-lin64 test-apps/test-remote.cpp
 	@cp test-apps/test-python.py $(DIST)/test-python
 	@echo "Finished building test programs" 
 	
