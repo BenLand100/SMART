@@ -77,7 +77,7 @@ extern "C" void EIOS_MoveMouse(Target t, int x, int y) __attribute__((stdcall));
 extern "C" void EIOS_HoldMouse(Target t, int x, int y, int button) __attribute__((stdcall)); 
 extern "C" void EIOS_ReleaseMouse(Target t, int x, int y, int button) __attribute__((stdcall)); 
 extern "C" bool EIOS_IsMouseHeld(Target t, int button) __attribute__((stdcall)); 
-extern "C" void EIOS_SendString(Target t, char* str) __attribute__((stdcall)); 
+extern "C" void EIOS_SendString(Target t, char* str, int keywait, int keymodwait) __attribute__((stdcall)); 
 extern "C" void EIOS_HoldKey(Target t, int key) __attribute__((stdcall)); 
 extern "C" void EIOS_ReleaseKey(Target t, int key) __attribute__((stdcall)); 
 extern "C" bool EIOS_IsKeyHeld(Target t, int key) __attribute__((stdcall)); 

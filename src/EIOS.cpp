@@ -121,7 +121,7 @@ bool EIOS_IsMouseHeld(Target t, int button) {
     return isMouseButtonHeld(button);
 }
   
-void EIOS_SendString(Target t, char* str) {
+void EIOS_SendString(Target t, char* str, int keywait, int keymodwait) {
     sendKeys(str);
 }
 

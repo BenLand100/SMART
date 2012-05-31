@@ -47,7 +47,7 @@ EXPORTS
     EIOS_HoldMouse=EIOS_HoldMouse@16
     EIOS_ReleaseMouse=EIOS_ReleaseMouse@16
     EIOS_IsMouseHeld=EIOS_IsMouseHeld@8
-    EIOS_SendString=EIOS_SendString@8
+    EIOS_SendString=EIOS_SendString@16
     EIOS_HoldKey=EIOS_HoldKey@8
     EIOS_ReleaseKey=EIOS_ReleaseKey@8
     EIOS_IsKeyHeld=EIOS_IsKeyHeld@8

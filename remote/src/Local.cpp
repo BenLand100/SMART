@@ -799,7 +799,7 @@ bool EIOS_IsMouseHeld(Target t, int button) {
     } else return false;
 } 
 
-void EIOS_SendString(Target t, char* str) {    
+void EIOS_SendString(Target t, char* str, int keywait, int keymodwait) {    
     if (t) {
         strcpy((char*)t->data->args,str);
         callClient(t,sendKeys);
