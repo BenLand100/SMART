@@ -170,7 +170,7 @@ void execfun() {
             *(bool*)(data->args) = ((type_isMouseButtonHeld)(functions[isMouseButtonHeld-FirstFunc]))(*(int*)(data->args));
             break;
         case sendKeys:
-            ((type_sendKeys)(functions[sendKeys-FirstFunc]))((char*)data->args);
+            ((type_sendKeys)(functions[sendKeys-FirstFunc]))((char*)data->args+2*sizeof(int),((int*)data->args)[0],((int*)data->args)[0]);
             break;
         case holdKey:
             ((type_holdKey)(functions[holdKey-FirstFunc]))(*(int*)data->args);

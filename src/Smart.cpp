@@ -185,7 +185,7 @@ void findClasses() {
     _client.releasekey = jre->GetMethodID(_client.clazz, "releaseKey", "(I)V");
     _client.releasemouse = jre->GetMethodID(_client.clazz, "releaseMouse", "(III)V");
     _client.ismousebuttonheld = jre->GetMethodID(_client.clazz, "isMouseButtonHeld", "(I)Z");
-    _client.sendkeys = jre->GetMethodID(_client.clazz, "sendKeys", "(Ljava/lang/String;)V");
+    _client.sendkeys = jre->GetMethodID(_client.clazz, "sendKeys", "(Ljava/lang/String;II)V");
     _client.destroy = jre->GetMethodID(_client.clazz, "destroy", "()V");
     _client.blocking = jre->GetFieldID(_client.clazz, "blocking", "Z");
     _client.active = jre->GetFieldID(_client.clazz, "active", "Z");

@@ -29,10 +29,10 @@ extern JCLIENT _client;
 extern JPOINT _point;
 
 //Sends a String to the client in a human way
-void sendKeys(char* text) {
+void sendKeys(char* text, int keywait, int keymodwait) {
     if (jre) {
         jobject string_ = jre->NewStringUTF(text);
-        jre->CallVoidMethod(smart, _client.sendkeys, string_);
+        jre->CallVoidMethod(smart, _client.sendkeys, string_, keywait, keymodwait);
         jre->DeleteLocalRef(string_);
 		checkexception(jre);
 	}

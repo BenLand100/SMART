@@ -571,9 +571,11 @@ bool exp_isMouseButtonHeld(int button) {
     } else return false;
 }
 
-void exp_sendKeys(char *text) {
+void exp_sendKeys(char *str, int keywait, int keymodwait) {
     if (local) {
-        strcpy((char*)local->data->args,text);
+        ((int*)local->data->args)[0] = keywait;
+        ((int*)local->data->args)[1] = keymodwait;
+        strcpy((char*)local->data->args+sizeof(int)*2,str);
         callClient(local,sendKeys);
     }
 }
@@ -801,7 +803,9 @@ bool EIOS_IsMouseHeld(Target t, int button) {
 
 void EIOS_SendString(Target t, char* str, int keywait, int keymodwait) {    
     if (t) {
-        strcpy((char*)t->data->args,str);
+        ((int*)t->data->args)[0] = keywait;
+        ((int*)t->data->args)[1] = keymodwait;
+        strcpy((char*)t->data->args+sizeof(int)*2,str);
         callClient(t,sendKeys);
     }
 }

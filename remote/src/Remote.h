@@ -47,7 +47,7 @@ typedef void (*type_windMouse)(int x, int y);
 typedef void (*type_clickMouse)(int x, int y, bool left);
 typedef void (*type_clickMousePlus)(int x, int y, int button);
 typedef bool (*type_isMouseButtonHeld)(int button);
-typedef void (*type_sendKeys)(char *text);
+typedef void (*type_sendKeys)(char *text, int keywait, int keymodwait);
 typedef void (*type_holdKey)(int code);
 typedef void (*type_releaseKey)(int code);
 typedef bool (*type_isKeyDown)(int code);

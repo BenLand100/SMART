@@ -534,7 +534,7 @@ public class EventNazi {
      * Not to be used for arrow keys, but can be used with F keys or the like
      * @param text String to send to the client
      */
-    public synchronized void sendKeys(String text) {
+    public synchronized void sendKeys(String text, int keywait, int keymodwait) {
         if (canInteract()) {
             char[] chars = text.toCharArray();
             if (!focused) getFocus();
@@ -544,19 +544,19 @@ public class EventNazi {
                 if (isShiftChar(c)) {
                     int shiftLoc = Math.random() > 0.5D ? KeyEvent.KEY_LOCATION_RIGHT : KeyEvent.KEY_LOCATION_LEFT;
                     BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), KeyEvent.SHIFT_MASK, KeyEvent.VK_SHIFT, KeyEvent.CHAR_UNDEFINED, shiftLoc));
-                    try { Thread.sleep((int)(Math.random() * 20 + 60)); } catch (Exception e) { e.printStackTrace(); }
+                    try { Thread.sleep((int)((Math.random() * 0.1 + 1) * keymodwait)); } catch (Exception e) { e.printStackTrace(); }
                     long time = System.currentTimeMillis();
                     BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_PRESSED, time, KeyEvent.SHIFT_MASK, code, c, keyLoc));
                     BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_TYPED, time, KeyEvent.SHIFT_MASK, 0, c, KeyEvent.KEY_LOCATION_UNKNOWN));
-                    try { Thread.sleep((int)(Math.random() * 20 + 90)); } catch (Exception e) { e.printStackTrace(); }
+                    try { Thread.sleep((int)((Math.random() * 0.1 + 1) + keywait)); } catch (Exception e) { e.printStackTrace(); }
                     BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_RELEASED, System.currentTimeMillis(), KeyEvent.SHIFT_MASK, code, c, keyLoc));
-                    try { Thread.sleep((int)(Math.random() * 20 + 60)); } catch (Exception e) { e.printStackTrace(); }
+                    try { Thread.sleep((int)((Math.random() * 0.1 + 1) + keymodwait)); } catch (Exception e) { e.printStackTrace(); }
                     BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_RELEASED, System.currentTimeMillis(), 0, KeyEvent.VK_SHIFT, KeyEvent.CHAR_UNDEFINED, shiftLoc));
                 } else {
                     long time = System.currentTimeMillis();
                     BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_PRESSED, time, 0, code, c, keyLoc));
                     BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_TYPED, time, 0, 0, c, KeyEvent.KEY_LOCATION_UNKNOWN));
-                    try { Thread.sleep((int)(Math.random() * 20 + 90)); } catch (Exception e) { e.printStackTrace(); }
+                    try { Thread.sleep((int)((Math.random() * 0.1 + 1) + keywait)); } catch (Exception e) { e.printStackTrace(); }
                     BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_RELEASED, System.currentTimeMillis(), 0, code, c, keyLoc));
                 }
             }

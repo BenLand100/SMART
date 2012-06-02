@@ -77,7 +77,7 @@ import sun.applet.AppletClassLoader;
  */
 public class Client implements ActionListener, ChangeListener {
     
-    public static final String VERSION = "7.1beta2";
+    public static final String VERSION = "7.1";
     public static final String TITLE = "SMARTv" + VERSION + " - SMART Minimizing Autoing Resource Thing - By BenLand100";
     public static final String USER_AGENT; //default for an (old) firefox version is set below
     static {
@@ -191,7 +191,7 @@ public class Client implements ActionListener, ChangeListener {
             clientFrame.requestFocusInWindow();
         }
         if (initseq != null) {
-            nazi.sendKeys(initseq);
+            nazi.sendKeys(initseq,90,60);
             initseq = null;
             System.out.println("Init Sequence Dispatched");
         }
@@ -282,9 +282,9 @@ public class Client implements ActionListener, ChangeListener {
     }
 
     //Convenience method for Native code see Input.cpp
-    public void sendKeys(String string) {
+    public void sendKeys(String string, int keywait, int keymodwait) {
         if (nazi != null) {
-            nazi.sendKeys(string);
+            nazi.sendKeys(string,keywait,keymodwait);
         }
     }
 

@@ -57,7 +57,7 @@ static char* exports[] = {
     (char*)"clickMouse", (char*)"procedure SmartClickMouse(x, y: integer; left: boolean);",
     (char*)"clickMousePlus", (char*)"procedure SmartClickMousePlus(x, y, button: integer);",
     (char*)"isMouseButtonHeld", (char*)"function SmartIsMouseButtonHeld(button: integer): boolean;",
-    (char*)"sendKeys", (char*)"procedure SmartSendKeys(Text: String);",
+    (char*)"sendKeys", (char*)"procedure SmartSendKeys(Text: String; keywait, keymodwait: integer);",
     (char*)"holdKey", (char*)"procedure SmartHoldKey(Code: Integer);",
     (char*)"releaseKey", (char*)"procedure SmartReleaseKey(Code: Integer);",
     (char*)"isKeyDown", (char*)"function SmartIsKeyDown(Code: Integer): Boolean;",

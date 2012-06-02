@@ -22,7 +22,7 @@
 
 #include "Smart.h"
 
-extern "C" void sendKeys(char*);
+extern "C" void sendKeys(char*,int,int);
 extern "C" bool isKeyDown(int);
 extern "C" void holdKey(int);
 extern "C" void releaseKey(int);

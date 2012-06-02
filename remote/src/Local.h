@@ -109,7 +109,7 @@ extern "C" void exp_windMouse(int x, int y);
 extern "C" void exp_clickMouse(int x, int y, bool left);
 extern "C" void exp_clickMousePlus(int x, int y, int button);
 extern "C" bool exp_isMouseButtonHeld(int button);
-extern "C" void exp_sendKeys(char *text);
+extern "C" void exp_sendKeys(char *text, int keywait, int keymodwait);
 extern "C" void exp_holdKey(int code);
 extern "C" void exp_releaseKey(int code);
 extern "C" bool exp_isKeyDown(int code);
@@ -148,7 +148,7 @@ static char* exports[] = {
     (char*)"exp_clickMouse", (char*)"procedure SmartClickMouse(x, y: integer; left: boolean);",
     (char*)"exp_clickMousePlus", (char*)"procedure SmartClickMousePlus(x, y, button: integer);",
     (char*)"exp_isMouseButtonHeld", (char*)"function SmartIsMouseButtonHeld(button: integer): boolean;",
-    (char*)"exp_sendKeys", (char*)"procedure SmartSendKeys(Text: String);",
+    (char*)"exp_sendKeys", (char*)"procedure SmartSendKeys(Text: String; keywait, keymodwait: integer);",
     (char*)"exp_holdKey", (char*)"procedure SmartHoldKey(Code: Integer);",
     (char*)"exp_releaseKey", (char*)"procedure SmartReleaseKey(Code: Integer);",
     (char*)"exp_isKeyDown", (char*)"function SmartIsKeyDown(Code: Integer): Boolean;",
