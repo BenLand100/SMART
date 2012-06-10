@@ -128,8 +128,18 @@ static char* exports[] = {
     (char*)"exp_pairClient", (char*)"function SmartPairClient(pid: integer): boolean;",
     (char*)"exp_killClient", (char*)"function SmartKillClient(pid: integer): boolean;",
     (char*)"exp_getCurrent", (char*)"function SmartCurrentClient(): integer;",
-    (char*)"exp_getImageArray", (char*)"function SmartImageArray(): integer;",
-    (char*)"exp_getDebugArray", (char*)"function SmartDebugArray(): integer;",
+    (char*)"exp_getImageArray", (char*)"function SmartImageArray(): int" 
+    #if __SIZEOF_POINTER__ == 4
+        "eger;",
+    #else
+        "64;",
+    #endif  
+    (char*)"exp_getDebugArray", (char*)"function SmartDebugArray(): int" 
+    #if __SIZEOF_POINTER__ == 4
+        "eger;",
+    #else
+        "64;",
+    #endif
     (char*)"exp_getRefresh", (char*)"function SmartGetRefresh: integer;",
     (char*)"exp_setRefresh", (char*)"procedure SmartSetRefresh(x: integer);",
     (char*)"exp_setTransparentColor", (char*)"procedure SmartSetTransparentColor(color: integer);",
