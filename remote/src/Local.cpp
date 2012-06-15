@@ -24,6 +24,7 @@
 #include <cstring>
 #include <iostream>
 #include <stdlib.h>
+#include <map>
 #ifndef _WIN32
 #include <sys/syscall.h>
 #include <sys/mman.h>
@@ -33,28 +34,38 @@
 
 using namespace std;
 
+static map<int,SMARTClient*> *pairedClients;
 static SMARTClient *local;
-
 static clients_dat clients;
 
 void freeClient(SMARTClient *client) {
     if (!client) return;
     if (client->memmap) {
-        if (--client->data->refcount == 0) {
+        if (--client->refcount == 0) {
+            cout << "Freeing client data [" << client->data->id << "]\n";
+            if (client->socket) {
+                #ifndef _WIN32
+                    close(client->socket);
+                #else
+                    closesocket(client->socket);
+                #endif
+                client->socket = 0;
+            }
+            pairedClients->erase(client->data->id);
             client->data->paired = 0;
-        }
-        #ifndef _WIN32
-        munmap(client->memmap,client->width*client->height*2*4+sizeof(shm_data));
-        close(client->fd);
-        #else
-        UnmapViewOfFile(client->data);
-        CloseHandle(client->memmap);
-        CloseHandle(client->file);
-        #endif
-        client->memmap = NULL;
-        client->data = NULL;
+            #ifndef _WIN32
+            munmap(client->memmap,client->width*client->height*2*4+sizeof(shm_data));
+            close(client->fd);
+            #else
+            UnmapViewOfFile(client->data);
+            CloseHandle(client->memmap);
+            CloseHandle(client->file);
+            #endif
+            client->memmap = NULL;
+            client->data = NULL;
+            delete client;
+       }
     }
-    delete client;
 }
 
 /**
@@ -66,22 +77,62 @@ void killClient(SMARTClient *client) {
     }
 }
 
+bool resock(SMARTClient *client) {
+    if (client->socket) 
+        #ifndef _WIN32
+            close(client->socket);
+        #else
+            closesocket(client->socket);
+        #endif
+    client->socket = socket(AF_INET, SOCK_STREAM, 0);
+    struct hostent *server = gethostbyname("localhost");
+    struct sockaddr_in localhost;
+    memset((char *) &localhost, 0, sizeof(localhost));
+    localhost.sin_family = AF_INET;
+    memcpy((char *)server->h_addr, (char *)&localhost.sin_addr.s_addr, server->h_length);
+    localhost.sin_port = htons(client->data->port);
+    cout << "Attempting to connect...\n";
+    if (connect(client->socket,(struct sockaddr *) &localhost,sizeof(localhost)) < 0) {
+        cout << "Could not connect socket\n";
+        #ifndef _WIN32
+            close(client->socket);
+        #else
+            closesocket(client->socket);
+        #endif
+        client->socket = 0;
+        return false;
+    }
+    return true;
+}
+
 /**
  * Invokes a remote method. Might free your client if the client died.
  * Assumes arguments are already set and results are set according to the comm protocol
  */
 void callClient(SMARTClient *client, int funid) {
-    client->data->funid = funid;
-    while (client->data->funid) { 
-        #ifndef _WIN32
-        usleep(10); //ms
-        #else
-        Sleep(10); //ms
-        #endif
+    if (send(client->socket,(const char*)&funid,sizeof(int),0)!=sizeof(int)) {
+        cout << "Could Not Call\n";
+        return;
+    }
+    struct timeval tv;
+    tv.tv_sec = 0;
+    tv.tv_usec = 100000;
+    fd_set rfds;
+    FD_ZERO(&rfds);
+    FD_SET(client->socket, &rfds);
+    for (;;) {
         if (client->data->time && time(0) - client->data->time > TIMEOUT) {
             cout << "Client appears to have died: aborting\n";
             break;
         }
+        if (select(client->socket+1, &rfds, &rfds, NULL, &tv)) {
+            if (recv(client->socket,(char*)&funid,sizeof(int),0)!=sizeof(int)) {
+                cout << "Call appears to have failed\n";
+            }
+            break;
+        }
+        tv.tv_sec = 0;
+        tv.tv_usec = 100000;
     }
 }
 
@@ -96,6 +147,27 @@ void callClient(SMARTClient *client, int funid) {
  * 7) Set data->paired to our PID
  */
 SMARTClient* pairClient(int id) {
+    #ifndef _WIN32
+    int tid = syscall(SYS_gettid);
+    #else
+    int tid = GetCurrentThreadId();
+    #endif
+    map<int,SMARTClient*>::iterator it = pairedClients->find(id);
+    if (it != pairedClients->end()) {
+        cout << "Client possibly paired to us\n";
+        if (it->second->data->paired == 0 || it->second->data->paired == tid) {
+            it->second->refcount++;
+            if (resock(it->second)) {   
+                return it->second;
+            } else {
+                cout << "Zombie detected (no socket response)\n";
+                return NULL;
+            }
+        } else {
+            cout << "Client is otherwise paired\n";
+            return NULL;
+        }
+    }
     SMARTClient *client = new SMARTClient;
     char shmfile[256];
     sprintf(shmfile,"SMART.%i",id);
@@ -153,11 +225,6 @@ SMARTClient* pairClient(int id) {
             delete client;
             return NULL;
         }
-        #ifndef _WIN32
-        int tid = syscall(SYS_gettid);
-        #else
-        int tid = GetCurrentThreadId();
-        #endif
         if (client_paired && client_paired != tid) { 
             cout << "Failed to pair - Client appears to be paired\n";
             #ifndef _WIN32
@@ -187,13 +254,16 @@ SMARTClient* pairClient(int id) {
             return NULL;   
         }
         #endif
-        if (client->data->paired == tid) {
-            client->data->refcount++;
-            cout << "Incrementing pairing refcount\n";
-        } else { 
-            client->data->paired = tid;
-            client->data->refcount = 1;
-        }
+        
+        client->socket = 0;
+        if (!resock(client)) {
+            freeClient(client);
+            return false;
+        } 
+        
+        client->data->paired = tid;
+        client->refcount = 1;
+        (*pairedClients)[id] = client;
         return client;
     } else {
         cout << "Failed to pair - No client by that ID\n";
@@ -276,6 +346,7 @@ SMARTClient* spawnClient(char* remote_path, char *root, char *params, int width,
  * This will also clean up any zombies left hanging.
  */
 int getClients(bool only_unpaired, int **_clients) {
+    cout << "Polling for SMARTs\n";
     int count = 0;
     if (_clients) *_clients = NULL;
     #ifndef _WIN32
@@ -365,6 +436,7 @@ int getClients(bool only_unpaired, int **_clients) {
  * Returns the number of clients in the structure
  */
 int exp_clientID(int idx) {
+    cout << "Returning index " << idx << '\n';
     if (idx < clients.count && idx >= 0) {
         return clients.ids[idx];
     }
@@ -413,8 +485,9 @@ int exp_spawnClient(char* remote_path, char *root, char *params, int width, int 
  * Pairs to an existing client, returning its ID or 0 if failed
  */
 bool exp_pairClient(int id) {
-    freeClient(local);
-    local = pairClient(id);
+    SMARTClient *next = pairClient(id);
+    if (next != local) freeClient(local);
+    local = next;
     return local ? local->data->id : 0;
 }
  
@@ -836,11 +909,13 @@ void internalConstructor() {
     clients.ids = 0;
     clients.count = exp_getClients(true);
     local = NULL;
+    pairedClients = new map<int,SMARTClient*>();
 }
 
 void internalDestructor() {
     freeClient(local);
     if (clients.ids) delete clients.ids;
+    delete pairedClients;
 }
 
 
@@ -886,13 +961,19 @@ int GetFunctionInfo(int index, void*& address, char*& def) {
 
 bool DllMain(HINSTANCE instance, int reason, void* checks) {
     switch (reason) {
-        case DLL_PROCESS_ATTACH:
+        case DLL_PROCESS_ATTACH: {
             dllinst = instance;
+            WORD wVersionRequested;
+            WSADATA wsaData;
+            wVersionRequested = MAKEWORD(2, 2);
+            WSAStartup(wVersionRequested, &wsaData);
             internalConstructor();
             return true;
+        }
         case DLL_THREAD_ATTACH:
             return true;
         case DLL_PROCESS_DETACH:
+            WSACleanup();
             internalDestructor();
             return true;
         case DLL_THREAD_DETACH:

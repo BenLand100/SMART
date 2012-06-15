@@ -148,7 +148,7 @@ $(LIN64_BUILD_DIR)/Remote.o: $(SRC_DIR)/Remote.cpp $(REMOTEHEADERFILES)
 $(DIST)/$(LOCAL_NAME)32$(WIN_LIB_EXT): $(LOCALWINOBJFILES)
 	@echo "Linking object files..."
 	@mkdir -p $(DIST)
-	@$(WIN_GPP) -shared -static-libgcc -static-libstdc++ -s -o $(DIST)/$(LOCAL_NAME)32$(WIN_LIB_EXT) $(LOCALWINOBJFILES)
+	@$(WIN_GPP) -shared -static-libgcc -static-libstdc++ -s -o $(DIST)/$(LOCAL_NAME)32$(WIN_LIB_EXT) $(LOCALWINOBJFILES) -lws2_32
 
 $(WIN_BUILD_DIR)/Local.o: $(SRC_DIR)/Local.cpp $(LOCALHEADERFILES)
 	@echo "Compiling Local.cpp"
@@ -158,7 +158,7 @@ $(WIN_BUILD_DIR)/Local.o: $(SRC_DIR)/Local.cpp $(LOCALHEADERFILES)
 $(DIST)/$(REMOTE_NAME)32$(WIN_EXE_EXT): $(REMOTEWINOBJFILES)
 	@echo "Linking object files..."
 	@mkdir -p $(DIST)
-	@$(WIN_GPP) -static-libgcc -static-libstdc++ -s -o $(DIST)/$(REMOTE_NAME)32$(WIN_EXE_EXT) $(REMOTEWINOBJFILES)
+	@$(WIN_GPP) -static-libgcc -static-libstdc++ -s -o $(DIST)/$(REMOTE_NAME)32$(WIN_EXE_EXT) $(REMOTEWINOBJFILES) -lws2_32
 
 $(WIN_BUILD_DIR)/Remote.o: $(SRC_DIR)/Remote.cpp $(REMOTEHEADERFILES)
 	@echo "Compiling Remote.cpp"
@@ -170,7 +170,7 @@ $(WIN_BUILD_DIR)/Remote.o: $(SRC_DIR)/Remote.cpp $(REMOTEHEADERFILES)
 $(DIST)/$(LOCAL_NAME)64$(WIN_LIB_EXT): $(LOCALWIN64OBJFILES)
 	@echo "Linking object files..."
 	@mkdir -p $(DIST)
-	@$(WIN64_GPP) -shared -static-libgcc -static-libstdc++ -s -o $(DIST)/$(LOCAL_NAME)64$(WIN_LIB_EXT) $(LOCALWIN64OBJFILES)
+	@$(WIN64_GPP) -shared -static-libgcc -static-libstdc++ -s -o $(DIST)/$(LOCAL_NAME)64$(WIN_LIB_EXT) $(LOCALWIN64OBJFILES) -lws2_32
 
 $(WIN64_BUILD_DIR)/Local.o: $(SRC_DIR)/Local.cpp $(LOCALHEADERFILES)
 	@echo "Compiling Local.cpp"
@@ -180,7 +180,7 @@ $(WIN64_BUILD_DIR)/Local.o: $(SRC_DIR)/Local.cpp $(LOCALHEADERFILES)
 $(DIST)/$(REMOTE_NAME)64$(WIN_EXE_EXT): $(REMOTEWIN64OBJFILES)
 	@echo "Linking object files..."
 	@mkdir -p $(DIST)
-	@$(WIN64_GPP) -static-libgcc -static-libstdc++ -s -o $(DIST)/$(REMOTE_NAME)64$(WIN_EXE_EXT) $(REMOTEWIN64OBJFILES)
+	@$(WIN64_GPP) -static-libgcc -static-libstdc++ -s -o $(DIST)/$(REMOTE_NAME)64$(WIN_EXE_EXT) $(REMOTEWIN64OBJFILES) -lws2_32
 
 $(WIN64_BUILD_DIR)/Remote.o: $(SRC_DIR)/Remote.cpp $(REMOTEHEADERFILES)
 	@echo "Compiling Remote.cpp"

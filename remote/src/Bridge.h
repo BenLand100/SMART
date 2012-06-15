@@ -23,7 +23,7 @@
 typedef struct {
     int id;             //PID of the client
     int paired;         //TID of the controller or ZERO if none
-    int refcount;       //Number of times the parent has paired
+    int port;
     int width,height;   //Size of the images that follow this structure in the SHM
     int time;           //Last time client active (zero if SMART hasn't initilized yet)
     int die;            //Set nonzero to have the client terminate
@@ -31,14 +31,25 @@ typedef struct {
     int dbgoff;         //Offset in the SHM where the debug image is stored
     
     /**
-     * Comm protocol - Controller sets arguments then sets funid to the ID 
-     * (nonzero) of the requested function. The Client executes the function
-     * then stores the results in args. Finally, the client sets funid back 
-     * to zero to signify the function is completed.
+     * Comm protocol - Controller sets arguments then writes funid to the client's
+     * socket to notify it of the new call. The Client executes the function
+     * then stores the results in args. Finally, the client echos the funid to
+     * the controller
      */
-    unsigned char funid, args[4096];
+    unsigned args[4096];
 } shm_data;
 
+
+#ifndef _WIN32
+#include <unistd.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h> 
+#else
+
+#endif
 
 /**
  * Comm protocol: use these numbers as funid, everything less or equal to 

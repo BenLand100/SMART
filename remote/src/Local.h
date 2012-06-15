@@ -44,10 +44,13 @@ extern "C" int GetFunctionInfo(int, void*&, char*&);
 
 typedef struct {
     int width,height;
+    int refcount;
     #ifndef _WIN32
+    int socket;
     int fd;
     void* memmap;
     #else
+    SOCKET socket;
     HANDLE file;
     HANDLE memmap;
     #endif

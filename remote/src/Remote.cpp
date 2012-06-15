@@ -40,7 +40,15 @@ static char *root,*params,*initseq,*useragent,*jvmpath,*maxmem;
 static int width,height;
 static void *img,*dbg;
 static void *memmap;
+static int server_socket,client_socket;
 static void **functions;
+
+static char shmfile[256];
+#ifndef _WIN32
+static int fd;
+#else
+
+#endif
 
 shm_data *data;
 
@@ -113,8 +121,8 @@ void initSMART() {
 /**
  * Executes functions passed from the paired process
  */
-void execfun() {
-    switch (data->funid) {
+void execfun(int funid) {
+    switch (funid) {
         case getRefresh:
             *(int*)(data->args) = ((type_getRefresh)(functions[getRefresh-FirstFunc]))();
             break;
@@ -204,14 +212,81 @@ void execfun() {
             //do nothing
             break;
         default:
-            cout << "Invalid function id: " << data->funid << '\n';
+            cout << "Invalid function id: " << funid << '\n';
     }
-    data->funid = 0;
+}
+
+int init_socks(int &port) {
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0) {
+        return 0; //failed
+    }
+    port = 4200;
+    while (port < 4300) { //No one will open 100 SMARTs on one machine... right?
+        struct sockaddr_in serv_addr;
+        memset((char *) &serv_addr, 0, sizeof(serv_addr));
+        serv_addr.sin_family = AF_INET;
+        serv_addr.sin_addr.s_addr = INADDR_ANY;
+        serv_addr.sin_port = htons(port);
+        if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
+            port++;
+            continue;
+        } else {
+            break;
+        }
+    }
+    if (port == 4300) {
+        port = 0;
+        #ifndef _WIN32
+            close(sockfd);
+        #else
+            closesocket(sockfd);
+        #endif
+        return 0; //failed
+    }
+    listen(sockfd,5);
+    return sockfd;
+}
+
+int poll_conn(int server_socket) {
+    struct timeval tv;
+    tv.tv_sec = 0;
+    tv.tv_usec = 100000;
+    fd_set rfds;
+    FD_ZERO(&rfds);
+    FD_SET(server_socket, &rfds);
+    if (select(server_socket+1, &rfds, &rfds, NULL, &tv)) {
+        cout << "Client socket connected\n";
+        int client_socket = accept(server_socket,NULL,NULL);
+        if (client_socket > 0) return client_socket;
+    }
+    return 0;
+}
+
+void clean_shm() {
+    #ifndef _WIN32
+    //Free memory and delete SMART.[pid] on terminate
+    munmap(memmap,width*height*2*4+sizeof(shm_data));
+    close(fd);
+    unlink(shmfile);
+    #else
+    UnmapViewOfFile(data);
+    CloseHandle(memmap);
+    DeleteFile(shmfile);
+    #endif
 }
 
 int main(int argc, char** argv) {
     //Read init args from arguments
     if (argc != 10) exit(0);
+    
+    #ifdef _WIN32
+    WORD wVersionRequested;
+    WSADATA wsaData;
+    int err;
+    wVersionRequested = MAKEWORD(2, 2);
+    WSAStartup(wVersionRequested, &wsaData);
+    #endif
     
     path = argv[1];
     if (strlen(path)==0) path = (char*)".";    
@@ -229,10 +304,9 @@ int main(int argc, char** argv) {
     if (strlen(maxmem)<=0) maxmem = 0;
    
     //Create the shared memory file
-    char shmfile[256];
     #ifndef _WIN32
     sprintf(shmfile,"SMART.%i",getpid());
-    int fd = open(shmfile,O_CREAT|O_RDWR,S_IRWXU|S_IRWXG|S_IRWXO); 
+    fd = open(shmfile,O_CREAT|O_RDWR,S_IRWXU|S_IRWXG|S_IRWXO); 
     lseek(fd,width*height*2*4+sizeof(shm_data),0);
     write(fd,"\0",1); //ensure proper size
     fsync(fd); //flush to disk
@@ -262,12 +336,12 @@ int main(int argc, char** argv) {
     #else
     data->id = GetCurrentProcessId();
     #endif
+    data->port = 0;
     data->paired = 0;
     data->width = width;
     data->height = height;
     data->time = 0;
     data->die = 0;
-    data->funid = 0;
     data->imgoff = sizeof(shm_data);
     data->imgoff = sizeof(shm_data)+4*width*height;
     #ifndef _WIN32
@@ -279,6 +353,24 @@ int main(int argc, char** argv) {
     //Let SMART use the shared memory for the images
     img = (((char*)data) + data->imgoff);
     dbg = (((char*)data) + data->dbgoff);
+    
+    int port;
+    server_socket = init_socks(port);
+    data->port = port;
+    client_socket = 0;
+    if (!server_socket) {
+        cout << "Error starting sockets\n";
+        clean_shm();
+        exit(1);
+    }
+    unsigned int i = 0;
+    while (!(client_socket = poll_conn(server_socket))) {
+        if (i++ > 25) {
+            cout << "Failed initial socket pairing\n";
+            clean_shm();
+            exit(1);
+        }
+    }
     
     //Load the smart plugin and link functions
     initSMART();
@@ -293,7 +385,37 @@ int main(int argc, char** argv) {
     //sleep by a signal
     for (unsigned int i = 0; !data->die && ((type_isActive)functions[isActive-FirstFunc])(); i++) {
         data->time = time(0);
-        if (data->funid != 0) execfun();
+        if (client_socket) {
+            struct timeval tv;
+            tv.tv_sec = 0;
+            tv.tv_usec = 100000;
+            fd_set rfds;
+            FD_ZERO(&rfds);
+            FD_SET(client_socket, &rfds);
+            for (int i = 0; i < 25 && select(client_socket+1, &rfds, NULL, NULL, &tv); i++) {
+                int funid;
+                if (recv(client_socket,(char*)&funid,sizeof(int),0) != sizeof(int)) {
+                    #ifndef _WIN32
+                        close(client_socket);
+                    #else
+                        closesocket(client_socket);
+                    #endif
+                    client_socket = 0;
+                } else {
+                    execfun(funid);
+                    if (send(client_socket,(const char*)&funid,sizeof(int),0) != sizeof(int)) {
+                        #ifndef _WIN32
+                            close(client_socket);
+                        #else
+                            closesocket(client_socket);
+                        #endif
+                        client_socket = 0;
+                    }
+                }
+            }
+        } else {
+            client_socket = poll_conn(server_socket);
+        }
         #ifndef _WIN32
         if (data->paired && syscall(SYS_tkill,data->paired,0)) {
         #else
@@ -302,7 +424,6 @@ int main(int argc, char** argv) {
             if (!paired) {
                 cout << "Paired thread no longer exists: reset\n";
                 data->paired = 0;
-                data->refcount = 0; 
             }
         }
         if (paired && !data->paired) {
@@ -316,31 +437,40 @@ int main(int argc, char** argv) {
         #endif
             cout << "Paired thread terminated: reset\n";
             data->paired = 0;
-            data->refcount = 0;
+            #ifndef _WIN32
+                close(client_socket);
+            #else
+                closesocket(client_socket);
+            #endif
+            client_socket = 0;
             #ifndef _WIN32
             fsync(fd);
             #else
             FlushFileBuffers(file);
             #endif
         }
-        #ifndef _WIN32
-        usleep(10); //ms
-        #else
-        Sleep(10); //ms
-        #endif
     }
     
-    #ifndef _WIN32
-    //Free memory and delete SMART.[pid] on terminate
-    munmap(memmap,width*height*2*4+sizeof(shm_data));
-    close(fd);
-    unlink(shmfile);
-    #else
-    if (paired) CloseHandle(paired);
-    UnmapViewOfFile(data);
-    CloseHandle(memmap);
+    #ifdef _WIN32
     CloseHandle(file);
-    DeleteFile(shmfile);
+    if (paired) CloseHandle(paired);
+    #endif
+    
+    clean_shm();
+    #ifndef _WIN32
+        close(server_socket);
+    #else
+        closesocket(server_socket);
+    #endif
+    if (client_socket)
+        #ifndef _WIN32
+            close(client_socket);
+        #else
+            closesocket(client_socket);
+        #endif
+    
+    #ifdef _WIN32
+    WSACleanup();
     #endif
     
     exit(1); //Make sure the JVM exits

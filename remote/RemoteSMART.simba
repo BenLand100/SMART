@@ -34,7 +34,7 @@ begin
   end;
   //Otherwise, start a new client (auto pairs)
   //These arguments are old, use new ones in practice. Note the jvmpath is for gentoo, it fails on other systems and tries the fallback jvm paths
-  result:= SmartSpawnClient('./Plugins/','http://world19.runescape.com/',',f5',765,503,'','','/usr/lib/jvm/sun-jre-bin-1.6/lib/amd64/server/libjvm.so',-1);
+  result:= SmartSpawnClient('./Plugins/','http://world19.runescape.com/',',f5',765,503,'','','/usr/lib/jvm/oracle-jre-bin-1.7/lib/amd64/server/libjvm.so',-1);
   SetEIOSTarget('libsmartremote',IntToStr(result)); //Set the client as the mouse/image target
 end;
 
