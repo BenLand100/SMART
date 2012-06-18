@@ -217,12 +217,13 @@ void execfun(int funid) {
 }
 
 int init_socks(int &port) {
-    int server_socket = socket(AF_INET, SOCK_STREAM, 0);
+    int server_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (server_socket < 0) {
         return 0; //failed
     }
     port = 4200;
     while (port < 4300) { //No one will open 100 SMARTs on one machine... right?
+        cout << "Trying port " << port << '\n';
         struct sockaddr_in local;
         memset((char *) &local, 0, sizeof(local));
         local.sin_family = AF_INET;
@@ -249,6 +250,7 @@ int init_socks(int &port) {
         cout << "Could not listen on server socket\n";
         return 0;
     }
+    cout << "Remote socket listening\n";
     return server_socket;
 }
 
@@ -260,8 +262,9 @@ int poll_conn(int server_socket) {
     FD_ZERO(&rfds);
     FD_SET(server_socket, &rfds);
     if (select(server_socket+1, &rfds, &rfds, NULL, &tv)) {
-        cout << "Client socket connected\n";
+        cout << "Client socket connected: ";
         int client_socket = accept(server_socket,NULL,NULL);
+        cout << client_socket << '\n';
         if (client_socket > 0) return client_socket;
     }
     return 0;
@@ -348,6 +351,15 @@ int main(int argc, char** argv) {
     data->die = 0;
     data->imgoff = sizeof(shm_data);
     data->imgoff = sizeof(shm_data)+4*width*height;
+    int port;
+    server_socket = init_socks(port);
+    data->port = port;
+    client_socket = 0;
+    if (!server_socket) {
+        cout << "Error starting sockets\n";
+        clean_shm();
+        exit(1);
+    }
     #ifndef _WIN32
     fsync(fd);
     #else
@@ -358,15 +370,7 @@ int main(int argc, char** argv) {
     img = (((char*)data) + data->imgoff);
     dbg = (((char*)data) + data->dbgoff);
     
-    int port;
-    server_socket = init_socks(port);
-    data->port = port;
-    client_socket = 0;
-    if (!server_socket) {
-        cout << "Error starting sockets\n";
-        clean_shm();
-        exit(1);
-    }
+
     unsigned int i = 0;
     while (!(client_socket = poll_conn(server_socket))) {
         if (i++ > 25) {

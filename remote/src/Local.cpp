@@ -30,6 +30,7 @@
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <dirent.h>
+#include <errno.h>
 #endif
 
 using namespace std;
@@ -90,18 +91,21 @@ bool resock(SMARTClient *client) {
         cout << "Could not resolve localhost, check your network settings\n";
         return false;
     }
-    client->socket = socket(AF_INET, SOCK_STREAM, 0);
+    client->socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     struct sockaddr_in local;
     memset((char *) &local, 0, sizeof(local));
     local.sin_family = AF_INET;
-    memcpy((char *)localhost->h_addr, (char *)&local.sin_addr.s_addr, localhost->h_length);
+    memcpy((char *)&local.sin_addr.s_addr,(char *)localhost->h_addr, localhost->h_length);
     local.sin_port = htons(client->data->port);
-    cout << "Attempting to connect...\n";
-    if (connect(client->socket,(struct sockaddr *) &local,sizeof(local)) < 0) {
-        cout << "Could not connect socket\n";
+    cout << "Attempting to connect to localhost:" << client->data->port << "\n";
+    int res;
+    if ((res=connect(client->socket,(struct sockaddr *) &local,sizeof(local))) < 0) {
+        cout << "Could not connect socket: ";
         #ifndef _WIN32
+            cout << errno << '\n';
             close(client->socket);
         #else
+            cout << WSAGetLastError() << '\n';
             closesocket(client->socket);
         #endif
         client->socket = 0;
