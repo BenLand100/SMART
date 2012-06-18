@@ -217,18 +217,18 @@ void execfun(int funid) {
 }
 
 int init_socks(int &port) {
-    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd < 0) {
+    int server_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_socket < 0) {
         return 0; //failed
     }
     port = 4200;
     while (port < 4300) { //No one will open 100 SMARTs on one machine... right?
-        struct sockaddr_in serv_addr;
-        memset((char *) &serv_addr, 0, sizeof(serv_addr));
-        serv_addr.sin_family = AF_INET;
-        serv_addr.sin_addr.s_addr = INADDR_ANY;
-        serv_addr.sin_port = htons(port);
-        if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
+        struct sockaddr_in local;
+        memset((char *) &local, 0, sizeof(local));
+        local.sin_family = AF_INET;
+        local.sin_addr.s_addr = INADDR_ANY;
+        local.sin_port = htons(port);
+        if (bind(server_socket, (struct sockaddr *) &local, sizeof(local)) < 0) {
             port++;
             continue;
         } else {
@@ -238,14 +238,18 @@ int init_socks(int &port) {
     if (port == 4300) {
         port = 0;
         #ifndef _WIN32
-            close(sockfd);
+            close(server_socket);
         #else
-            closesocket(sockfd);
+            closesocket(server_socket);
         #endif
+        cout << "Could not bind server socket\n";
         return 0; //failed
     }
-    listen(sockfd,5);
-    return sockfd;
+    if (listen(server_socket,5)!=0) {
+        cout << "Could not listen on server socket\n";
+        return 0;
+    }
+    return server_socket;
 }
 
 int poll_conn(int server_socket) {

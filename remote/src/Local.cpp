@@ -84,15 +84,20 @@ bool resock(SMARTClient *client) {
         #else
             closesocket(client->socket);
         #endif
+    client->socket = 0;
+    struct hostent *localhost = gethostbyname("localhost");
+    if (!localhost) {
+        cout << "Could not resolve localhost, check your network settings\n";
+        return false;
+    }
     client->socket = socket(AF_INET, SOCK_STREAM, 0);
-    struct hostent *server = gethostbyname("localhost");
-    struct sockaddr_in localhost;
-    memset((char *) &localhost, 0, sizeof(localhost));
-    localhost.sin_family = AF_INET;
-    memcpy((char *)server->h_addr, (char *)&localhost.sin_addr.s_addr, server->h_length);
-    localhost.sin_port = htons(client->data->port);
+    struct sockaddr_in local;
+    memset((char *) &local, 0, sizeof(local));
+    local.sin_family = AF_INET;
+    memcpy((char *)localhost->h_addr, (char *)&local.sin_addr.s_addr, localhost->h_length);
+    local.sin_port = htons(client->data->port);
     cout << "Attempting to connect...\n";
-    if (connect(client->socket,(struct sockaddr *) &localhost,sizeof(localhost)) < 0) {
+    if (connect(client->socket,(struct sockaddr *) &local,sizeof(local)) < 0) {
         cout << "Could not connect socket\n";
         #ifndef _WIN32
             close(client->socket);
