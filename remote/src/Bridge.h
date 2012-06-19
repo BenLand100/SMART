@@ -36,7 +36,7 @@ typedef struct {
      * then stores the results in args. Finally, the client echos the funid to
      * the controller
      */
-    unsigned args[4096];
+    unsigned char args[4096];
 } shm_data;
 
 

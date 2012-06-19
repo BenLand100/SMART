@@ -350,7 +350,7 @@ int main(int argc, char** argv) {
     data->time = 0;
     data->die = 0;
     data->imgoff = sizeof(shm_data);
-    data->imgoff = sizeof(shm_data)+4*width*height;
+    data->dbgoff = sizeof(shm_data)+4*width*height;
     int port;
     server_socket = init_socks(port);
     data->port = port;
