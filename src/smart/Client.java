@@ -77,7 +77,7 @@ import sun.applet.AppletClassLoader;
  */
 public class Client implements ActionListener, ChangeListener {
     
-    public static final String VERSION = "7.2(dev)";
+    public static final String VERSION = "7.2";
     public static final String TITLE = "SMARTv" + VERSION + " - SMART Minimizing Autoing Resource Thing - By BenLand100";
     public static final String USER_AGENT; //default for an (old) firefox version is set below
     static {
@@ -853,6 +853,7 @@ public class Client implements ActionListener, ChangeListener {
 
     public float getFieldFloat(Object o, String path) {
         o = getFieldObject(o, path);
+
         if (o != null && o instanceof Float) {
             return ((Float) o).floatValue();
         }
