@@ -1,4 +1,4 @@
-#   Copyright 2010 by Benjamin J. Land (a.k.a. BenLand100)
+#   Copyright 2012 by Benjamin J. Land (a.k.a. BenLand100)
 # 
 #   This file is part of the SMART Minimizing Autoing Resource Thing (SMART)
 # 
@@ -21,19 +21,26 @@ WIN64_GPP=x86_64-w64-mingw32-g++
 LIN_GPP=i686-pc-linux-gnu-g++
 LIN64_GPP=x86_64-pc-linux-gnu-g++
 JAVAC=javac
-JAVA=java
+JAR=jar
 
 DIST=dist
 BUILD=build
-WIN_NAME=libsmart32.dll
-WIN64_NAME=libsmart64.dll
-LIN_NAME=libsmart32.so
-LIN64_NAME=libsmart64.so
+WIN_NAME=libsmartremote32.dll
+WIN64_NAME=libsmartremote64.dll
+LIN_NAME=libsmartremote32.so
+LIN64_NAME=libsmartremote64.so
 
-WIN_COMPILE_ARGS=-DWINDOWS -Wall -O0 -s -c
-WIN64_COMPILE_ARGS=-DWINDOWS -Wall -O0 -s -c
-LIN_COMPILE_ARGS=-fPIC -DLINUX -Wall -O3 -s -c
-LIN64_COMPILE_ARGS=-fPIC -DLINUX -Wall -O3 -s -c
+JNI_WIN_NAME=libsmartjni32.dll
+JNI_WIN64_NAME=libsmartjni64.dll
+JNI_LIN_NAME=libsmartjni32.so
+JNI_LIN64_NAME=libsmartjni64.so
+
+JAVA_NAME=smart.jar
+
+WIN_COMPILE_ARGS=-DWINDOWS -O3 -s -c
+WIN64_COMPILE_ARGS=-DWINDOWS -O3 -s -c
+LIN_COMPILE_ARGS=-fPIC -DLINUX -O3 -s -c
+LIN64_COMPILE_ARGS=-fPIC -DLINUX -O3 -s -c
 
 SRC_DIR=src
 LIN_BUILD_DIR=$(BUILD)/linux32
@@ -43,78 +50,55 @@ WIN64_BUILD_DIR=$(BUILD)/windows64
 JAVA_BUILD_DIR=$(BUILD)/java
 
 CPPSOURCEFILES= \
-	$(SRC_DIR)/Main.cpp \
-	$(SRC_DIR)/Color.cpp \
-	$(SRC_DIR)/ClassLoader.cpp \
-	$(SRC_DIR)/Input.cpp \
-	$(SRC_DIR)/Reflection.cpp \
-	$(SRC_DIR)/JVM.cpp \
-	$(SRC_DIR)/Smart.cpp \
-	$(SRC_DIR)/EIOS.cpp
+	$(SRC_DIR)/SmartRemote.cpp
+	
+JNI_CPPSOURCEFILES= \
+	$(SRC_DIR)/SmartJNI.cpp
 	
 CPPHEADERFILES= \
-	$(SRC_DIR)/jni.h \
-	$(SRC_DIR)/jni_md.h \
-	$(SRC_DIR)/Main.h \
-	$(SRC_DIR)/Color.h \
-	$(SRC_DIR)/ClassLoader.h \
-	$(SRC_DIR)/Input.h \
-	$(SRC_DIR)/Reflection.h \
-	$(SRC_DIR)/JVM.h \
-	$(SRC_DIR)/Smart.h \
-	$(SRC_DIR)/EIOS.h
+	$(SRC_DIR)/SmartRemote.h \
+	$(SRC_DIR)/libsmartremote.def
+
+JNI_CPPHEADERFILES= \
+    $(SRC_DIR)/jni.h \
 	
 WINOBJFILES= \
-	$(WIN_BUILD_DIR)/Main.o \
-	$(WIN_BUILD_DIR)/Color.o \
-	$(WIN_BUILD_DIR)/ClassLoader.o \
-	$(WIN_BUILD_DIR)/Input.o \
-	$(WIN_BUILD_DIR)/Reflection.o \
-	$(WIN_BUILD_DIR)/JVM.o \
-	$(WIN_BUILD_DIR)/Smart.o \
-	$(WIN_BUILD_DIR)/EIOS.o
+	$(WIN_BUILD_DIR)/SmartRemote.o
+	 
+JNI_WINOBJFILES= \
+	$(WIN_BUILD_DIR)/SmartJNI.o 
 	
 WIN64OBJFILES= \
-	$(WIN64_BUILD_DIR)/Main.o \
-	$(WIN64_BUILD_DIR)/Color.o \
-	$(WIN64_BUILD_DIR)/ClassLoader.o \
-	$(WIN64_BUILD_DIR)/Input.o \
-	$(WIN64_BUILD_DIR)/Reflection.o \
-	$(WIN64_BUILD_DIR)/JVM.o \
-	$(WIN64_BUILD_DIR)/Smart.o \
-	$(WIN64_BUILD_DIR)/EIOS.o
+	$(WIN64_BUILD_DIR)/SmartRemote.o 
+	
+JNI_WIN64OBJFILES= \
+	$(WIN64_BUILD_DIR)/SmartJNI.o 
 	
 LINOBJFILES= \
-	$(LIN_BUILD_DIR)/Main.o \
-	$(LIN_BUILD_DIR)/Color.o \
-	$(LIN_BUILD_DIR)/ClassLoader.o \
-	$(LIN_BUILD_DIR)/Input.o \
-	$(LIN_BUILD_DIR)/Reflection.o \
-	$(LIN_BUILD_DIR)/JVM.o \
-	$(LIN_BUILD_DIR)/Smart.o \
-	$(LIN_BUILD_DIR)/EIOS.o
+	$(LIN_BUILD_DIR)/SmartRemote.o 
+	
+JNI_LINOBJFILES= \
+	$(LIN_BUILD_DIR)/SmartJNI.o 
 	
 LIN64OBJFILES= \
-	$(LIN64_BUILD_DIR)/Main.o \
-	$(LIN64_BUILD_DIR)/Color.o \
-	$(LIN64_BUILD_DIR)/ClassLoader.o \
-	$(LIN64_BUILD_DIR)/Input.o \
-	$(LIN64_BUILD_DIR)/Reflection.o \
-	$(LIN64_BUILD_DIR)/JVM.o \
-	$(LIN64_BUILD_DIR)/Smart.o \
-	$(LIN64_BUILD_DIR)/EIOS.o
+	$(LIN64_BUILD_DIR)/SmartRemote.o
 	
-SMARTSOURCES= \
-    $(SRC_DIR)/java/awt/Canvas.java \
-    $(SRC_DIR)/smart/BlockingEventQueue.java \
-    $(SRC_DIR)/smart/Client.java \
-    $(SRC_DIR)/smart/ClientStub.java \
-    $(SRC_DIR)/smart/EventNazi.java \
-    $(SRC_DIR)/smart/EventRedirect.java \
-    $(SRC_DIR)/smart/UnblockedEvent.java
+JNI_LIN64OBJFILES= \
+	$(LIN64_BUILD_DIR)/SmartJNI.o 
+	
+JAVASOURCES= \
+    $(SRC_DIR)/Canvas.java \
+    $(SRC_DIR)/Main.java \
+    $(SRC_DIR)/BlockingEventQueue.java \
+    $(SRC_DIR)/Client.java \
+    $(SRC_DIR)/ClientStub.java \
+    $(SRC_DIR)/EventNazi.java \
+    $(SRC_DIR)/EventRedirect.java \
+    $(SRC_DIR)/UnblockedEvent.java
     
-SMARTCLASSES= \
+JAVACLASSES= \
     $(JAVA_BUILD_DIR)/java/awt/Canvas.class \
+    $(JAVA_BUILD_DIR)/smart/Main.class \
     $(JAVA_BUILD_DIR)/smart/BlockingEventQueue.class \
     $(JAVA_BUILD_DIR)/smart/Client.class \
     $(JAVA_BUILD_DIR)/smart/ClientStub.class \
@@ -127,21 +111,17 @@ all:
 	
 everything: linux linux64 windows windows64
 
-linux: $(DIST)/$(LIN_NAME)
+linux: $(JAVACLASSES) $(DIST)/$(LIN_NAME) $(DIST)/$(JNI_LIN_NAME)
 	@echo "Finished Building the Linux 32bit SMART distribution"
-	@make -C remote DIST=../dist BUILD=../build linux
 	
-linux64: $(DIST)/$(LIN64_NAME)
+linux64: $(JAVACLASSES) $(DIST)/$(LIN64_NAME) $(DIST)/$(JNI_LIN64_NAME)
 	@echo "Finished Building the Linux 64bit SMART distribution"
-	@make -C remote DIST=../dist BUILD=../build linux64
 
-windows: $(DIST)/$(WIN_NAME)
+windows: $(JAVACLASSES) $(DIST)/$(WIN_NAME) $(DIST)/$(JNI_WIN_NAME)
 	@echo "Finished Building the Windows 32bit SMART distribution"
-	@make -C remote DIST=../dist BUILD=../build windows
 
-windows64: $(DIST)/$(WIN64_NAME)
+windows64: $(JAVACLASSES) $(DIST)/$(WIN64_NAME) $(DIST)/$(JNI_WIN64_NAME)
 	@echo "Finished Building the Windows 64bit SMART distribution"
-	@make -C remote DIST=../dist BUILD=../build windows64
 	
 test: test-apps/test-windows.cpp test-apps/test-linux.cpp test-apps/test-scar.cpp
 	@mkdir -p $(DIST)
@@ -163,210 +143,107 @@ test: test-apps/test-windows.cpp test-apps/test-linux.cpp test-apps/test-scar.cp
 	
 clean: 
 	@echo "Cleaning build files..."
-	@rm -rf $(BUILD) $(DIST)
-	@rm -f $(SRC_DIR)/classes.data    
+	@rm -rf $(BUILD) $(DIST)  
 	
 #### LINUX BUILDING DIRECTIVES ####
 
 $(DIST)/$(LIN_NAME): $(LINOBJFILES)
-	@echo "Linking SMART object files..."
+	@echo "Linking Linux Remote object files..."
 	@mkdir -p $(DIST)
 	@$(LIN_GPP) -fPIC -shared -s -o $(DIST)/$(LIN_NAME) $(LINOBJFILES)
+	
+$(DIST)/$(JNI_LIN_NAME): $(JNI_LINOBJFILES)
+	@echo "Linking Linux JNI object files..."
+	@mkdir -p $(DIST)
+	@$(LIN_GPP) -fPIC -shared -s -o $(DIST)/$(JNI_LIN_NAME) $(JNI_LINOBJFILES)
 
-$(LIN_BUILD_DIR)/Main.o: $(SRC_DIR)/Main.cpp $(CPPHEADERFILES)
-	@echo "Compiling Main.cpp"
+$(LIN_BUILD_DIR)/SmartRemote.o: $(SRC_DIR)/SmartRemote.cpp $(CPPHEADERFILES)
+	@echo "Compiling SmartRemote.cpp"
 	@mkdir -p $(LIN_BUILD_DIR)
-	@$(LIN_GPP) $(LIN_COMPILE_ARGS) -o $(LIN_BUILD_DIR)/Main.o $(SRC_DIR)/Main.cpp
+	@$(LIN_GPP) $(LIN_COMPILE_ARGS) -o $(LIN_BUILD_DIR)/SmartRemote.o $(SRC_DIR)/SmartRemote.cpp
+	
+$(LIN_BUILD_DIR)/SmartJNI.o: $(SRC_DIR)/SmartJNI.cpp $(JNI_CPPHEADERFILES)
+	@echo "Compiling SmartJNI.cpp"
+	@mkdir -p $(LIN_BUILD_DIR)
+	@$(LIN_GPP) $(LIN_COMPILE_ARGS) -o $(LIN_BUILD_DIR)/SmartJNI.o $(SRC_DIR)/SmartJNI.cpp
 
-${LIN_BUILD_DIR}/Color.o: $(SRC_DIR)/Color.cpp $(CPPHEADERFILES)
-	@echo "Compiling Color.cpp"
-	@mkdir -p $(LIN_BUILD_DIR)
-	@$(LIN_GPP) $(LIN_COMPILE_ARGS) -o $(LIN_BUILD_DIR)/Color.o $(SRC_DIR)/Color.cpp
-
-${LIN_BUILD_DIR}/ClassLoader.o: $(SRC_DIR)/ClassLoader.cpp $(SRC_DIR)/classes.data $(CPPHEADERFILES)
-	@echo "Compiling ClassLoader.cpp"
-	@mkdir -p $(LIN_BUILD_DIR)
-	@$(LIN_GPP) $(LIN_COMPILE_ARGS) -o $(LIN_BUILD_DIR)/ClassLoader.o $(SRC_DIR)/ClassLoader.cpp
-
-${LIN_BUILD_DIR}/Input.o: $(SRC_DIR)/Input.cpp $(CPPHEADERFILES)
-	@echo "Compiling Input.cpp"
-	@mkdir -p $(LIN_BUILD_DIR)
-	@$(LIN_GPP) $(LIN_COMPILE_ARGS) -o $(LIN_BUILD_DIR)/Input.o $(SRC_DIR)/Input.cpp
-
-${LIN_BUILD_DIR}/Reflection.o: $(SRC_DIR)/Reflection.cpp $(CPPHEADERFILES)
-	@echo "Compiling Reflection.cpp"
-	@mkdir -p $(LIN_BUILD_DIR)
-	@$(LIN_GPP) $(LIN_COMPILE_ARGS) -o $(LIN_BUILD_DIR)/Reflection.o $(SRC_DIR)/Reflection.cpp
-
-${LIN_BUILD_DIR}/JVM.o: $(SRC_DIR)/JVM.cpp $(CPPHEADERFILES)
-	@echo "Compiling JVM.cpp"
-	@mkdir -p $(LIN_BUILD_DIR)
-	@$(LIN_GPP) $(LIN_COMPILE_ARGS) -o $(LIN_BUILD_DIR)/JVM.o $(SRC_DIR)/JVM.cpp
-
-${LIN_BUILD_DIR}/Smart.o: $(SRC_DIR)/Smart.cpp $(CPPHEADERFILES)
-	@echo "Compiling Smart.cpp"
-	@mkdir -p $(LIN_BUILD_DIR)
-	@$(LIN_GPP) $(LIN_COMPILE_ARGS) -o $(LIN_BUILD_DIR)/Smart.o $(SRC_DIR)/Smart.cpp
-
-${LIN_BUILD_DIR}/EIOS.o: $(SRC_DIR)/EIOS.cpp $(CPPHEADERFILES)
-	@echo "Compiling EIOS.cpp"
-	@mkdir -p $(LIN_BUILD_DIR)
-	@$(LIN_GPP) $(LIN_COMPILE_ARGS) -o $(LIN_BUILD_DIR)/EIOS.o $(SRC_DIR)/EIOS.cpp
 	
 #### LINUX64 BUILDING DIRECTIVES ####
 
 $(DIST)/$(LIN64_NAME): $(LIN64OBJFILES)
-	@echo "Linking SMART object files..."
+	@echo "Linking Linux64 Remote object files..."
 	@mkdir -p $(DIST)
 	@$(LIN64_GPP) -fPIC -shared -s -o $(DIST)/$(LIN64_NAME) $(LIN64OBJFILES)
+	
+$(DIST)/$(JNI_LIN64_NAME): $(JNI_LIN64OBJFILES)
+	@echo "Linking Linux64 JNI object files..."
+	@mkdir -p $(DIST)
+	@$(LIN64_GPP) -fPIC -shared -s -o $(DIST)/$(JNI_LIN64_NAME) $(JNI_LIN64OBJFILES)
 
-$(LIN64_BUILD_DIR)/Main.o: $(SRC_DIR)/Main.cpp $(CPPHEADERFILES)
-	@echo "Compiling Main.cpp"
+$(LIN64_BUILD_DIR)/SmartRemote.o: $(SRC_DIR)/SmartRemote.cpp $(CPPHEADERFILES)
+	@echo "Compiling SmartRemote.cpp"
 	@mkdir -p $(LIN64_BUILD_DIR)
-	@$(LIN64_GPP) $(LIN64_COMPILE_ARGS) -o $(LIN64_BUILD_DIR)/Main.o $(SRC_DIR)/Main.cpp
+	@$(LIN64_GPP) $(LIN64_COMPILE_ARGS) -o $(LIN64_BUILD_DIR)/SmartRemote.o $(SRC_DIR)/SmartRemote.cpp
+	
+$(LIN64_BUILD_DIR)/SmartJNI.o: $(SRC_DIR)/SmartJNI.cpp $(JNI_CPPHEADERFILES)
+	@echo "Compiling SmartJNI.cpp"
+	@mkdir -p $(LIN64_BUILD_DIR)
+	@$(LIN64_GPP) $(LIN64_COMPILE_ARGS) -o $(LIN64_BUILD_DIR)/SmartJNI.o $(SRC_DIR)/SmartJNI.cpp
 
-${LIN64_BUILD_DIR}/Color.o: $(SRC_DIR)/Color.cpp $(CPPHEADERFILES)
-	@echo "Compiling Color.cpp"
-	@mkdir -p $(LIN64_BUILD_DIR)
-	@$(LIN64_GPP) $(LIN64_COMPILE_ARGS) -o $(LIN64_BUILD_DIR)/Color.o $(SRC_DIR)/Color.cpp
-
-${LIN64_BUILD_DIR}/ClassLoader.o: $(SRC_DIR)/ClassLoader.cpp $(SRC_DIR)/classes.data $(CPPHEADERFILES)
-	@echo "Compiling ClassLoader.cpp"
-	@mkdir -p $(LIN64_BUILD_DIR)
-	@$(LIN64_GPP) $(LIN64_COMPILE_ARGS) -o $(LIN64_BUILD_DIR)/ClassLoader.o $(SRC_DIR)/ClassLoader.cpp
-
-${LIN64_BUILD_DIR}/Input.o: $(SRC_DIR)/Input.cpp $(CPPHEADERFILES)
-	@echo "Compiling Input.cpp"
-	@mkdir -p $(LIN64_BUILD_DIR)
-	@$(LIN64_GPP) $(LIN64_COMPILE_ARGS) -o $(LIN64_BUILD_DIR)/Input.o $(SRC_DIR)/Input.cpp
-
-${LIN64_BUILD_DIR}/Reflection.o: $(SRC_DIR)/Reflection.cpp $(CPPHEADERFILES)
-	@echo "Compiling Reflection.cpp"
-	@mkdir -p $(LIN64_BUILD_DIR)
-	@$(LIN64_GPP) $(LIN64_COMPILE_ARGS) -o $(LIN64_BUILD_DIR)/Reflection.o $(SRC_DIR)/Reflection.cpp
-
-${LIN64_BUILD_DIR}/JVM.o: $(SRC_DIR)/JVM.cpp $(CPPHEADERFILES)
-	@echo "Compiling JVM.cpp"
-	@mkdir -p $(LIN64_BUILD_DIR)
-	@$(LIN64_GPP) $(LIN64_COMPILE_ARGS) -o $(LIN64_BUILD_DIR)/JVM.o $(SRC_DIR)/JVM.cpp
-
-${LIN64_BUILD_DIR}/Smart.o: $(SRC_DIR)/Smart.cpp $(CPPHEADERFILES)
-	@echo "Compiling Smart.cpp"
-	@mkdir -p $(LIN64_BUILD_DIR)
-	@$(LIN64_GPP) $(LIN64_COMPILE_ARGS) -o $(LIN64_BUILD_DIR)/Smart.o $(SRC_DIR)/Smart.cpp
-
-${LIN64_BUILD_DIR}/EIOS.o: $(SRC_DIR)/EIOS.cpp $(CPPHEADERFILES)
-	@echo "Compiling EIOS.cpp"
-	@mkdir -p $(LIN64_BUILD_DIR)
-	@$(LIN64_GPP) $(LIN64_COMPILE_ARGS) -o $(LIN64_BUILD_DIR)/EIOS.o $(SRC_DIR)/EIOS.cpp
 
 #### WINDOWS BUILDING DIRECTIVES ####
 
 $(DIST)/$(WIN_NAME): $(WINOBJFILES)
-	@echo "Linking object files..."
+	@echo "Linking Windows Remote object files..."
 	@mkdir -p $(DIST)
-	@$(WIN_GPP) -Wl,$(SRC_DIR)/libsmart.def -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(WIN_NAME) $(WINOBJFILES)
-
-$(WIN_BUILD_DIR)/Main.o: $(SRC_DIR)/Main.cpp $(CPPHEADERFILES)
-	@echo "Compiling Main.cpp"
-	@mkdir -p $(WIN_BUILD_DIR)
-	@$(WIN_GPP) $(WIN_COMPILE_ARGS) -o $(WIN_BUILD_DIR)/Main.o $(SRC_DIR)/Main.cpp
-
-${WIN_BUILD_DIR}/Color.o: $(SRC_DIR)/Color.cpp $(CPPHEADERFILES)
-	@echo "Compiling Color.cpp"
-	@mkdir -p $(WIN_BUILD_DIR)
-	@$(WIN_GPP) $(WIN_COMPILE_ARGS) -o $(WIN_BUILD_DIR)/Color.o $(SRC_DIR)/Color.cpp
-
-${WIN_BUILD_DIR}/ClassLoader.o: $(SRC_DIR)/ClassLoader.cpp $(SRC_DIR)/classes.data $(CPPHEADERFILES)
-	@echo "Compiling Classloader.cpp"
-	@mkdir -p $(WIN_BUILD_DIR)
-	@$(WIN_GPP) $(WIN_COMPILE_ARGS) -o $(WIN_BUILD_DIR)/ClassLoader.o $(SRC_DIR)/ClassLoader.cpp
-
-${WIN_BUILD_DIR}/Input.o: $(SRC_DIR)/Input.cpp $(CPPHEADERFILES)
-	@echo "Compiling Input.cpp"
-	@mkdir -p $(WIN_BUILD_DIR)
-	@$(WIN_GPP) $(WIN_COMPILE_ARGS) -o $(WIN_BUILD_DIR)/Input.o $(SRC_DIR)/Input.cpp
-
-${WIN_BUILD_DIR}/Reflection.o: $(SRC_DIR)/Reflection.cpp $(CPPHEADERFILES)
-	@echo "Compiling Reflection.cpp"
-	@mkdir -p $(WIN_BUILD_DIR)
-	@$(WIN_GPP) $(WIN_COMPILE_ARGS) -o $(WIN_BUILD_DIR)/Reflection.o $(SRC_DIR)/Reflection.cpp
-
-${WIN_BUILD_DIR}/JVM.o: $(SRC_DIR)/JVM.cpp $(CPPHEADERFILES)
-	@echo "Compiling JVM.cpp"
-	@mkdir -p $(WIN_BUILD_DIR)
-	@$(WIN_GPP) $(WIN_COMPILE_ARGS) -o $(WIN_BUILD_DIR)/JVM.o $(SRC_DIR)/JVM.cpp
-
-${WIN_BUILD_DIR}/Smart.o: $(SRC_DIR)/Smart.cpp $(CPPHEADERFILES)
-	@echo "Compiling Smart.cpp"
-	@mkdir -p $(WIN_BUILD_DIR)
-	@$(WIN_GPP) $(WIN_COMPILE_ARGS) -o $(WIN_BUILD_DIR)/Smart.o $(SRC_DIR)/Smart.cpp
+	@$(WIN_GPP) -Wl,$(SRC_DIR)/libsmartremote.def -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(WIN_NAME) $(WINOBJFILES)
 	
-${WIN_BUILD_DIR}/EIOS.o: $(SRC_DIR)/EIOS.cpp $(CPPHEADERFILES)
-	@echo "Compiling EIOS.cpp"
+$(DIST)/$(JNI_WIN_NAME): $(JNI_WINOBJFILES)
+	@echo "Linking Windows JNI object files..."
+	@mkdir -p $(DIST)
+	@$(WIN_GPP) -Wl,$(SRC_DIR)/libsmartremote.def -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(JNI_WIN_NAME) $(JNI_WINOBJFILES)
+
+$(WIN_BUILD_DIR)/SmartRemote.o: $(SRC_DIR)/SmartRemote.cpp $(CPPHEADERFILES)
+	@echo "Compiling SmartRemote.cpp"
 	@mkdir -p $(WIN_BUILD_DIR)
-	@$(WIN_GPP) $(WIN_COMPILE_ARGS) -o $(WIN_BUILD_DIR)/EIOS.o $(SRC_DIR)/EIOS.cpp
+	@$(WIN_GPP) $(WIN_COMPILE_ARGS) -o $(WIN_BUILD_DIR)/SmartRemote.o $(SRC_DIR)/SmartRemote.cpp
+	
+$(WIN_BUILD_DIR)/SmartJNI.o: $(SRC_DIR)/SmartJNI.cpp $(JNI_CPPHEADERFILES)
+	@echo "Compiling SmartJNI.cpp"
+	@mkdir -p $(WIN_BUILD_DIR)
+	@$(WIN_GPP) $(WIN_COMPILE_ARGS) -o $(WIN_BUILD_DIR)/SmartJNI.o $(SRC_DIR)/SmartJNI.cpp
 
 #### WINDOWS64 BUILDING DIRECTIVES ####
 
 $(DIST)/$(WIN64_NAME): $(WIN64OBJFILES)
-	@echo "Linking object files..."
+	@echo "Linking Windows64 Remote object files..."
 	@mkdir -p $(DIST)
-	@$(WIN64_GPP) -Wl,$(SRC_DIR)/libsmart.def -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(WIN64_NAME) $(WIN64OBJFILES)
+	@$(WIN64_GPP) -Wl,$(SRC_DIR)/libsmartremote.def -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(WIN64_NAME) $(WIN64OBJFILES)
 
-$(WIN64_BUILD_DIR)/Main.o: $(SRC_DIR)/Main.cpp $(CPPHEADERFILES)
-	@echo "Compiling Main.cpp"
-	@mkdir -p $(WIN64_BUILD_DIR)
-	@$(WIN64_GPP) $(WIN64_COMPILE_ARGS) -o $(WIN64_BUILD_DIR)/Main.o $(SRC_DIR)/Main.cpp
+$(DIST)/$(JNI_WIN64_NAME): $(JNI_WIN64OBJFILES)
+	@echo "Linking Windows64 JNI object files..."
+	@mkdir -p $(DIST)
+	@$(WIN64_GPP) -Wl,$(SRC_DIR)/libsmartremote.def -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(JNI_WIN64_NAME) $(JNI_WIN64OBJFILES)
 
-${WIN64_BUILD_DIR}/Color.o: $(SRC_DIR)/Color.cpp $(CPPHEADERFILES)
-	@echo "Compiling Color.cpp"
+$(WIN64_BUILD_DIR)/SmartRemote.o: $(SRC_DIR)/SmartRemote.cpp $(CPPHEADERFILES)
+	@echo "Compiling SmartRemote.cpp"
 	@mkdir -p $(WIN64_BUILD_DIR)
-	@$(WIN64_GPP) $(WIN64_COMPILE_ARGS) -o $(WIN64_BUILD_DIR)/Color.o $(SRC_DIR)/Color.cpp
-
-${WIN64_BUILD_DIR}/ClassLoader.o: $(SRC_DIR)/ClassLoader.cpp $(SRC_DIR)/classes.data $(CPPHEADERFILES)
-	@echo "Compiling Classloader.cpp"
-	@mkdir -p $(WIN64_BUILD_DIR)
-	@$(WIN64_GPP) $(WIN64_COMPILE_ARGS) -o $(WIN64_BUILD_DIR)/ClassLoader.o $(SRC_DIR)/ClassLoader.cpp
-
-${WIN64_BUILD_DIR}/Input.o: $(SRC_DIR)/Input.cpp $(CPPHEADERFILES)
-	@echo "Compiling Input.cpp"
-	@mkdir -p $(WIN64_BUILD_DIR)
-	@$(WIN64_GPP) $(WIN64_COMPILE_ARGS) -o $(WIN64_BUILD_DIR)/Input.o $(SRC_DIR)/Input.cpp
-
-${WIN64_BUILD_DIR}/Reflection.o: $(SRC_DIR)/Reflection.cpp $(CPPHEADERFILES)
-	@echo "Compiling Reflection.cpp"
-	@mkdir -p $(WIN64_BUILD_DIR)
-	@$(WIN64_GPP) $(WIN64_COMPILE_ARGS) -o $(WIN64_BUILD_DIR)/Reflection.o $(SRC_DIR)/Reflection.cpp
-
-${WIN64_BUILD_DIR}/JVM.o: $(SRC_DIR)/JVM.cpp $(CPPHEADERFILES)
-	@echo "Compiling JVM.cpp"
-	@mkdir -p $(WIN64_BUILD_DIR)
-	@$(WIN64_GPP) $(WIN64_COMPILE_ARGS) -o $(WIN64_BUILD_DIR)/JVM.o $(SRC_DIR)/JVM.cpp
-
-${WIN64_BUILD_DIR}/Smart.o: $(SRC_DIR)/Smart.cpp $(CPPHEADERFILES)
-	@echo "Compiling Smart.cpp"
-	@mkdir -p $(WIN64_BUILD_DIR)
-	@$(WIN64_GPP) $(WIN64_COMPILE_ARGS) -o $(WIN64_BUILD_DIR)/Smart.o $(SRC_DIR)/Smart.cpp
+	@$(WIN64_GPP) $(WIN64_COMPILE_ARGS) -o $(WIN64_BUILD_DIR)/SmartRemote.o $(SRC_DIR)/SmartRemote.cpp
 	
-${WIN64_BUILD_DIR}/EIOS.o: $(SRC_DIR)/EIOS.cpp $(CPPHEADERFILES)
-	@echo "Compiling EIOS.cpp"
+$(WIN64_BUILD_DIR)/SmartJNI.o: $(SRC_DIR)/SmartJNI.cpp $(JNI_CPPHEADERFILES)
+	@echo "Compiling SmartJNI.cpp"
 	@mkdir -p $(WIN64_BUILD_DIR)
-	@$(WIN64_GPP) $(WIN64_COMPILE_ARGS) -o $(WIN64_BUILD_DIR)/EIOS.o $(SRC_DIR)/EIOS.cpp
+	@$(WIN64_GPP) $(WIN64_COMPILE_ARGS) -o $(WIN64_BUILD_DIR)/SmartJNI.o $(SRC_DIR)/SmartJNI.cpp
 
-#### JAVA/Cypher BUILDING DIRECTIVES ####
 
-src/classes.data: $(SMARTCLASSES) $(BUILD)/cypher/Cypher.class 
-	@echo "Encoding Java classes..."
-	@$(JAVA) -classpath $(BUILD) cypher.Cypher $(JAVA_BUILD_DIR) ./src/classes.data
+#### JAVA BUILDING DIRECTIVES ####
 
-$(BUILD)/cypher/Cypher.class: $(SRC_DIR)/cypher/Cypher.java
-	@echo "Compiling Class Cypher"
-	@mkdir -p $(JAVA_BUILD_DIR)
-	@$(JAVAC) -sourcepath $(SRC_DIR) -d $(BUILD) $(SRC_DIR)/cypher/Cypher.java
-
-$(SMARTCLASSES): $(SMARTSOURCES)
+ $(JAVACLASSES): $(JAVASOURCES)
 	@echo "Compiling Java Classes..."
 	@mkdir -p $(JAVA_BUILD_DIR)
-	@$(JAVAC) -classpath $(JAVA_BUILD_DIR) -sourcepath $(SRC_DIR) -d $(JAVA_BUILD_DIR) $(SMARTSOURCES)
+	@$(JAVAC) -classpath $(JAVA_BUILD_DIR) -sourcepath $(SRC_DIR) -d $(JAVA_BUILD_DIR) $(JAVASOURCES)
+	@echo "Creating JAR Archive..."
+	@mkdir -p $(DIST)
+	@$(JAR) cfe $(DIST)/$(JAVA_NAME) smart.Main -C $(JAVA_BUILD_DIR) .
+
 

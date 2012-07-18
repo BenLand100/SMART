@@ -1,5 +1,5 @@
 /**
- *  Copyright 2010 by Benjamin J. Land (a.k.a. BenLand100)
+ *  Copyright 2012 by Benjamin J. Land (a.k.a. BenLand100)
  *
  *  This file is part of the SMART Minimizing Autoing Resource Thing (SMART)
  *
@@ -48,10 +48,19 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-/* jni_md.h contains the machine-dependent typedefs for jbyte, jint
-   and jlong */
 
-#include "jni_md.h"
+#define JNIEXPORT
+#define JNIIMPORT
+#define JNICALL
+
+typedef int jint;
+#ifdef _LP64 /* 64-bit Solaris */
+typedef long jlong;
+#else
+typedef long long jlong;
+#endif
+
+typedef signed char jbyte;
 
 #ifdef __cplusplus
 extern "C" {

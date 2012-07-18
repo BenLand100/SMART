@@ -1,5 +1,5 @@
 /**
- *  Copyright 2010 by Benjamin J. Land (a.k.a. BenLand100)
+ *  Copyright 2012 by Benjamin J. Land (a.k.a. BenLand100)
  *
  *  This file is part of the SMART Minimizing Autoing Resource Thing (SMART)
  *
@@ -35,22 +35,14 @@ public class Canvas extends Component implements Accessible {
 
     @Override
     public void setVisible(boolean visible) {
+        //Client.canvasNotify(this);
         super.setVisible(visible);
-        Client.canvasNotify(this);
     }
     
     private static final String base = "canvas";
     private static int nameCounter = 0;
-    private static int refresh = 20;
     private BufferedImage buffer = null;
     
-    public int getRefresh() {
-        return refresh;
-    }
-    
-    public void setRefresh(int refresh) {
-        this.refresh = refresh;
-    }
     public BufferedImage getBuffer() {
         return buffer;
     }
@@ -115,7 +107,6 @@ public class Canvas extends Component implements Accessible {
     }
     
     public Graphics getGraphics() {
-        if (buffer != null) try { Thread.sleep(refresh); } catch (Exception e) { }
         return buffer == null ?  super.getGraphics() : buffer.getGraphics();
     }
     

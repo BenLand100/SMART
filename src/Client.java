@@ -1,5 +1,5 @@
 /**
- *  Copyright 2010 by Benjamin J. Land (a.k.a. BenLand100)
+ *  Copyright 2012 by Benjamin J. Land (a.k.a. BenLand100)
  *
  *  This file is part of the SMART Minimizing Autoing Resource Thing (SMART)
  *
@@ -21,13 +21,7 @@ package smart;
 
 import java.applet.Applet;
 import java.awt.AWTEvent;
-import java.awt.BorderLayout;
-import java.awt.Canvas;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.GridLayout;
-import java.awt.Point;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -42,8 +36,7 @@ import java.awt.image.ImageObserver;
 import java.awt.Image;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
+import java.lang.reflect.*;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -52,11 +45,7 @@ import java.net.URLEncoder;
 import java.net.HttpURLConnection;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.util.Locale;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Hashtable;
-import java.util.Stack;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JButton;
@@ -77,7 +66,7 @@ import sun.applet.AppletClassLoader;
  */
 public class Client implements ActionListener, ChangeListener {
     
-    public static final String VERSION = "7.2";
+    public static final String VERSION = "8.0";
     public static final String TITLE = "SMARTv" + VERSION + " - SMART Minimizing Autoing Resource Thing - By BenLand100";
     public static final String USER_AGENT; //default for an (old) firefox version is set below
     static {
@@ -88,38 +77,13 @@ public class Client implements ActionListener, ChangeListener {
 	    USER_AGENT = "Mozilla/5.0 (" + windowing + "; U; " + osname + " " + System.getProperty("os.version") + "; " + Locale.getDefault().getLanguage()+"-"+Locale.getDefault().getCountry()+"; rv:1.9.0.10) Gecko/2009042316 Firefox/3.0.10";    
     }
     
-    //mantains a list of classloader strings and clients associated with it
-    private static Hashtable<String, Client> clients = new Hashtable<String, Client>();
-
-    /**
-     * Since there is only one Canvas ever associated with a classloader, this method 
-     * effectively ensures that the Canvas is always correct
-     */
-    public static void canvasNotify(Canvas it) {
-        try {
-            //System.out.println("Notify " + it.getClass().getClassLoader().toString());
-            if (it == null) return;
-            if (clients.containsKey(it.getClass().getClassLoader().toString())) {
-                //System.out.println("Fired");
-                Client client = clients.get(it.getClass().getClassLoader().toString());
-                if (client == null) {
-                    System.out.println("Bad client? Interesting...");
-                } else {
-                    client.target(it);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    
     /**
      * Testing method for a non-native start of SMART
      */
     public static void main(String... args) throws Exception {
         int w = 765;
         int h = 503;
-        new Client(ByteBuffer.allocate(w * h * 4), ByteBuffer.allocate(w * h * 4), w, h, "http://world79.runescape.com/",",f5","",null,0);
+        new Client(ByteBuffer.allocate(w * h * 4), ByteBuffer.allocate(w * h * 4), w, h, "http://world37.runescape.com/",",f6989315976681059684","",null,0);
     }
     
     private int width = 825;
@@ -153,52 +117,6 @@ public class Client implements ActionListener, ChangeListener {
     private int ID;
 
     /**
-     * Since some applets might create a new Canvas every time the applet is focused,
-     * this callback lets the Client know the Canvas has changed, and it can grab it 
-     * as necessary.
-     */
-    public void target(Canvas it) {
-        if (it == canvas || it == null) {
-            return;
-        }
-        boolean iam = blocking;
-        if (iam) {
-            stopBlocking();
-        }
-        BlockingEventQueue.removeComponent(canvas);
-        if (canvas == null) iam = true;
-        canvas = it;
-        canvas.setRefresh(refresh);
-        if (blitThread != null) {
-            try {
-                blitThread.stop();
-            } catch (Exception e) {
-                System.out.println("Bad stuff went down, recovering...");
-                e.printStackTrace();
-            }
-        }
-        blitThread = createBlitThread();
-        BlockingEventQueue.addComponent(canvas, new EventRedirect() {
-            @Override
-            public void dispatched(AWTEvent e) {
-                clientFrame.requestFocusInWindow(); //any event should cause a refocus
-            }
-        });
-        BlockingEventQueue.ensureBlocking();
-        BlockingEventQueue.setBlocking(canvas, iam);
-        if (iam) {
-            startBlocking();
-            clientFrame.requestFocusInWindow();
-        }
-        if (initseq != null) {
-            nazi.sendKeys(initseq,90,60);
-            initseq = null;
-            System.out.println("Init Sequence Dispatched");
-        }
-        blitThread.start();
-    }
-
-    /**
      * Creates a new SMART java instance with the given native buffers, allocated size, and startup params.
      * This method can take some time, but returns as SOON as the applet is loaded, i.e. does not wait
      * for the applet to finish setting itself up.
@@ -227,53 +145,55 @@ public class Client implements ActionListener, ChangeListener {
             setRefresh(60);
             active = true;
             clientFrame.setVisible(true);
+            blitThread = createBlitThread();
+            blitThread.start();
         } catch (Exception e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(null, "Error starting SMART, ensure the target page has an applet declaration", "SMART", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    //Convenience method for Native code see Input.cpp
+    //Convenience method for Native code see Main.java
     public void moveMouse(int x, int y) {
         if (nazi != null) {
             nazi.moveMouse(x, y);
         }
     }
 
-    //Convenience method for Native code see Input.cpp
+    //Convenience method for Native code see Main.java
     public void windMouse(int x, int y) {
         if (nazi != null) {
             nazi.windMouse(x, y);
         }
     }
 
-    //Convenience method for Native code see Input.cpp
+    //Convenience method for Native code see Main.java
     public void clickMouse(int x, int y, int button) {
         if (nazi != null) {
             nazi.clickMouse(x, y, button);
         }
     }
     
-    //Convenience method for Native code see Input.cpp
+    //Convenience method for Native code see Main.java
     public void holdMouse(int x, int y, int button) {
         if (nazi != null) {
             nazi.holdMouse(x, y, button);
         }
     }
 
-    //Convenience method for Native code see Input.cpp
+    //Convenience method for Native code see Main.java
     public void releaseMouse(int x, int y, int button) {
         if (nazi != null) {
             nazi.releaseMouse(x, y, button);
         }
     }
 
-    //Convenience method for Native code see Input.cpp
+    //Convenience method for Native code see Main.java
     public boolean isMouseButtonHeld( int button) {
         return nazi != null ? nazi.isMouseButtonHeld(button) : false;
     }
 
-    //Convenience method for Native code see Input.cpp
+    //Convenience method for Native code see Main.java
     public Point getMousePos() {
         if (nazi != null) {
             return nazi.getMousePos();
@@ -281,26 +201,26 @@ public class Client implements ActionListener, ChangeListener {
         return new Point(-1, -1);
     }
 
-    //Convenience method for Native code see Input.cpp
+    //Convenience method for Native code see Main.java
     public void sendKeys(String string, int keywait, int keymodwait) {
         if (nazi != null) {
             nazi.sendKeys(string,keywait,keymodwait);
         }
     }
 
-    //Convenience method for Native code see Input.cpp
+    //Convenience method for Native code see Main.java
     public void holdKey(int keycode) {
         if (nazi != null) {
             nazi.holdKey(keycode);
         }
     }
 
-    //Convenience method for Native code see Input.cpp
+    //Convenience method for Native code see Main.java
     public boolean isKeyDown(int keycode) {
         return nazi != null ? nazi.isKeyDown(keycode) : false;
     }
     
-    //Convenience method for Native code see Input.cpp
+    //Convenience method for Native code see Main.java
     public void releaseKey(int keycode) {
         if (nazi != null) {
             nazi.releaseKey(keycode);
@@ -338,7 +258,7 @@ public class Client implements ActionListener, ChangeListener {
      */
     private Thread createBlitThread() {
         try {
-            canvas.setBackground(new Color(0xFE, 0xFE, 0xFE));
+            /*canvas.setBackground(new Color(0xFE, 0xFE, 0xFE));
             final Graphics canvasGraphics = canvas.getCanvasGraphics();
             final BufferedImage buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_BGR);
             System.out.println("Replacing Canvas Drawing Surface");
@@ -351,11 +271,45 @@ public class Client implements ActionListener, ChangeListener {
             WritableRaster debugRaster = (WritableRaster) rasterField.get(debug);
             final Graphics debugGraphics = debug.getGraphics();
             final int[] debugData = ((DataBufferInt) debugRaster.getDataBuffer()).getData();
-            debugGraphics.setColor(Color.RED);
+            debugGraphics.setColor(Color.RED);*/
             return new Thread("Smart_Image_Transfer") {
                 @Override
                 public void run() {
-                    int len = width*height;
+                    /*while (true) {
+                        try {
+                            sleep(refresh);
+                            System.out.println(clientApplet.getComponentCount());
+                            Component comp = clientApplet.getComponent(0);
+                            Field[] fields = comp.getClass().getDeclaredFields();
+                            for (Field f : fields) {
+                                if (f.getType().equals(Class.forName("java.awt.Component"))) {
+                                    f.setAccessible(true);
+                                    Applet rs2 = (Applet)f.get(comp);
+                                    Class rs2class = rs2.getClass();
+                                    System.out.println(rs2class);
+                                    System.out.println(rs2class.getGenericSuperclass());
+                                    //System.out.println(Arrays.toString(rs2class.getDeclaredMethods()));
+                                    //System.out.println(Arrays.toString(rs2class.getDeclaredFields()));
+                                    System.out.println("I bet there's one: " + rs2.getComponentCount());
+                                    Canvas actual = (Canvas)rs2.getComponent(0);
+                                    System.out.println(actual);
+                                    System.out.println(rs2 == clientApplet);
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }*/
+                    /*BlockingEventQueue.addComponent(canvas, new EventRedirect() {
+                        @Override
+                        public void dispatched(AWTEvent e) {
+                            clientFrame.requestFocusInWindow(); //any event should cause a refocus
+                        }
+                    });
+                    BlockingEventQueue.ensureBlocking();
+                    BlockingEventQueue.setBlocking(canvas, iam);*/
+                
+                    /*int len = width*height;
                     int[] temp = new int[len];
                     try {
                         
@@ -399,7 +353,7 @@ public class Client implements ActionListener, ChangeListener {
                         System.out.println("Transfer Thread Died");
                         e.printStackTrace();
                         blitThread.start();
-                    }
+                    }*/
                 }
             };
         } catch (Exception e) {
@@ -434,28 +388,6 @@ public class Client implements ActionListener, ChangeListener {
         return false;
     }
 
-    /**
-     * Nasty horrible way of making the JVM shutdown and free all garbage
-     */
-    public static void cleanThreads(ThreadGroup group, int level) { 
-        int numThreads = group.activeCount(); 
-        Thread[] threads = new Thread[numThreads*2]; 
-        numThreads = group.enumerate(threads, false); 
-        for (int i=0; i<numThreads; i++) { 
-            Thread thread = threads[i];
-            if (thread != Thread.currentThread()) {
-                System.out.println("Other Thread: " + thread);
-            } else {
-                System.out.println("This  Thread: " + thread);
-            }
-        } 
-        int numGroups = group.activeGroupCount(); 
-        ThreadGroup[] groups = new ThreadGroup[numGroups*2]; 
-        numGroups = group.enumerate(groups, false); 
-        for (int i=0; i<numGroups; i++) { 
-            cleanThreads(groups[i], level+1); 
-        } 
-    } 
 
     /**
      * Frees any remaining refrences and exits the client, or so we hope.
@@ -465,12 +397,12 @@ public class Client implements ActionListener, ChangeListener {
         if (active) {
             System.out.println("Destroying SMART");
             active = false;
-            for (Map.Entry<String,Client> entry : clients.entrySet()) {
+            /*for (Map.Entry<String,Client> entry : clients.entrySet()) {
                 if (entry.getValue() == this) {
                     clients.remove(entry.getKey());
                     break;
                 }
-            }
+            }*/
             BlockingEventQueue.removeComponent(canvas);
             clientFrame.setVisible(false);
             clientApplet.stop();
@@ -480,18 +412,7 @@ public class Client implements ActionListener, ChangeListener {
         } else {
             System.out.println("SMART already destroyed");
         }
-        System.out.println("Current Threads");
-        ThreadGroup root = Thread.currentThread().getThreadGroup().getParent(); 
-        while (root.getParent() != null) {
-            root = root.getParent(); 
-        } 
-        cleanThreads(root, 0);
-        
-        System.out.println("Runtime Garbage Collection Invoked");
-        Runtime r = Runtime.getRuntime();
-        r.gc();
-        System.out.println("System Garbage Collection Invoked");
-        System.gc();
+        Main.cleanup();
     }
 
     /**
@@ -574,7 +495,7 @@ public class Client implements ActionListener, ChangeListener {
             e.printStackTrace();
         }
         gameLoader = clientApplet.getComponent(0).getClass().getClassLoader();
-        clients.put(gameLoader.toString(), this);
+        //clients.put(gameLoader.toString(), this);
         System.out.println("Client Fully Initialized");
         clientFrame.pack();
         clientFrame.setResizable(false);
@@ -712,7 +633,7 @@ public class Client implements ActionListener, ChangeListener {
             refreshSlider.setValue(x);
         }
         if (canvas != null) {
-            canvas.setRefresh(500 / x - 5);
+            //canvas.setRefresh(500 / x - 5);
         }
         refresh = 500 / x + 20;
     }
@@ -740,422 +661,4 @@ public class Client implements ActionListener, ChangeListener {
         setRefresh(refreshSlider.getValue());
     }
 
-    /**
-     * Used for all reflection methods, this takes an object refrence which is known
-     * as the parent, or zero for static scope, and a path that basically amounts to fields
-     * in objects or classes and static fields (if in the static scope), and return the
-     * value of the field. The proper return type should ALWAYS be used. Conveniance methods
-     * are provided for 1, 2, and 3 dimensional arrays
-     */
-    public Object findObjectFromPath(Object o, String path) throws Exception {
-        String[] parts = path.split("\\.");
-        Stack<String> stack = new Stack<String>();
-        Field field;
-        if (o == null) {
-            Class c = gameLoader.loadClass(parts[0]);
-            for (int i = parts.length - 1; i > 0; i--) {
-                stack.push(parts[i]);
-            }
-            field = c.getDeclaredField(stack.pop());
-            field.setAccessible(true);
-            o = field.get(null);
-        } else {
-            for (int i = parts.length - 1; i >= 0; i--) {
-                stack.push(parts[i]);
-            }
-        }
-        if (!stack.empty()) {
-            while (!stack.empty()) {
-                String theField = stack.pop();
-                Class theClass = o.getClass();
-                field = null;
-                while (field == null && theClass != Object.class) {
-                    try {
-                        field = theClass.getDeclaredField(theField);
-                    } catch (Exception e) {
-                        try {
-                            theClass = theClass.getSuperclass();
-                        } catch (Exception x) {
-                            break;
-                        }
-                    }
-                }
-                field.setAccessible(true);
-                o = field.get(o);
-            }
-        }
-        return o;
-    }
-    
-    //***
-    //The following are convenience methods for the Native side of SMART
-    //***
-    
-    public Object getFieldObject(Object o, String path) {
-	    if (path == null) return o;
-        try {
-            return findObjectFromPath(o,path);
-        } catch (Exception e) {
-            System.out.println("Field not found: " + path);
-        }
-        return null;
-    }
-
-    public boolean isPathValid(Object o, String path) {
-	    if (path == null) return true;
-        try {
-            findObjectFromPath(o,path);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public boolean getFieldBoolean(Object o, String path) {
-        o = getFieldObject(o, path);
-        if (o != null && o instanceof Boolean) {
-            return ((Boolean) o).booleanValue();
-        }
-        return false;
-    }
-
-    public int getFieldLongH(Object o, String path) {
-        o = getFieldObject(o, path);
-        if (o != null && o instanceof Long) {
-            return (int) ((((Long) o).longValue() >> 32) & 0xFFFFFFFF);
-        }
-        return -1;
-    }
-
-    public int getFieldLongL(Object o, String path) {
-        o = getFieldObject(o, path);
-        if (o != null && o instanceof Long) {
-            return (int) (((Long) o).longValue() & 0xFFFFFFFF);
-        }
-        return -1;
-    }
-
-    public int getFieldInt(Object o, String path) {
-        o = getFieldObject(o, path);
-        if (o != null && o instanceof Integer) {
-            return ((Integer) o).intValue();
-        }
-        return -1;
-    }
-
-    public int getFieldShort(Object o, String path) {
-        o = getFieldObject(o, path);
-        if (o != null && o instanceof Short) {
-            return ((Short) o).intValue();
-        }
-        return -1;
-    }
-
-    public float getFieldFloat(Object o, String path) {
-        o = getFieldObject(o, path);
-
-        if (o != null && o instanceof Float) {
-            return ((Float) o).floatValue();
-        }
-        return -1F;
-    }
-
-    public double getFieldDouble(Object o, String path) {
-        o = getFieldObject(o, path);
-        if (o != null && o instanceof Double) {
-            return ((Double) o).doubleValue();
-        }
-        return -1D;
-    }
-
-    public int getFieldByte(Object o, String path) {
-        o = getFieldObject(o, path);
-        if (o != null && o instanceof Byte) {
-            return ((Byte) o).intValue();
-        }
-        return -1;
-    }
-
-    public Object getFieldArray3DObject(Object o, String path, int x, int y, int z) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.get(Array.get(Array.get(o, x), y), z);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    public int getFieldArray3DByte(Object o, String path, int x, int y, int z) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.getByte(Array.get(Array.get(o, x), y), z);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-
-    public int getFieldArray3DChar(Object o, String path, int x, int y, int z) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.getChar(Array.get(Array.get(o, x), y), z);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    public int getFieldArray3DShort(Object o, String path, int x, int y, int z) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.getShort(Array.get(Array.get(o, x), y), z);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    public int getFieldArray3DInt(Object o, String path, int x, int y, int z) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.getInt(Array.get(Array.get(o, x), y), z);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    public float getFieldArray3DFloat(Object o, String path, int x, int y, int z) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.getFloat(Array.get(Array.get(o, x), y), z);
-        } catch (Exception e) {
-            return -1F;
-        }
-    }
-
-
-    public double getFieldArray3DDouble(Object o, String path, int x, int y, int z) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.getDouble(Array.get(Array.get(o, x), y), z);
-        } catch (Exception e) {
-            return -1D;
-        }
-    }
-
-    public boolean getFieldArray3DBoolean(Object o, String path, int x, int y, int z) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.getBoolean(Array.get(Array.get(o, x), y), z);
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public int getFieldArray3DLongL(Object o, String path, int x, int y, int z) {
-        o = getFieldObject(o, path);
-        try {
-            return (int) (Array.getLong(Array.get(Array.get(o, x), y), z) & 0xFFFFFFFF);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    public int getFieldArray3DLongH(Object o, String path, int x, int y, int z) {
-        o = getFieldObject(o, path);
-        try {
-            return (int) ((Array.getLong(Array.get(Array.get(o, x), y), z) >> 32) & 0xFFFFFFFF);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    public Object getFieldArray2DObject(Object o, String path, int x, int y) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.get(Array.get(o, x), y);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    public int getFieldArray2DByte(Object o, String path, int x, int y) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.getByte(Array.get(o, x), y);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    public int getFieldArray2DChar(Object o, String path, int x, int y) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.getChar(Array.get(o, x), y);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    public int getFieldArray2DShort(Object o, String path, int x, int y) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.getShort(Array.get(o, x), y);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    public int getFieldArray2DInt(Object o, String path, int x, int y) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.getInt(Array.get(o, x), y);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    public float getFieldArray2DFloat(Object o, String path, int x, int y) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.getFloat(Array.get(o, x), y);
-        } catch (Exception e) {
-            return -1F;
-        }
-    }
-
-    public double getFieldArray2DDouble(Object o, String path, int x, int y) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.getDouble(Array.get(o, x), y);
-        } catch (Exception e) {
-            return -1D;
-        }
-    }
-
-    public boolean getFieldArray2DBoolean(Object o, String path, int x, int y) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.getBoolean(Array.get(o, x), y);
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public int getFieldArray2DLongL(Object o, String path, int x, int y) {
-        o = getFieldObject(o, path);
-        try {
-            return (int) (Array.getLong(Array.get(o, x), y) & 0xFFFFFFFF);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    public int getFieldArray2DLongH(Object o, String path, int x, int y) {
-        o = getFieldObject(o, path);
-        try {
-            return (int) ((Array.getLong(Array.get(o, x), y) >> 32) & 0xFFFFFFFF);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    public int getFieldArrayByte(Object o, String path, int index) {
-        o = getFieldObject(o, path);
-        try {
-            return (int) Array.getByte(o, index);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    public int getFieldArrayShort(Object o, String path, int index) {
-        o = getFieldObject(o, path);
-        try {
-            return (int) Array.getShort(o, index);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    public int getFieldArrayChar(Object o, String path, int index) {
-        o = getFieldObject(o, path);
-        try {
-            return (int) Array.getChar(o, index);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    public int getFieldArrayInt(Object o, String path, int index) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.getInt(o, index);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    public float getFieldArrayFloat(Object o, String path, int index) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.getFloat(o, index);
-        } catch (Exception e) {
-            return -1F;
-        }
-    }
-
-    public double getFieldArrayDouble(Object o, String path, int index) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.getDouble(o, index);
-        } catch (Exception e) {
-            return -1D;
-        }
-    }
-
-    public int getFieldArrayLongH(Object o, String path, int index) {
-        o = getFieldObject(o, path);
-        try {
-            return (int) ((Array.getLong(o, index) >> 32) & 0xFFFFFFFF);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    public int getFieldArrayLongL(Object o, String path, int index) {
-        o = getFieldObject(o, path);
-        try {
-            return (int) (Array.getLong(o, index) & 0xFFFFFFFF);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    public boolean getFieldArrayBoolean(Object o, String path, int index) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.getBoolean(o, index);
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public Object getFieldArrayObject(Object o, String path, int index) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.get(o, index);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    public int getFieldArraySize(Object o, String path, int dim) {
-        o = getFieldObject(o, path);
-        try {
-            if (dim < 1) return -2;
-            while (dim-- > 1) o = Array.get(o,0);
-            return Array.getLength(o);
-        } catch (Exception e) {
-            return -3;
-        }
-    }
 }

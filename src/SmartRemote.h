@@ -1,26 +1,91 @@
 /**
  *  Copyright 2012 by Benjamin J. Land (a.k.a. BenLand100)
  *
- *  This file is part of the SMART-Remote
+ *  This file is part of the SMART
  *
- *  SMART-Remote is free software: you can redistribute it and/or modify
+ *  SMART is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  SMART-Remote is distributed in the hope that it will be useful,
+ *  SMART is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with SMART-Remote. If not, see <http://www.gnu.org/licenses/>.
+ *  along with SMART. If not, see <http://www.gnu.org/licenses/>.
  */
  
-#ifndef _LOCAL_H
-#define	_LOCAL_H
+#ifndef _SMARTREMOTE_H
+#define	_SMARTREMOTE_H
+int port, width, height, paired, imgoff, dbgoff;
+typedef struct {
+    int port;           //The port the client listens on
+    int id;             //ID of the client: SMART.id
+    int width,height;   //Size of the images that follow this structure in the SHM
+    int paired;         //TID of the controller or ZERO if none
+    int imgoff;         //Offset in the SHM where the image is stored
+    int dbgoff;         //Offset in the SHM where the debug image is stored
+    
+    /**
+     * Comm protocol - Controller sets arguments then writes funid to the client's
+     * socket to notify it of the new call. The Client executes the function
+     * then stores the results in args. Finally, the client echos the funid to
+     * the controller
+     */
+    unsigned char args[4096];
+} shm_data;
 
-#include "Bridge.h"
+
+#ifndef _WIN32
+#include <unistd.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h> 
+#else
+
+#endif
+
+/**
+ * Comm protocol: use these numbers as funid, everything less or equal to 
+ * NumImports is a direct export from SMART and must correspond to the name in
+ * imports[def-FirstFunc]
+ */
+
+#define FirstFunc           1
+
+#define getRefresh          FirstFunc+0
+#define setRefresh          FirstFunc+1
+#define setTransparentColor FirstFunc+2
+#define setDebug            FirstFunc+3
+#define setGraphics         FirstFunc+4 
+#define setEnabled          FirstFunc+5
+#define isActive            FirstFunc+6
+#define isBlocking          FirstFunc+7
+#define getMousePos         FirstFunc+8
+#define holdMouse           FirstFunc+9
+#define releaseMouse        FirstFunc+10
+#define holdMousePlus       FirstFunc+11
+#define releaseMousePlus    FirstFunc+12
+#define moveMouse           FirstFunc+13
+#define windMouse           FirstFunc+14
+#define clickMouse          FirstFunc+15
+#define clickMousePlus      FirstFunc+16
+#define isMouseButtonHeld   FirstFunc+17
+#define sendKeys            FirstFunc+18
+#define holdKey             FirstFunc+19
+#define releaseKey          FirstFunc+20
+#define isKeyDown           FirstFunc+21
+
+#define ExtraFuncs          FirstFunc+22
+
+#define Ping                ExtraFuncs+0
+#define Die                 ExtraFuncs+1
+
+
 
 #ifndef _WIN32
 #include <dlfcn.h>
@@ -116,14 +181,9 @@ extern "C" void exp_sendKeys(char *text, int keywait, int keymodwait);
 extern "C" void exp_holdKey(int code);
 extern "C" void exp_releaseKey(int code);
 extern "C" bool exp_isKeyDown(int code);
-extern "C" int exp_getColor(int x, int y);
-extern "C" bool exp_findColor(int &x, int& y, int color, int sx, int sy, int ex, int ey);
-extern "C" bool exp_findColorTol(int &x, int& y, int color, int sx, int sy, int ex, int ey, int tol);
-extern "C" bool exp_findColorSpiral(int &x, int& y, int color, int sx, int sy, int ex, int ey);
-extern "C" bool exp_findColorSpiralTol(int &x, int& y, int color, int sx, int sy, int ex, int ey, int tol);
 
 //Exports for Local
-#define NumExports 35
+#define NumExports 30
 static char* exports[] = {
     (char*)"exp_clientID", (char*)"function SmartClientID(idx: integer): integer;",
     (char*)"exp_getClients", (char*)"function SmartGetClients(only_unpaired: boolean): integer;",
@@ -164,12 +224,7 @@ static char* exports[] = {
     (char*)"exp_sendKeys", (char*)"procedure SmartSendKeys(Text: String; keywait, keymodwait: integer);",
     (char*)"exp_holdKey", (char*)"procedure SmartHoldKey(Code: Integer);",
     (char*)"exp_releaseKey", (char*)"procedure SmartReleaseKey(Code: Integer);",
-    (char*)"exp_isKeyDown", (char*)"function SmartIsKeyDown(Code: Integer): Boolean;",
-    (char*)"exp_getColor", (char*)"function SmartGetColor(x, y: integer): integer;",
-    (char*)"exp_findColor", (char*)"function SmartFindColor(var x, y: integer; color, sx, sy, ex, ey: integer): boolean;",
-    (char*)"exp_findColorTol", (char*)"function SmartFindColorTolerance(var x, y: integer; color, sx, sy, ex, ey, tol: integer): boolean;",
-    (char*)"exp_findColorSpiral", (char*)"function SmartFindColorSpiral(var x, y: integer; color, sx, sy, ex, ey: integer): boolean;",
-    (char*)"exp_findColorSpiralTol", (char*)"function SmartFindColorSpiralTolerance(var x, y: integer; color, sx, sy, ex, ey, tol: integer): boolean;",
+    (char*)"exp_isKeyDown", (char*)"function SmartIsKeyDown(Code: Integer): Boolean;"
 };
 
 #endif	/* _LOCAL_H */
