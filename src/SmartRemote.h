@@ -189,7 +189,7 @@ extern "C" bool exp_isKeyDown(int code);
 static char* exports[] = {
     (char*)"exp_clientID", (char*)"function SmartClientID(idx: integer): integer;",
     (char*)"exp_getClients", (char*)"function SmartGetClients(only_unpaired: boolean): integer;",
-    (char*)"exp_spawnClient",(char*)"function SmartSpawnClient(remote_path, root, params: string; width, height: integer; initseq, useragent, jvmpath: string; maxmem: integer): integer;",
+    (char*)"exp_spawnClient",(char*)"function SmartSpawnClient(remote_path, root, params: string; width, height: integer; initseq, useragent, javaargs: string;): integer;",
     (char*)"exp_pairClient", (char*)"function SmartPairClient(pid: integer): boolean;",
     (char*)"exp_killClient", (char*)"function SmartKillClient(pid: integer): boolean;",
     (char*)"exp_getCurrent", (char*)"function SmartCurrentClient(): integer;",
