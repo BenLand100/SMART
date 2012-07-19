@@ -187,7 +187,7 @@ SMARTClient* pairClient(int id) {
         GENERIC_READ|GENERIC_WRITE,
         FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE,
         NULL,
-        OPEN_ALWAYS,
+        OPEN_EXISTING,FILE_ATTRIBUTE_TEMPORARY|FILE_FLAG_RANDOM_ACCESS|FILE_FLAG_OVERLAPPED,
         NULL);
     if (client->file != INVALID_HANDLE_VALUE) {
     #endif
@@ -268,6 +268,7 @@ SMARTClient* pairClient(int id) {
 
 /**
  * Creates a remote SMART client and pairs to it
+ * FIXME javaargs not handled for linux
  */
 SMARTClient* spawnClient(char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char* javaargs) {
     SMARTClient *client;
@@ -280,25 +281,21 @@ SMARTClient* spawnClient(char* remote_path, char *root, char *params, int width,
     if (!useragent) useragent = &empty;
     if (!javaargs) javaargs = &empty;
     char bootclasspath[512];
-    sprintf(bootclasspath,"-Xbootclasspath/p:%s/%s",remote_path,"smart.jar");
+    sprintf(bootclasspath,"-Xbootclasspath/p:\"%s/%s\"",remote_path,"smart.jar");
     char library[512];
     #ifdef _WIN32
-    sprintf(library,"%s/libremote%s.%s",remote_path,bits,"dll");
-    /*int len = 2*strlen(remote_path)+strlen(root)+strlen(params)+strlen(_width)+strlen(_height)+strlen(initseq)+strlen(useragent)+strlen(javaargs);
-    char *args = new char[len+10*3+20];
-    sprintf(args,"\"%ssmartremote%s.exe\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\"",remote_path,bits,remote_path,root,params,_width,_height,initseq,useragent,javaargs);
-    char *exec = new char[strlen(remote_path)+20];
-    sprintf(exec,"%ssmartremote%s.exe",remote_path,bits);
-    cout << exec << '\n';*/ //REWRITE THIS BLOCK
+    sprintf(library,"%s/libsmartjni%s.dll",remote_path,bits);
+    int len = strlen(javaargs)+strlen(bootclasspath)+strlen(library)+strlen(root)+strlen(params)+strlen(_width)+strlen(_height)+strlen(initseq)+strlen(useragent)+7*3+40; //A little extra
+    char *args = new char[len];
+    sprintf(args,"java.exe %s %s smart.Main \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\"",javaargs,bootclasspath,library,root,params,_width,_height,initseq,useragent);
     PROCESS_INFORMATION procinfo;
     STARTUPINFO startupinfo;
     memset(&startupinfo, 0, sizeof(STARTUPINFO));
     memset(&procinfo, 0, sizeof(PROCESS_INFORMATION));
     startupinfo.cb = sizeof(STARTUPINFOW); 
-    CreateProcess(exec,args,NULL,NULL,FALSE,CREATE_DEFAULT_ERROR_MODE,NULL,NULL,&startupinfo,&procinfo);
+    CreateProcess("java.exe",args,NULL,NULL,FALSE,CREATE_DEFAULT_ERROR_MODE,NULL,NULL,&startupinfo,&procinfo);
     CloseHandle(procinfo.hProcess);
     CloseHandle(procinfo.hThread);
-    delete exec;
     delete args;
     int count = 0;
     do {
@@ -309,7 +306,7 @@ SMARTClient* spawnClient(char* remote_path, char *root, char *params, int width,
     callClient(client,Ping);
     return client;
     #else
-    sprintf(library,"%s/libsmartjni%s.%s",remote_path,bits,"so");
+    sprintf(library,"%s/libsmartjni%s.so",remote_path,bits);
     int v = fork();
     if (v) {
         int count = 0;

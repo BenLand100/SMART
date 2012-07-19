@@ -219,17 +219,17 @@ $(LIN64_BUILD_DIR)/SmartJNI.o: $(SRC_DIR)/SmartJNI.cpp $(JNI_CPPHEADERFILES)
 $(DIST)/$(WIN_NAME): $(WINOBJFILES)
 	@echo "Linking Windows Remote object files..."
 	@mkdir -p $(DIST)
-	@$(WIN_GPP) -Wl,$(SRC_DIR)/libsmartremote.def -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(WIN_NAME) $(WINOBJFILES)
+	@$(WIN_GPP) -Wl,$(SRC_DIR)/libsmartremote.def -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(WIN_NAME) $(WINOBJFILES) -lws2_32
 	
 $(DIST)/$(JNI_WIN_NAME): $(JNI_WINOBJFILES)
 	@echo "Linking Windows JNI object files..."
 	@mkdir -p $(DIST)
-	@$(WIN_GPP) -Wl,$(SRC_DIR)/libsmartremote.def -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(JNI_WIN_NAME) $(JNI_WINOBJFILES)
+	@$(WIN_GPP) -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(JNI_WIN_NAME) $(JNI_WINOBJFILES)
 
 $(WIN_BUILD_DIR)/SmartRemote.o: $(SRC_DIR)/SmartRemote.cpp $(CPPHEADERFILES)
 	@echo "Compiling SmartRemote.cpp"
 	@mkdir -p $(WIN_BUILD_DIR)
-	@$(WIN_GPP) $(WIN_COMPILE_ARGS) -o $(WIN_BUILD_DIR)/SmartRemote.o $(SRC_DIR)/SmartRemote.cpp
+	@$(WIN_GPP) $(WIN_COMPILE_ARGS) -o $(WIN_BUILD_DIR)/SmartRemote.o $(SRC_DIR)/SmartRemote.cpp -lws2_32
 	
 $(WIN_BUILD_DIR)/SmartJNI.o: $(SRC_DIR)/SmartJNI.cpp $(JNI_CPPHEADERFILES)
 	@echo "Compiling SmartJNI.cpp"
@@ -241,17 +241,17 @@ $(WIN_BUILD_DIR)/SmartJNI.o: $(SRC_DIR)/SmartJNI.cpp $(JNI_CPPHEADERFILES)
 $(DIST)/$(WIN64_NAME): $(WIN64OBJFILES)
 	@echo "Linking Windows64 Remote object files..."
 	@mkdir -p $(DIST)
-	@$(WIN64_GPP) -Wl,$(SRC_DIR)/libsmartremote.def -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(WIN64_NAME) $(WIN64OBJFILES)
+	@$(WIN64_GPP) -Wl,$(SRC_DIR)/libsmartremote.def -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(WIN64_NAME) $(WIN64OBJFILES) -lws2_32
 
 $(DIST)/$(JNI_WIN64_NAME): $(JNI_WIN64OBJFILES)
 	@echo "Linking Windows64 JNI object files..."
 	@mkdir -p $(DIST)
-	@$(WIN64_GPP) -Wl,$(SRC_DIR)/libsmartremote.def -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(JNI_WIN64_NAME) $(JNI_WIN64OBJFILES)
+	@$(WIN64_GPP) -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(JNI_WIN64_NAME) $(JNI_WIN64OBJFILES)
 
 $(WIN64_BUILD_DIR)/SmartRemote.o: $(SRC_DIR)/SmartRemote.cpp $(CPPHEADERFILES)
 	@echo "Compiling SmartRemote.cpp"
 	@mkdir -p $(WIN64_BUILD_DIR)
-	@$(WIN64_GPP) $(WIN64_COMPILE_ARGS) -o $(WIN64_BUILD_DIR)/SmartRemote.o $(SRC_DIR)/SmartRemote.cpp
+	@$(WIN64_GPP) $(WIN64_COMPILE_ARGS) -o $(WIN64_BUILD_DIR)/SmartRemote.o $(SRC_DIR)/SmartRemote.cpp -lws2_32
 	
 $(WIN64_BUILD_DIR)/SmartJNI.o: $(SRC_DIR)/SmartJNI.cpp $(JNI_CPPHEADERFILES)
 	@echo "Compiling SmartJNI.cpp"

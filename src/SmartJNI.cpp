@@ -29,6 +29,9 @@
     #include <string.h>
     #include <sys/types.h>
 #else
+    #if __SIZEOF_POINTER__ == 4
+       #define _WIN32_WINNT 0x0501
+    #endif
     #include <windows.h>
 #endif
 
@@ -38,7 +41,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_smart_Main_checkAlive(JNIEnv *env, jc
     #else
         HANDLE thread = OpenThread(SYNCHRONIZE,FALSE,tid);
         if (!thread) return JNI_FALSE;
-        jboolean res = WaitForSingleObject(paired, 0) == WAIT_TIMEOUT ? JNI_TRUE : JNI_FALSE;
+        jboolean res = WaitForSingleObject(thread, 0) == WAIT_TIMEOUT ? JNI_TRUE : JNI_FALSE;
         CloseHandle(thread);
         return res;
     #endif
