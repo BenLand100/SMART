@@ -19,44 +19,20 @@
 
 package smart;
 
-import java.applet.Applet;
-import java.awt.AWTEvent;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
-import java.awt.image.WritableRaster;
-import java.awt.image.ImageObserver;
-import java.awt.Image;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.awt.event.*;
+import java.awt.image.*;
+import java.io.*;
 import java.lang.reflect.*;
-import java.net.JarURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLClassLoader;
-import java.net.URLEncoder;
-import java.net.HttpURLConnection;
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
+import java.net.*;
+import java.nio.*;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import java.util.regex.*;
+import javax.swing.*;
+import javax.swing.border.*;
+import javax.swing.event.*;
 import sun.applet.AppletClassLoader;
+import java.applet.Applet;
 
 /**
  * Contains all of the setup and control for the RuneScape client. Responsible
@@ -76,6 +52,10 @@ public class Client implements ActionListener, ChangeListener {
 	    else if (osname.contains("Mac")) windowing = "Macintosh";
 	    USER_AGENT = "Mozilla/5.0 (" + windowing + "; U; " + osname + " " + System.getProperty("os.version") + "; " + Locale.getDefault().getLanguage()+"-"+Locale.getDefault().getCountry()+"; rv:1.9.0.10) Gecko/2009042316 Firefox/3.0.10";    
     }
+    
+    private static enum OperatingMode {
+        SafeMode,Software,DirectX,OpenGL
+    } 
         
     //mantains a list of classloader strings and clients associated with it
     private static Hashtable<String, Client> clients = new Hashtable<String, Client>();
@@ -102,8 +82,8 @@ public class Client implements ActionListener, ChangeListener {
         }
     }
 
-    private int width = 825;
-    private int height = 500;
+    private int width;
+    private int height;
     private URLClassLoader thisLoader;
     private ClassLoader gameLoader;
     private Applet clientApplet;
@@ -127,6 +107,8 @@ public class Client implements ActionListener, ChangeListener {
     private JButton gfxbtn;
     private JButton debugbtn;
     private JSlider refreshSlider;
+    private JComboBox opModeSelector;
+    private OperatingMode operatingMode = OperatingMode.SafeMode;
     private Canvas canvas;
     private String initseq = null;
     private String useragent = null;
@@ -334,76 +316,60 @@ public class Client implements ActionListener, ChangeListener {
             return new Thread("Smart_Image_Transfer") {
                 @Override
                 public void run() {
-                    /*while (true) {
-                        try {
-                            sleep(refresh);
-                            System.out.println(clientApplet.getComponentCount());
-                            Component comp = clientApplet.getComponent(0);
-                            Field[] fields = comp.getClass().getDeclaredFields();
-                            for (Field f : fields) {
-                                if (f.getType().equals(Class.forName("java.awt.Component"))) {
-                                    f.setAccessible(true);
-                                    Applet rs2 = (Applet)f.get(comp);
-                                    Class rs2class = rs2.getClass();
-                                    System.out.println(rs2class);
-                                    System.out.println(rs2class.getGenericSuperclass());
-                                    //System.out.println(Arrays.toString(rs2class.getDeclaredMethods()));
-                                    //System.out.println(Arrays.toString(rs2class.getDeclaredFields()));
-                                    System.out.println("I bet there's one: " + rs2.getComponentCount());
-                                    Canvas actual = (Canvas)rs2.getComponent(0);
-                                    System.out.println(actual);
-                                    System.out.println(rs2 == clientApplet);
-                                }
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }*/
-                    /*BlockingEventQueue.addComponent(canvas, new EventRedirect() {
-                        @Override
-                        public void dispatched(AWTEvent e) {
-                            clientFrame.requestFocusInWindow(); //any event should cause a refocus
-                        }
-                    });
-                    BlockingEventQueue.ensureBlocking();
-                    BlockingEventQueue.setBlocking(canvas, iam);*/
-                
                     int len = width*height;
                     int[] temp = new int[len];
                     try {
-                        
                         System.out.println("Transfer Thread Entered");
                         while (active) {
                             sleep(refresh);
-                            while (blocking) {
-                                sleep(refresh);
-                                nativeBuff.rewind();
-                                for (int i = 0; i < len; ++i) {
-                                    if (bufferData[i] != 0xFEFEFE) {
-                                        temp[i] = bufferData[i] << 8;
-                                    }
-                                }
-                                nativeBuff.put(temp);
-                                if (renderWhileBlocking && !minimized) {
-                                    final Point p = getMousePos();
-                                    if (debuggfx) {
-                                        nativeDebug.rewind();
+                            switch (operatingMode) {
+                                case SafeMode:
+                                    while (blocking) {
+                                        sleep(refresh);
+                                        nativeBuff.rewind();
                                         for (int i = 0; i < len; ++i) {
-                                            int color = nativeDebug.get() >> 8;
-                                            if (color != transColor) {
-                                                debugData[i] = color;
-                                            } else {
-                                                debugData[i] = bufferData[i];   
+                                            if (bufferData[i] != 0xFEFEFE) {
+                                                temp[i] = bufferData[i] << 8;
                                             }
                                         }
-                                    } else {
-                                        debugGraphics.drawImage(buffer, 0, 0, null);
+                                        nativeBuff.put(temp);
+                                        if (renderWhileBlocking && !minimized) {
+                                            final Point p = getMousePos();
+                                            if (debuggfx) {
+                                                nativeDebug.rewind();
+                                                for (int i = 0; i < len; ++i) {
+                                                    int color = nativeDebug.get() >> 8;
+                                                    if (color != transColor) {
+                                                        debugData[i] = color;
+                                                    } else {
+                                                        debugData[i] = bufferData[i];   
+                                                    }
+                                                }
+                                            } else {
+                                                debugGraphics.drawImage(buffer, 0, 0, null);
+                                            }
+                                            debugGraphics.fillOval(p.x - 2, p.y - 2, 4, 4);
+                                            canvasGraphics.drawImage(debug,0,0,null);
+                                        }
                                     }
-                                    debugGraphics.fillOval(p.x - 2, p.y - 2, 4, 4);
-                                    canvasGraphics.drawImage(debug,0,0,null);
-                                }
+                                    canvasGraphics.drawImage(buffer, 0, 0, null);
+                                    break;
+                                case Software:
+                                    while (blocking) {
+                                        sleep(refresh);
+                                    }
+                                    break;
+                                case DirectX:
+                                    while (blocking) {
+                                        sleep(refresh);
+                                    }
+                                    break;
+                                case OpenGL:
+                                    while (blocking) {
+                                        sleep(refresh);
+                                    }
+                                    break;
                             }
-                            canvasGraphics.drawImage(buffer, 0, 0, null);
                         }
                         System.out.println("Transfer Thread Exited");
                     } catch (IllegalThreadStateException e) {
@@ -541,6 +507,9 @@ public class Client implements ActionListener, ChangeListener {
         debugbtn = new JButton("Enable Debug");
         debugbtn.addActionListener(this);
         south.add(debugbtn);
+        opModeSelector = new JComboBox(new String[] {"SafeMode","Software","DirectX","OpenGL"});
+        opModeSelector.addActionListener(this);
+        south.add(opModeSelector);
         System.out.println("Client INIT");
         clientApplet.init();
         System.out.println("Client START");
@@ -680,6 +649,12 @@ public class Client implements ActionListener, ChangeListener {
             setGraphics(!renderWhileBlocking);
         } else if (e.getSource() == debugbtn) {
             setDebug(!debuggfx);
+        } else if (e.getSource() == opModeSelector) {
+            operatingMode = OperatingMode.valueOf((String)opModeSelector.getSelectedItem());
+            if (blocking) { 
+                stopBlocking();
+                startBlocking();
+            }
         }
     }
 
