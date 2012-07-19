@@ -39,14 +39,17 @@ typedef struct {
 
 
 #ifndef _WIN32
-#include <unistd.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h> 
+    #include <unistd.h>
+    #include <string.h>
+    #include <sys/types.h>
+    #include <sys/socket.h>
+    #include <netinet/in.h>
+    #include <netdb.h> 
 #else
-
+    #if __SIZEOF_POINTER__ == 4
+       #define _WIN32_WINNT 0x0501
+    #endif
+    #include <windows.h>
 #endif
 
 /**
@@ -92,7 +95,6 @@ typedef struct {
 void load() __attribute__((constructor));
 void unload() __attribute__((destructor));
 #else
-#include <windows.h>
 extern "C" bool DllMain(HINSTANCE, int, void*) __attribute__((stdcall));
 #endif
 

@@ -25,11 +25,11 @@
 #include <stdlib.h>
 #include <map>
 #ifndef _WIN32
-#include <sys/syscall.h>
-#include <sys/mman.h>
-#include <fcntl.h>
-#include <dirent.h>
-#include <errno.h>
+    #include <sys/syscall.h>
+    #include <sys/mman.h>
+    #include <fcntl.h>
+    #include <dirent.h>
+    #include <errno.h>
 #endif
 
 using namespace std;
@@ -250,7 +250,7 @@ SMARTClient* pairClient(int id) {
         #endif
         
         client->data->paired = tid;
-        cout << "Setting the client's controller to out TID\n";
+        cout << "Setting the client's controller to our TID\n";
         client->socket = 0;
         if (!resock(client)) {
             freeClient(client);
@@ -285,23 +285,29 @@ SMARTClient* spawnClient(char* remote_path, char *root, char *params, int width,
     char library[512];
     #ifdef _WIN32
     sprintf(library,"%s/libsmartjni%s.dll",remote_path,bits);
-    int len = strlen(javaargs)+strlen(bootclasspath)+strlen(library)+strlen(root)+strlen(params)+strlen(_width)+strlen(_height)+strlen(initseq)+strlen(useragent)+7*3+40; //A little extra
+    int len = strlen(javaargs)+strlen(bootclasspath)+strlen(library)+strlen(root)+strlen(params)+strlen(_width)+strlen(_height)+strlen(initseq)+strlen(useragent)+7*3+50; //A little extra
     char *args = new char[len];
-    sprintf(args,"java.exe %s %s smart.Main \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\"",javaargs,bootclasspath,library,root,params,_width,_height,initseq,useragent);
-    PROCESS_INFORMATION procinfo;
-    STARTUPINFO startupinfo;
-    memset(&startupinfo, 0, sizeof(STARTUPINFO));
-    memset(&procinfo, 0, sizeof(PROCESS_INFORMATION));
-    startupinfo.cb = sizeof(STARTUPINFOW); 
-    CreateProcess("java.exe",args,NULL,NULL,FALSE,CREATE_DEFAULT_ERROR_MODE,NULL,NULL,&startupinfo,&procinfo);
-    CloseHandle(procinfo.hProcess);
-    CloseHandle(procinfo.hThread);
+    sprintf(args,"%s %s smart.Main \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\"",javaargs,bootclasspath,library,root,params,_width,_height,initseq,useragent);
+    SHELLEXECUTEINFO info;
+    memset(&info, 0, sizeof(SHELLEXECUTEINFO));
+    info.cbSize = sizeof(SHELLEXECUTEINFO); 
+    info.fMask = SEE_MASK_NOCLOSEPROCESS;
+    info.lpFile = "java.exe";
+    info.lpParameters = args;
+    info.nShow = SW_SHOWNORMAL;
+    ShellExecuteEx(&info);
     delete args;
+    if (!info.hProcess) {
+        cout << "Failed to spawn process. Make sure java.exe is on your path and that SMART is installed correctly.\n";
+        return NULL;
+    }
+    int pid = GetProcessId(info.hProcess);
+    CloseHandle(info.hProcess);
     int count = 0;
     do {
         Sleep(1000);
         count++;
-    } while  (!(client=pairClient(procinfo.dwProcessId))&&count<10);
+    } while  (!(client=pairClient(pid))&&count<10);
     if (count >= 10) return NULL;
     callClient(client,Ping);
     return client;
@@ -319,6 +325,7 @@ SMARTClient* spawnClient(char* remote_path, char *root, char *params, int width,
         return client;
     } else {
         execlp("java","java",bootclasspath,"smart.Main",library,root,params,_width,_height,initseq,useragent,NULL);
+        cout << "Process terminating. If nothing happened, make sure java is on your path and that SMART is installed correctly.\n";
         exit(1);
     }
     #endif
