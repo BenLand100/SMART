@@ -42,8 +42,18 @@ class Smart:
 		else:
 			self._dll = CDLL('./libsmart'+bitstr+'.so')
 	    #Remote
-		self._dll.setup.argtypes = [c_char_p,c_char_p,c_long,c_long,c_char_p]
-		self._dll.setup.restype = None
+	    self._dll.exp_clientID.argtypes = [c_long];
+	    self._dll.exp_clientID.restype = c_long;
+        self._dll.exp_getClients.argtypes = [c_bool];
+        self._dll.exp_getClients.restype = c_long;
+        self._dll.exp_pairClient.argtypes = [c_long];
+        self._dll.exp_pairClient.restype = c_bool;
+        self._dll.exp_getCurrent.argtypes = [];
+        self._dll.exp_getCurrent.restype = c_long;
+        self._dll.exp_killClient.argtypes = [c_long];
+        self._dll.exp_killClient.restype = c_bool;
+		self._dll.spawnClient.argtypes = [c_char_p,c_char_p,c_char_p,c_long,c_long,c_char_p,c_char_p,c_char_p]
+		self._dll.spawnClient.restype = c_long
 		#Smart
 		self._dll.getImageArray.argtypes = []
 		self._dll.getImageArray.restype = c_long
@@ -90,9 +100,44 @@ class Smart:
 		self._dll.releaseMousePlus.restype = None
 		self._dll.clickMousePlus.argtypes = [c_long, c_long, c_long]
 		self._dll.clickMousePlus.restype = None
-		self._dll.setup(root,args,width,height,initseq)
 
-	#from Smart.cpp
+    #Remote
+
+	def getClientID(self,idx):
+		"""Returns the ID of the client at internal index idx."""
+		res = self._dll.exp_clientID(idx)
+		return res.value
+
+	def getClients(self,only_unpaired=True):
+		"""Populates the internal client list with unpaired or all clients."""
+		res = self._dll.exp_getClients(only_unpaired)
+		return res.value
+    
+	def pairClient(self,pid):
+		"""Attempts to pair to the client SMART.PID."""
+		res = self._dll.exp_pairClient(pid)
+		return res.value
+    
+	def getCurrent(self):
+		"""Returns the PID of the currently paired client."""
+		res = self._dll.exp_getCurrent()
+		return res.value
+    
+	def killClient(self,pid):
+		"""Attempts to kill to the client SMART.PID."""
+		res = self._dll.exp_killClient(pid)
+		return res.value
+		
+    
+	def spawnClient(self,remote_path,root,params,width,height,initseq,useragent,javaargs):
+		"""Attempts to kill to the client SMART.PID."""
+		res = self._dll.exp_killClient(pid)
+		return res.value
+		
+		self._dll.spawnClient.argtypes = [c_char_p,c_char_p,c_char_p,c_long,c_long,c_char_p,c_char_p,c_char_p]
+		self._dll.spawnClient.restype = c_long
+
+	#from Smart
 
 	def getImageArray(self):
 		"""Returns a c_void_p to SMART's image buffer array."""
@@ -140,7 +185,7 @@ class Smart:
 		"""(Re)Initilizes SMART with the given arguments."""
 		self._dll.setup(root, args, w, h, initseq)
 
-	#from Input.cpp
+	#from Input
 
 	def sendKeys(self, string):
 		"""Sends a string of characters to the client in a human way."""

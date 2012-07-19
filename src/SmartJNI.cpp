@@ -32,7 +32,7 @@
     #include <windows.h>
 #endif
 
-extern "C" JNIEXPORT jboolean JNICALL Java_smart_Remote_checkAlive(JNIEnv *env, jclass cls, jint tid) {    
+extern "C" JNIEXPORT jboolean JNICALL Java_smart_Main_checkAlive(JNIEnv *env, jclass cls, jint tid) {    
     #ifndef _WIN32
         return syscall(SYS_tkill,tid,0) ? JNI_FALSE : JNI_TRUE;
     #else
@@ -44,7 +44,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_smart_Remote_checkAlive(JNIEnv *env, 
     #endif
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_smart_Remote_getPID(JNIEnv *env, jclass cls, jint dummy) {
+extern "C" JNIEXPORT jint JNICALL Java_smart_Main_getPID(JNIEnv *env, jclass cls, jint dummy) {
     #ifndef _WIN32
         return getpid();
     #else
@@ -64,7 +64,7 @@ extern "C" JNIEXPORT jint JNICALL Java_smart_Remote_getPID(JNIEnv *env, jclass c
 int n_size;
 void *data;
 
-extern "C" JNIEXPORT jobject JNICALL Java_smart_Remote_mapShared(JNIEnv *env, jclass cls, jstring path, jint size) {
+extern "C" JNIEXPORT jobject JNICALL Java_smart_Main_mapShared(JNIEnv *env, jclass cls, jstring path, jint size) {
     n_size = size; 
     const char* shmfile = env->GetStringUTFChars(path, 0);
     #ifndef _WIN32
@@ -91,7 +91,7 @@ extern "C" JNIEXPORT jobject JNICALL Java_smart_Remote_mapShared(JNIEnv *env, jc
     return buffer;
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_smart_Remote_unmap(JNIEnv *env, jclass cls) {
+extern "C" JNIEXPORT jint JNICALL Java_smart_Main_unmap(JNIEnv *env, jclass cls) {
     #ifndef _WIN32
         munmap(memmap,n_size);
         close(fd);

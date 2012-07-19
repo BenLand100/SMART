@@ -280,7 +280,7 @@ SMARTClient* spawnClient(char* remote_path, char *root, char *params, int width,
     if (!useragent) useragent = &empty;
     if (!javaargs) javaargs = &empty;
     char bootclasspath[512];
-    sprintf(bootclasspath,"-Xbootclasspath/p:%s",remote_path);
+    sprintf(bootclasspath,"-Xbootclasspath/p:%s/%s",remote_path,"smart.jar");
     char library[512];
     #ifdef _WIN32
     sprintf(library,"%s/libremote%s.%s",remote_path,bits,"dll");
@@ -309,7 +309,7 @@ SMARTClient* spawnClient(char* remote_path, char *root, char *params, int width,
     callClient(client,Ping);
     return client;
     #else
-    sprintf(library,"%s/libremote%s.%s",remote_path,bits,"so");
+    sprintf(library,"%s/libsmartjni%s.%s",remote_path,bits,"so");
     int v = fork();
     if (v) {
         int count = 0;
@@ -335,7 +335,6 @@ SMARTClient* spawnClient(char* remote_path, char *root, char *params, int width,
  * This will also clean up any zombies left hanging.
  */
 int getClients(bool only_unpaired, int **_clients) {
-    cout << "Polling for SMARTs\n";
     int count = 0;
     if (_clients) *_clients = NULL;
     #ifndef _WIN32

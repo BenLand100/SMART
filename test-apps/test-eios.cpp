@@ -1,5 +1,5 @@
 /**
- *  Copyright 2010 by Benjamin J. Land (a.k.a. BenLand100)
+ *  Copyright 2012 by Benjamin J. Land (a.k.a. BenLand100)
  *
  *  This file is part of the SMART Minimizing Autoing Resource Thing (SMART)
  *
@@ -51,15 +51,15 @@ typedef bool (*EIOS_IsKeyHeld)(Target t, int key) __attribute__((stdcall));
 int main(int argc, char** argv) {
     #ifndef _WIN32
         #if __SIZEOF_POINTER__ == 4
-            void* libsmart = dlopen("./libsmart32.so",RTLD_LAZY);
+            void* libsmart = dlopen("./libsmartremote32.so",RTLD_LAZY);
         #else
-            void* libsmart = dlopen("./libsmart64.so",RTLD_LAZY);
+            void* libsmart = dlopen("./libsmartremote64.so",RTLD_LAZY);
         #endif
     #else
         #if __SIZEOF_POINTER__ == 4
-            HMODULE libsmart = LoadLibrary("./libsmart32.dll");
+            HMODULE libsmart = LoadLibrary("./libsmartremote32.dll");
         #else
-            HMODULE libsmart = LoadLibrary("./libsmart64.dll");
+            HMODULE libsmart = LoadLibrary("./libsmartremote64.dll");
         #endif
     #endif
     cout << "Library: " << libsmart << '\n';

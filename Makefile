@@ -107,9 +107,17 @@ JAVACLASSES= \
     $(JAVA_BUILD_DIR)/smart/UnblockedEvent.class
 
 all:
-	@echo "Syntax for SMART makefile:\n    For Windows distributions: make windows windows64\n    For Linux distributions: make linux linux64\n    For SCAR distributions: make scar\n    For All distributions: make everything\n    For test apps: make test\n    To clean build files: make clean"
+	@echo "Syntax for the SMART makefile:
+	@echo "    For Windows distributions: make windows windows64"
+	@echo "    For Linux distributions: make linux linux64"
+	@echo "    For All distributions: make everything"
+	@echo "    For test apps: make test-python test-linux test-linux64 test-windows test-windows64"
+	@echo "    For all test apps: make test-all"
+	@echo "    To clean build files: make clean"
 	
 everything: linux linux64 windows windows64
+
+test-all: test-python test-windows test-windows64 test-linux test-linux64
 
 linux: $(JAVACLASSES) $(DIST)/$(LIN_NAME) $(DIST)/$(JNI_LIN_NAME)
 	@echo "Finished Building the Linux 32bit SMART distribution"
@@ -123,23 +131,38 @@ windows: $(JAVACLASSES) $(DIST)/$(WIN_NAME) $(DIST)/$(JNI_WIN_NAME)
 windows64: $(JAVACLASSES) $(DIST)/$(WIN64_NAME) $(DIST)/$(JNI_WIN64_NAME)
 	@echo "Finished Building the Windows 64bit SMART distribution"
 	
-test: test-apps/test-windows.cpp test-apps/test-linux.cpp test-apps/test-scar.cpp
+test-linux:
 	@mkdir -p $(DIST)
-	@$(WIN_GPP) -Wall -o $(DIST)/test-windows32.exe test-apps/test-windows.cpp
-	@$(WIN64_GPP) -Wall -o $(DIST)/test-windows64.exe test-apps/test-windows.cpp
-	@$(WIN_GPP) -Wall -o $(DIST)/test-scar.exe test-apps/test-scar.cpp
-	@$(LIN_GPP) -Wall -fPIC -ldl -o $(DIST)/test-linux32 test-apps/test-linux.cpp
-	@$(LIN64_GPP) -Wall -fPIC -ldl -o $(DIST)/test-linux64 test-apps/test-linux.cpp
-	@$(WIN_GPP) -Wall -o $(DIST)/test-eios-win32.exe test-apps/test-eios.cpp
-	@$(WIN64_GPP) -Wall -o $(DIST)/test-eios-win64.exe test-apps/test-eios.cpp
-	@$(LIN_GPP) -Wall -fPIC -ldl -o $(DIST)/test-eios-lin32 test-apps/test-eios.cpp
-	@$(LIN64_GPP) -Wall -fPIC -ldl -o $(DIST)/test-eios-lin64 test-apps/test-eios.cpp
-	@$(WIN_GPP) -Wall -o $(DIST)/test-remote-win32.exe test-apps/test-remote.cpp
-	@$(WIN64_GPP) -Wall -o $(DIST)/test-remote-win64.exe test-apps/test-remote.cpp
-	@$(LIN_GPP) -Wall -fPIC -ldl -o $(DIST)/test-remote-lin32 test-apps/test-remote.cpp
-	@$(LIN64_GPP) -Wall -fPIC -ldl -o $(DIST)/test-remote-lin64 test-apps/test-remote.cpp
+	@$(LIN_GPP) -ldl -o $(DIST)/test-spawn32 test-apps/test-spawn.cpp
+	@$(LIN_GPP) -ldl -o $(DIST)/test-eios32 test-apps/test-eios.cpp
+	@$(LIN_GPP) -ldl -o $(DIST)/test-exports32 test-apps/test-exports.cpp
+	@echo "Finished building Linux 32bit test files"
+	
+test-linux64:
+	@mkdir -p $(DIST)
+	@$(LIN64_GPP) -ldl -o $(DIST)/test-spawn64 test-apps/test-spawn.cpp
+	@$(LIN64_GPP) -ldl -o $(DIST)/test-eios64 test-apps/test-eios.cpp
+	@$(LIN64_GPP) -ldl -o $(DIST)/test-exports64 test-apps/test-exports.cpp
+	@echo "Finished building Linux 64bit test files"
+	
+test-windows: 
+	@mkdir -p $(DIST)
+	@$(WIN_GPP) -o $(DIST)/test-spawn32.exe test-apps/test-spawn.cpp
+	@$(WIN_GPP) -o $(DIST)/test-eios32.exe test-apps/test-eios.cpp
+	@$(WIN_GPP) -o $(DIST)/test-exports32.exe test-apps/test-exports.cpp
+	@echo "Finished building Windows 32bit test files"
+	
+test-windows64:
+	@mkdir -p $(DIST)
+	@$(WIN64_GPP) -o $(DIST)/test-spawn64.exe test-apps/test-spawn.cpp
+	@$(WIN64_GPP) -o $(DIST)/test-eios64.exe test-apps/test-eios.cpp
+	@$(WIN64_GPP) -o $(DIST)/test-exports64.exe test-apps/test-exports.cpp
+	@echo "Finished building Windows 64bit test files"
+	
+test-python:
+	@mkdir -p $(DIST)
 	@cp test-apps/test-python.py $(DIST)/test-python
-	@echo "Finished building test programs" 
+	@echo "Finished building Python test files"
 	
 clean: 
 	@echo "Cleaning build files..."

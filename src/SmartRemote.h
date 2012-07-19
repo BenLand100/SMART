@@ -153,7 +153,7 @@ extern "C" bool EIOS_IsKeyHeld(Target t, int key) __attribute__((stdcall));
 
 extern "C" int exp_clientID(int idx);
 extern "C" int exp_getClients(bool only_unpaired);
-extern "C" int exp_spawnClient(char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char *jvmpath, int maxmem);
+extern "C" int exp_spawnClient(char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char* javaargs);
 extern "C" bool exp_pairClient(int pid);
 extern "C" int exp_getCurrent();
 extern "C" bool exp_killClient(int pid);
