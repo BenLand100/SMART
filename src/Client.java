@@ -76,16 +76,32 @@ public class Client implements ActionListener, ChangeListener {
 	    else if (osname.contains("Mac")) windowing = "Macintosh";
 	    USER_AGENT = "Mozilla/5.0 (" + windowing + "; U; " + osname + " " + System.getProperty("os.version") + "; " + Locale.getDefault().getLanguage()+"-"+Locale.getDefault().getCountry()+"; rv:1.9.0.10) Gecko/2009042316 Firefox/3.0.10";    
     }
-    
+        
+    //mantains a list of classloader strings and clients associated with it
+    private static Hashtable<String, Client> clients = new Hashtable<String, Client>();
+
     /**
-     * Testing method for a non-native start of SMART
+     * Since there is only one Canvas ever associated with a classloader, this method
+     * effectively ensures that the Canvas is always correct
      */
-    public static void main(String... args) throws Exception {
-        int w = 765;
-        int h = 503;
-        new Client(ByteBuffer.allocate(w * h * 4), ByteBuffer.allocate(w * h * 4), w, h, "http://world37.runescape.com/",",f6989315976681059684","",null,0);
+    public static void canvasNotify(Canvas it) {
+        try {
+            //System.out.println("Notify " + it.getClass().getClassLoader().toString());
+            if (it == null) return;
+            if (clients.containsKey(it.getClass().getClassLoader().toString())) {
+                //System.out.println("Fired");
+                Client client = clients.get(it.getClass().getClassLoader().toString());
+                if (client == null) {
+                    System.out.println("Bad client? Interesting...");
+                } else {
+                    client.target(it);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-    
+
     private int width = 825;
     private int height = 500;
     private URLClassLoader thisLoader;
@@ -145,12 +161,55 @@ public class Client implements ActionListener, ChangeListener {
             setRefresh(60);
             active = true;
             clientFrame.setVisible(true);
-            blitThread = createBlitThread();
-            blitThread.start();
         } catch (Exception e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(null, "Error starting SMART, ensure the target page has an applet declaration", "SMART", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    /**
+     * Since some applets might create a new Canvas every time the applet is focused,
+     * this callback lets the Client know the Canvas has changed, and it can grab it
+     * as necessary.
+     */
+    public void target(Canvas it) {
+        if (it == canvas || it == null) {
+            return;
+        }
+        boolean iam = blocking;
+        if (iam) {
+            stopBlocking();
+        }
+        BlockingEventQueue.removeComponent(canvas);
+        if (canvas == null) iam = true;
+        canvas = it;
+        if (blitThread != null) {
+            try {
+                blitThread.stop();
+            } catch (Exception e) {
+                System.out.println("Bad stuff went down, recovering...");
+                e.printStackTrace();
+            }
+        }
+        blitThread = createBlitThread();
+        BlockingEventQueue.addComponent(canvas, new EventRedirect() {
+            @Override
+            public void dispatched(AWTEvent e) {
+                clientFrame.requestFocusInWindow(); //any event should cause a refocus
+            }
+        });
+        BlockingEventQueue.ensureBlocking();
+        BlockingEventQueue.setBlocking(canvas, iam);
+        if (iam) {
+            startBlocking();
+            clientFrame.requestFocusInWindow();
+        }
+        if (initseq != null) {
+            nazi.sendKeys(initseq,90,60);
+            initseq = null;
+            System.out.println("Init Sequence Dispatched");
+        }
+        blitThread.start();
     }
 
     //Convenience method for Native code see Main.java
@@ -258,7 +317,7 @@ public class Client implements ActionListener, ChangeListener {
      */
     private Thread createBlitThread() {
         try {
-            /*canvas.setBackground(new Color(0xFE, 0xFE, 0xFE));
+            canvas.setBackground(new Color(0xFE, 0xFE, 0xFE));
             final Graphics canvasGraphics = canvas.getCanvasGraphics();
             final BufferedImage buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_BGR);
             System.out.println("Replacing Canvas Drawing Surface");
@@ -271,7 +330,7 @@ public class Client implements ActionListener, ChangeListener {
             WritableRaster debugRaster = (WritableRaster) rasterField.get(debug);
             final Graphics debugGraphics = debug.getGraphics();
             final int[] debugData = ((DataBufferInt) debugRaster.getDataBuffer()).getData();
-            debugGraphics.setColor(Color.RED);*/
+            debugGraphics.setColor(Color.RED);
             return new Thread("Smart_Image_Transfer") {
                 @Override
                 public void run() {
@@ -309,7 +368,7 @@ public class Client implements ActionListener, ChangeListener {
                     BlockingEventQueue.ensureBlocking();
                     BlockingEventQueue.setBlocking(canvas, iam);*/
                 
-                    /*int len = width*height;
+                    int len = width*height;
                     int[] temp = new int[len];
                     try {
                         
@@ -353,7 +412,7 @@ public class Client implements ActionListener, ChangeListener {
                         System.out.println("Transfer Thread Died");
                         e.printStackTrace();
                         blitThread.start();
-                    }*/
+                    }
                 }
             };
         } catch (Exception e) {
@@ -397,12 +456,12 @@ public class Client implements ActionListener, ChangeListener {
         if (active) {
             System.out.println("Destroying SMART");
             active = false;
-            /*for (Map.Entry<String,Client> entry : clients.entrySet()) {
+            for (Map.Entry<String,Client> entry : clients.entrySet()) {
                 if (entry.getValue() == this) {
                     clients.remove(entry.getKey());
                     break;
                 }
-            }*/
+            }
             BlockingEventQueue.removeComponent(canvas);
             clientFrame.setVisible(false);
             clientApplet.stop();
@@ -495,7 +554,7 @@ public class Client implements ActionListener, ChangeListener {
             e.printStackTrace();
         }
         gameLoader = clientApplet.getComponent(0).getClass().getClassLoader();
-        //clients.put(gameLoader.toString(), this);
+        clients.put(gameLoader.toString(), this);
         System.out.println("Client Fully Initialized");
         clientFrame.pack();
         clientFrame.setResizable(false);

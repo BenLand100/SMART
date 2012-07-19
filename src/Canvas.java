@@ -35,7 +35,7 @@ public class Canvas extends Component implements Accessible {
 
     @Override
     public void setVisible(boolean visible) {
-        //Client.canvasNotify(this);
+        Client.canvasNotify(this);
         super.setVisible(visible);
     }
     

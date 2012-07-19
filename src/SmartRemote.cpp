@@ -281,7 +281,7 @@ SMARTClient* spawnClient(char* remote_path, char *root, char *params, int width,
     if (!useragent) useragent = &empty;
     if (!javaargs) javaargs = &empty;
     char bootclasspath[512];
-    sprintf(bootclasspath,"-Xbootclasspath/p:\"%s/%s\"",remote_path,"smart.jar");
+    sprintf(bootclasspath,"-Xbootclasspath/p:%s/%s",remote_path,"smart.jar");
     char library[512];
     #ifdef _WIN32
     sprintf(library,"%s/libsmartjni%s.dll",remote_path,bits);
