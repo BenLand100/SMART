@@ -31,19 +31,17 @@ class point:
 		return '('+str(self.x)+','+str(self.y)+')'
 
 class Smart:
-	"""General SMART wrapper for python, requires v8.0 or later"""
-	def __init__(self, root, args, width, height, initseq, jvmpath = None):
-		"""Sets up the python bindings for SMART, sets the JVM if specified, 
-		   and invokes the setup routine, assuming the libsmart library is
-		   in the current path."""
-		bitstr = '64' if sys.maxsize > 2**32 else '32'
-		if platform.system() == 'Windows':
-			self._dll = CDLL('./libsmart'+bitstr+'.dll')
-		else:
-			self._dll = CDLL('./libsmart'+bitstr+'.so')
-	    #Remote
-	    self._dll.exp_clientID.argtypes = [c_long];
-	    self._dll.exp_clientID.restype = c_long;
+    """General SMART wrapper for python, requires v8.0 or later"""
+    def __init__(self):
+        """Sets up the python bindings for SMART."""
+        bitstr = '64' if sys.maxsize > 2**32 else '32'
+        if platform.system() == 'Windows':
+	        self._dll = CDLL('./libsmartremote'+bitstr+'.dll')
+        else:
+	        self._dll = CDLL('./libsmartremote'+bitstr+'.so')
+        #Remote
+        self._dll.exp_clientID.argtypes = [c_long];
+        self._dll.exp_clientID.restype = c_long;
         self._dll.exp_getClients.argtypes = [c_bool];
         self._dll.exp_getClients.restype = c_long;
         self._dll.exp_pairClient.argtypes = [c_long];
@@ -52,199 +50,196 @@ class Smart:
         self._dll.exp_getCurrent.restype = c_long;
         self._dll.exp_killClient.argtypes = [c_long];
         self._dll.exp_killClient.restype = c_bool;
-		self._dll.spawnClient.argtypes = [c_char_p,c_char_p,c_char_p,c_long,c_long,c_char_p,c_char_p,c_char_p]
-		self._dll.spawnClient.restype = c_long
-		#Smart
-		self._dll.getImageArray.argtypes = []
-		self._dll.getImageArray.restype = c_long
-		self._dll.setTransparentColor.argtypes = [c_long]
-		self._dll.setTransparentColor.restype = None
-		self._dll.setDebug.argtypes = [c_bool]
-		self._dll.setDebug.restype = None
-		self._dll.setGraphics.argtypes = [c_bool]
-		self._dll.setGraphics.restype = None
-		self._dll.getDebugArray.argtypes = []
-		self._dll.getDebugArray.restype = c_long
-		self._dll.isActive.argtypes = []
-		self._dll.isActive.restype = c_bool
-		self._dll.isBlocking.argtypes = []
-		self._dll.isBlocking.restype = c_bool
-		self._dll.getRefresh.argtypes = []
-		self._dll.getRefresh.restype = c_long
-		self._dll.setRefresh.argtypes = [c_long]
-		self._dll.setRefresh.restype = None
-		#Input
-		self._dll.sendKeys.argtypes = [c_char_p]
-		self._dll.sendKeys.restype = None
-		self._dll.isKeyDown.argtypes = [c_long]
-		self._dll.isKeyDown.restype = c_bool
-		self._dll.holdKey.argtypes = [c_long]
-		self._dll.holdKey.restype = None
-		self._dll.releaseKey.argtypes = [c_long]
-		self._dll.releaseKey.restype = None
-		self._dll.getMousePos.argtypes = [POINTER(c_long), POINTER(c_long)]
-		self._dll.getMousePos.restype = None
-		self._dll.moveMouse.argtypes = [c_long, c_long]
-		self._dll.moveMouse.restype = None
-		self._dll.windMouse.argtypes = [c_long, c_long]
-		self._dll.windMouse.restype = None
-		self._dll.holdMouse.argtypes = [c_long, c_long, c_bool]
-		self._dll.holdMouse.restype = None
-		self._dll.releaseMouse.argtypes = [c_long, c_long, c_bool]
-		self._dll.releaseMouse.restype = None
-		self._dll.clickMouse.argtypes = [c_long, c_long, c_bool]
-		self._dll.clickMouse.restype = None
-		self._dll.holdMousePlus.argtypes = [c_long, c_long, c_long]
-		self._dll.holdMousePlus.restype = None
-		self._dll.releaseMousePlus.argtypes = [c_long, c_long, c_long]
-		self._dll.releaseMousePlus.restype = None
-		self._dll.clickMousePlus.argtypes = [c_long, c_long, c_long]
-		self._dll.clickMousePlus.restype = None
+        self._dll.exp_spawnClient.argtypes = [c_char_p,c_char_p,c_char_p,c_long,c_long,c_char_p,c_char_p,c_char_p]
+        self._dll.exp_spawnClient.restype = c_long
+        #Smart
+        self._dll.exp_getImageArray.argtypes = []
+        self._dll.exp_getImageArray.restype = c_long
+        self._dll.exp_setTransparentColor.argtypes = [c_long]
+        self._dll.exp_setTransparentColor.restype = None
+        self._dll.exp_setDebug.argtypes = [c_bool]
+        self._dll.exp_setDebug.restype = None
+        self._dll.exp_setGraphics.argtypes = [c_bool]
+        self._dll.exp_setGraphics.restype = None
+        self._dll.exp_getDebugArray.argtypes = []
+        self._dll.exp_getDebugArray.restype = c_long
+        self._dll.exp_isActive.argtypes = []
+        self._dll.exp_isActive.restype = c_bool
+        self._dll.exp_isBlocking.argtypes = []
+        self._dll.exp_isBlocking.restype = c_bool
+        self._dll.exp_getRefresh.argtypes = []
+        self._dll.exp_getRefresh.restype = c_long
+        self._dll.exp_setRefresh.argtypes = [c_long]
+        self._dll.exp_setRefresh.restype = None
+        #Input
+        self._dll.exp_sendKeys.argtypes = [c_char_p]
+        self._dll.exp_sendKeys.restype = None
+        self._dll.exp_isKeyDown.argtypes = [c_long]
+        self._dll.exp_isKeyDown.restype = c_bool
+        self._dll.exp_holdKey.argtypes = [c_long]
+        self._dll.exp_holdKey.restype = None
+        self._dll.exp_releaseKey.argtypes = [c_long]
+        self._dll.exp_releaseKey.restype = None
+        self._dll.exp_getMousePos.argtypes = [POINTER(c_long), POINTER(c_long)]
+        self._dll.exp_getMousePos.restype = None
+        self._dll.exp_moveMouse.argtypes = [c_long, c_long]
+        self._dll.exp_moveMouse.restype = None
+        self._dll.exp_windMouse.argtypes = [c_long, c_long]
+        self._dll.exp_windMouse.restype = None
+        self._dll.exp_holdMouse.argtypes = [c_long, c_long, c_bool]
+        self._dll.exp_holdMouse.restype = None
+        self._dll.exp_releaseMouse.argtypes = [c_long, c_long, c_bool]
+        self._dll.exp_releaseMouse.restype = None
+        self._dll.exp_clickMouse.argtypes = [c_long, c_long, c_bool]
+        self._dll.exp_clickMouse.restype = None
+        self._dll.exp_holdMousePlus.argtypes = [c_long, c_long, c_long]
+        self._dll.exp_holdMousePlus.restype = None
+        self._dll.exp_releaseMousePlus.argtypes = [c_long, c_long, c_long]
+        self._dll.exp_releaseMousePlus.restype = None
+        self._dll.exp_clickMousePlus.argtypes = [c_long, c_long, c_long]
+        self._dll.exp_clickMousePlus.restype = None
 
     #Remote
 
-	def getClientID(self,idx):
-		"""Returns the ID of the client at internal index idx."""
-		res = self._dll.exp_clientID(idx)
-		return res.value
+    def getClientID(self,idx):
+	    """Returns the ID of the client at internal index idx."""
+	    res = self._dll.exp_clientID(idx)
+	    return res
 
-	def getClients(self,only_unpaired=True):
-		"""Populates the internal client list with unpaired or all clients."""
-		res = self._dll.exp_getClients(only_unpaired)
-		return res.value
-    
-	def pairClient(self,pid):
-		"""Attempts to pair to the client SMART.PID."""
-		res = self._dll.exp_pairClient(pid)
-		return res.value
-    
-	def getCurrent(self):
-		"""Returns the PID of the currently paired client."""
-		res = self._dll.exp_getCurrent()
-		return res.value
-    
-	def killClient(self,pid):
-		"""Attempts to kill to the client SMART.PID."""
-		res = self._dll.exp_killClient(pid)
-		return res.value
-		
-    
-	def spawnClient(self,remote_path,root,params,width,height,initseq,useragent,javaargs):
-		"""Attempts to kill to the client SMART.PID."""
-		res = self._dll.exp_killClient(pid)
-		return res.value
-		
-		self._dll.spawnClient.argtypes = [c_char_p,c_char_p,c_char_p,c_long,c_long,c_char_p,c_char_p,c_char_p]
-		self._dll.spawnClient.restype = c_long
+    def getClients(self,only_unpaired=True):
+	    """Populates the internal client list with unpaired or all clients."""
+	    res = self._dll.exp_getClients(only_unpaired)
+	    return res
 
-	#from Smart
+    def pairClient(self,pid):
+	    """Attempts to pair to the client SMART.PID."""
+	    res = self._dll.exp_pairClient(pid)
+	    return res
 
-	def getImageArray(self):
-		"""Returns a c_void_p to SMART's image buffer array."""
-		res = self._dll.getImageArray()
-		return res.value
+    def getCurrent(self):
+	    """Returns the PID of the currently paired client."""
+	    res = self._dll.exp_getCurrent()
+	    return res
 
-	def getDebugArray(self):
-		"""Returns a c_void_p to SMART's debug drawing array."""
-		res = self._dll.getDebugArray()
-		return res.value
+    def killClient(self,pid):
+	    """Attempts to kill to the client SMART.PID."""
+	    res = self._dll.exp_killClient(pid)
+	    return res.value
+	
+    def spawnClient(self,remote_path,root,params,width,height,initseq='',useragent='',javaargs=''):
+	    """Attempts to kill to the client SMART.PID."""
+	    res = self._dll.exp_spawnClient(remote_path,root,params,width,height,initseq,useragent,javaargs)
+	    return res
 
-	def setTransparentColor(self, color):
-		"""Sets the color (int value) that is transparent on the debug image."""
-		self._dll.setTransparentColor(color)
+    #from Smart
 
-	def setDebug(self, on):
-		"""Enables or disables the debug drawing."""
-		self._dll.setDebug(on)
+    def getImageArray(self):
+	    """Returns a c_void_p to SMART's image buffer array."""
+	    res = self._dll.exp_getImageArray()
+	    return res.value
 
-	def setGraphics(self, on):
-		"""Enables or disables renderig graphics on the screen."""
-		self._dll.setGraphics(on)
-		
-	def isActive(self):
-		"""Specifies whether or not SMART has loaded."""
-		res = self._dll.isActive()
-		return res.value
+    def getDebugArray(self):
+	    """Returns a c_void_p to SMART's debug drawing array."""
+	    res = self._dll.exp_getDebugArray()
+	    return res.value
 
-	def isBlocking(self):
-		"""Specifies whether or not SMART is blocking events. (i.e. whether 
-		   SMART is enabled or disabled.)"""
-		res = self._dll.isBlocking()
-		return res.value
+    def setTransparentColor(self, color):
+	    """Sets the color (int value) that is transparent on the debug image."""
+	    self._dll.exp_setTransparentColor(color)
 
-	def getRefresh(self):
-		"""Returns the value of the FPS slider."""
-		res = self._dll.getRefresh()
-		return res.value
+    def setDebug(self, on):
+	    """Enables or disables the debug drawing."""
+	    self._dll.exp_setDebug(on)
 
-	def setRefresh(self, x):
-		"""Sets the value of the FPS slider."""
-		self._dll.setRefresh(x)
+    def setGraphics(self, on):
+	    """Enables or disables renderig graphics on the screen."""
+	    self._dll.exp_setGraphics(on)
+	
+    def isActive(self):
+	    """Specifies whether or not SMART has loaded."""
+	    res = self._dll.exp_isActive()
+	    return res.value
 
-	def setup(self, root, args, w, h, initseq):
-		"""(Re)Initilizes SMART with the given arguments."""
-		self._dll.setup(root, args, w, h, initseq)
+    def isBlocking(self):
+	    """Specifies whether or not SMART is blocking events. (i.e. whether 
+	       SMART is enabled or disabled.)"""
+	    res = self._dll.exp_isBlocking()
+	    return res
 
-	#from Input
+    def getRefresh(self):
+	    """Returns the value of the FPS slider."""
+	    res = self._dll.exp_getRefresh()
+	    return res
 
-	def sendKeys(self, string):
-		"""Sends a string of characters to the client in a human way."""
-		self._dll.sendKeys(string)
+    def setRefresh(self, x):
+	    """Sets the value of the FPS slider."""
+	    self._dll.exp_setRefresh(x)
 
-	def isKeyDown(self, c):
-		"""Tests if a key code is down."""
-		res = self._dll.isKeyDown(c)
-		return res.value
+    def setup(self, root, args, w, h, initseq):
+	    """(Re)Initilizes SMART with the given arguments."""
+	    self._dll.exp_setup(root, args, w, h, initseq)
 
-	def holdKey(self, c):
-		"""Holds the specified key code."""
-		self._dll.holdKey(c)
+    #from Input
 
-	def releaseKey(self, c):
-		"""Releases the specified key code."""
-		self._dll.releaseKey(c)
+    def sendKeys(self, string):
+	    """Sends a string of characters to the client in a human way."""
+	    self._dll.exp_sendKeys(string)
 
-	def getMousePos(self):
-		"""Returns the current mouse position."""
-		x = c_long()
-		y = c_long()
-		self._dll.getMousePos(byref(x), byref(y))
-		return point(x.value,y.value)
+    def isKeyDown(self, c):
+	    """Tests if a key code is down."""
+	    res = self._dll.exp_isKeyDown(c)
+	    return res
 
-	def moveMouse(self, x, y):
-		"""Sets the mouse to the specified position."""
-		self._dll.moveMouse(x, y)
-		
-	def holdMouse(self, x, y, left):
-		"""Holds the mouse (left or right) at the spcecified position."""
-		self._dll.holdMouse(x, y, left)
+    def holdKey(self, c):
+	    """Holds the specified key code."""
+	    self._dll.exp_holdKey(c)
 
-	def releaseMouse(self, x, y, left):
-		"""Releases the mouse (left or right) at the specified position."""
-		self._dll.releaseMouse(x, y, left)
+    def releaseKey(self, c):
+	    """Releases the specified key code."""
+	    self._dll.exp_releaseKey(c)
 
-	def clickMouse(self, x, y, left):
-		"""Clicks the mouse (left or right) humanly at the specified position."""
-		self._dll.clickMouse(x, y, left)
-		
-	def holdMousePlus(self, x, y, button):
-		"""Holds the mouse (left or right) at the spcecified position."""
-		self._dll.holdMousePlus(x, y, button)
+    def getMousePos(self):
+	    """Returns the current mouse position."""
+	    x = c_long()
+	    y = c_long()
+	    self._dll.exp_getMousePos(byref(x), byref(y))
+	    return point(x.value,y.value)
 
-	def releaseMousePlus(self, x, y, button):
-		"""Releases the mouse (left or right) at the specified position."""
-		self._dll.releaseMousePlus(x, y, button)
+    def moveMouse(self, x, y):
+	    """Sets the mouse to the specified position."""
+	    self._dll.exp_moveMouse(x, y)
+	
+    def holdMouse(self, x, y, left):
+	    """Holds the mouse (left or right) at the spcecified position."""
+	    self._dll.exp_holdMouse(x, y, left)
 
-	def clickMousePlus(self, x, y, button):
-		"""Clicks the mouse (left or right) humanly at the specified position."""
-		self._dll.clickMousePlus(x, y, button)
+    def releaseMouse(self, x, y, left):
+	    """Releases the mouse (left or right) at the specified position."""
+	    self._dll.exp_releaseMouse(x, y, left)
 
-	def windMouse(self, x, y):
-		"""Moves the mouse humanly to a specified position."""
-		self._dll.windMouse(x, y)
+    def clickMouse(self, x, y, left):
+	    """Clicks the mouse (left or right) humanly at the specified position."""
+	    self._dll.exp_clickMouse(x, y, left)
+	
+    def holdMousePlus(self, x, y, button):
+	    """Holds the mouse (left or right) at the spcecified position."""
+	    self._dll.exp_holdMousePlus(x, y, button)
+
+    def releaseMousePlus(self, x, y, button):
+	    """Releases the mouse (left or right) at the specified position."""
+	    self._dll.exp_releaseMousePlus(x, y, button)
+
+    def clickMousePlus(self, x, y, button):
+	    """Clicks the mouse (left or right) humanly at the specified position."""
+	    self._dll.exp_clickMousePlus(x, y, button)
+
+    def windMouse(self, x, y):
+	    """Moves the mouse humanly to a specified position."""
+	    self._dll.exp_windMouse(x, y)
 
 if __name__ == "__main__":
-        smart = Smart('http://world19.runescape.com/', ',f5', 765, 503, '')
+        smart = Smart();
+        print smart.spawnClient('.','http://world37.runescape.com/',',f681985954784915908',765,553,'s')
         import time
         from threading import *
         t = Timer(10.0, smart.hardReset)
