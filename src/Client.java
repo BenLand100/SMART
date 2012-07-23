@@ -364,11 +364,28 @@ public class Client implements ActionListener, ChangeListener {
                                         sleep(refresh);
                                     }
                                     break;
-                                case OpenGL:
-                                    while (blocking) {
-                                        sleep(refresh);
-                                    }
-                                    break;
+                                case OpenGL: {
+                                        int c = 0;
+                                        long time = System.currentTimeMillis();
+                                        //JFrame img = new JFrame("Teh Buffar");
+                                        //ImageIcon icon = new ImageIcon(buffer);
+                                        //img.add(new JLabel(icon));
+                                        //img.setVisible(true);
+                                        while (operatingMode == OperatingMode.OpenGL) {
+                                            sleep(refresh);
+                                            c++;
+                                            if (c % 100 == 0) {
+                                                System.out.println((1.0/((System.currentTimeMillis()-time)/1000.0)) + " fps");
+                                                time = System.currentTimeMillis();
+                                            }
+                                            Main.copyGLBuffer(0,0,width,height,nativeBuff);
+                                            //nativeBuff.rewind();
+                                            //for (int i = 0; i < len; ++i) {
+                                            //    bufferData[i] = nativeDebug.get() >> 8;
+                                            //}
+                                        }
+                                        //img.setVisible(false);
+                                    } break;
                             }
                         }
                         System.out.println("Transfer Thread Exited");

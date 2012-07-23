@@ -201,7 +201,7 @@ $(DIST)/$(LIN64_NAME): $(LIN64OBJFILES)
 $(DIST)/$(JNI_LIN64_NAME): $(JNI_LIN64OBJFILES)
 	@echo "Linking Linux64 JNI object files..."
 	@mkdir -p $(DIST)
-	@$(LIN64_GPP) -fPIC -shared -s -o $(DIST)/$(JNI_LIN64_NAME) $(JNI_LIN64OBJFILES)
+	@$(LIN64_GPP) -lGL -fPIC -shared -s -o $(DIST)/$(JNI_LIN64_NAME) $(JNI_LIN64OBJFILES)
 
 $(LIN64_BUILD_DIR)/SmartRemote.o: $(SRC_DIR)/SmartRemote.cpp $(CPPHEADERFILES)
 	@echo "Compiling SmartRemote.cpp"

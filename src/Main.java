@@ -88,6 +88,8 @@ public class Main {
     
     public static native int getPID();
     
+    public static native void copyGLBuffer(int x, int y, int w, int h, IntBuffer dest);
+    
     public static void debug(String str) {
         System.out.println("REMOTE: " + str);
     }

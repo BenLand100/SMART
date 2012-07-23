@@ -21,6 +21,7 @@
 #include "jni.h"
 
 #ifndef _WIN32
+    //#include <GL/gl.h>
     #include <sys/syscall.h>
     #include <sys/mman.h>
     #include <fcntl.h>
@@ -47,7 +48,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_smart_Main_checkAlive(JNIEnv *env, jc
     #endif
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_smart_Main_getPID(JNIEnv *env, jclass cls, jint dummy) {
+extern "C" JNIEXPORT jint JNICALL Java_smart_Main_getPID(JNIEnv *env, jclass cls) {
     #ifndef _WIN32
         return getpid();
     #else
@@ -55,53 +56,11 @@ extern "C" JNIEXPORT jint JNICALL Java_smart_Main_getPID(JNIEnv *env, jclass cls
     #endif
 }
 
-//This MIGHT be needed if Java's SHM mapping doesn't work on windows
-/*
-#ifndef _WIN32
-    int fd;
-    void *memmap;
-#else
-    HANDLE file;
-    HANDLE memmap;
-#endif
-int n_size;
-void *data;
-
-extern "C" JNIEXPORT jobject JNICALL Java_smart_Main_mapShared(JNIEnv *env, jclass cls, jstring path, jint size) {
-    n_size = size; 
-    const char* shmfile = env->GetStringUTFChars(path, 0);
+extern "C" JNIEXPORT void JNICALL Java_smart_Main_copyGLBuffer(JNIEnv *env, jclass cls, jint x, jint y, jint w, jint h, jobject dest) {
+    void *data = env->GetDirectBufferAddress(dest);
     #ifndef _WIN32
-        fd = open(shmfile,O_RDWR);
-        if (fd != -1) {
-            memmap = mmap(NULL,size,PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-            data = (void*)memmap;
-        }
+        //glReadPixels(x,y,w,h,GL_BGR,GL_UNSIGNED_INT_8_8_8_8,data);
     #else
-        file = CreateFile(
-            shmfile,
-            GENERIC_READ|GENERIC_WRITE,
-            FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE,
-            NULL,
-            OPEN_ALWAYS,
-            NULL);
-        if (file != INVALID_HANDLE_VALUE) {
-            memmap = CreateFileMapping(client->file,NULL,PAGE_READWRITE,0,size,shmfile);
-            data = (void*)MapViewOfFile(client->memmap,FILE_MAP_ALL_ACCESS,0,0,size);
-        }
-    #endif
-    env->ReleaseStringUTFChars(path, shmfile);
-    jobject buffer = env->NewDirectByteBuffer(data, size);
-    return buffer;
-}
-
-extern "C" JNIEXPORT jint JNICALL Java_smart_Main_unmap(JNIEnv *env, jclass cls) {
-    #ifndef _WIN32
-        munmap(memmap,n_size);
-        close(fd);
-    #else
-        UnmapViewOfFile(data);
-        CloseHandle(memmap);
-        CloseHandle(file);
     #endif
 }
-*/
+
