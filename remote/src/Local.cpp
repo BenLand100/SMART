@@ -272,6 +272,9 @@ SMARTClient* pairClient(int id) {
         
         client->data->paired = tid;
         client->refcount = 1;
+        #ifdef _WIN32
+        FlushFileBuffers(client->file);
+        #endif
         (*pairedClients)[id] = client;
         return client;
     } else {

@@ -432,6 +432,7 @@ int main(int argc, char** argv) {
             if (!paired) {
                 cout << "Paired thread no longer exists: reset\n";
                 data->paired = 0;
+                FlushFileBuffers(file);
             }
         }
         if (paired && !data->paired) {
