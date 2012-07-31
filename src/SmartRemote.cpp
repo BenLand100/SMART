@@ -736,7 +736,7 @@ void EIOS_GetMousePosition(Target t, int* x, int* y) {
 } 
 
 void EIOS_MoveMouse(Target t, int x, int y) {
-    if (local) {
+    if (t) {
         ((int*)(t->data->args))[0] = x;
         ((int*)(t->data->args))[1] = y;
         callClient(t,moveMouse);
@@ -744,7 +744,7 @@ void EIOS_MoveMouse(Target t, int x, int y) {
 } 
 
 void EIOS_HoldMouse(Target t, int x, int y, int button) {
-    if (local) {
+    if (t) {
         ((int*)(t->data->args))[0] = x;
         ((int*)(t->data->args))[1] = y;
         ((int*)(t->data->args))[2] = button;
