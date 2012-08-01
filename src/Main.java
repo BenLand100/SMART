@@ -84,6 +84,14 @@ public class Main {
         mem.putInt(4*4,tid);
     }
     
+    public static void setImgOff(int off) {
+        mem.putInt(5*4,off);
+    }
+    
+    public static void setDbgOff(int off) {
+        mem.putInt(6*4,off);
+    }
+    
     public static native boolean checkAlive(int tid);
     
     public static native int getPID();
@@ -157,7 +165,9 @@ public class Main {
                 StringBuilder keys = new StringBuilder();
                 byte c;
                 args.position(8);
-                while ((c=args.get()) != 0) keys.append((char)(c & 0xff)); 
+                while ((c=args.get()) != 0) { 
+                    keys.append(c); 
+                }
                 client.sendKeys(keys.toString(),args.getInt(0*4),args.getInt(1*4));
                 } break;
             case holdKey:
@@ -217,8 +227,10 @@ public class Main {
             mem.order(ByteOrder.LITTLE_ENDIAN);
             mem.position(nVars*4);
             args = mem.slice();
+            setImgOff(imgoff);
             mem.position(imgoff);
             ByteBuffer img = mem.slice();
+            setDbgOff(dbgoff);
             mem.position(dbgoff);
             ByteBuffer dbg = mem.slice();
             mem.rewind();
