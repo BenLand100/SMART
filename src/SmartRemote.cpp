@@ -32,6 +32,8 @@
     #include <errno.h>
 #endif
 
+#define debug cout << "SMART: "
+
 using namespace std;
 
 static map<int,SMARTClient*> *pairedClients;
@@ -41,8 +43,9 @@ static clients_dat clients;
 void freeClient(SMARTClient *client) {
     if (!client) return;
     if (client->memmap) {
+        debug << "Decrementing refcount [" << client->data->id << "]\n";
         if (--client->refcount == 0) {
-            cout << "Freeing client data [" << client->data->id << "]\n";
+            debug << "Freeing client data [" << client->data->id << "]\n";
             if (client->socket) {
                 #ifndef _WIN32
                     close(client->socket);
@@ -78,7 +81,7 @@ bool resock(SMARTClient *client) {
     client->socket = 0;
     struct hostent *localhost = gethostbyname("localhost");
     if (!localhost) {
-        cout << "Could not resolve localhost, check your network settings\n";
+        debug << "Could not resolve localhost, check your network settings\n";
         return false;
     }
     client->socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -87,15 +90,15 @@ bool resock(SMARTClient *client) {
     local.sin_family = AF_INET;
     memcpy((char *)&local.sin_addr.s_addr,(char *)localhost->h_addr, localhost->h_length);
     local.sin_port = htons(client->data->port);
-    cout << "Attempting to connect to localhost:" << client->data->port << "\n";
+    debug << "Attempting to connect to localhost:" << client->data->port << "\n";
     int res;
     if ((res=connect(client->socket,(struct sockaddr *) &local,sizeof(local))) < 0) {
-        cout << "Could not connect socket: ";
+        debug << "Could not connect socket: ";
         #ifndef _WIN32
-            cout << errno << '\n';
+            debug << errno << '\n';
             close(client->socket);
         #else
-            cout << WSAGetLastError() << '\n';
+            debug << WSAGetLastError() << '\n';
             closesocket(client->socket);
         #endif
         client->socket = 0;
@@ -110,7 +113,7 @@ bool resock(SMARTClient *client) {
  */
 void callClient(SMARTClient *client, char funid) {
     if (send(client->socket,(const char*)&funid,sizeof(char),0)!=sizeof(char)) {
-        cout << "Could Not Call\n";
+        debug << "Could Not Call\n";
         return;
     }
     struct timeval tv;
@@ -122,14 +125,14 @@ void callClient(SMARTClient *client, char funid) {
     for (int i = 0; i < 600; i++) {
         if (select(client->socket+1, &rfds, &rfds, NULL, &tv)) {
             if (recv(client->socket,(char*)&funid,sizeof(char),0)!=sizeof(char)) {
-                cout << "Call appears to have failed, or client successfully killed.\n";
+                debug << "Call appears to have failed, or client successfully killed.\n";
             }
             return;
         }
         tv.tv_sec = 0;
         tv.tv_usec = 100000;
     }
-    cout << "Client timed out\n";
+    debug << "Client timed out\n";
 }
 
 /**
@@ -157,25 +160,25 @@ SMARTClient* pairClient(int id) {
     #endif
     map<int,SMARTClient*>::iterator it = pairedClients->find(id);
     if (it != pairedClients->end()) {
-        cout << "Client possibly paired to us\n";
+        debug << "Client possibly paired to us\n";
         if (it->second->data->paired == tid) {
-            cout << "Already paired: Incrementing refcount\n";
+            debug << "Already paired: Incrementing refcount\n";
             it->second->refcount++;
             return it->second;
         }
         if (it->second->data->paired == 0) {
-            cout << "Repairing: Incrementing refcount\n";
+            debug << "Repairing: Incrementing refcount\n";
             it->second->refcount++;
             it->second->data->paired = tid; 
             if (resock(it->second)) {  
                 return it->second;
             } else {
-                cout << "Zombie detected (no socket response)\n";
+                debug << "Zombie detected (no socket response)\n";
                 // ***FIXME*** Issue process kill here
                 return NULL;
             }
         } else {
-            cout << "Client is otherwise paired\n";
+            debug << "Client is otherwise paired\n";
             return NULL;
         }
     }
@@ -199,18 +202,18 @@ SMARTClient* pairClient(int id) {
         client->memmap = mmap(NULL,sizeof(shm_data),PROT_READ|PROT_WRITE, MAP_SHARED, client->fd, 0);
         client->data = (shm_data*)client->memmap;
         if (!client->data) {
-            cout << "Could not map shared memory (pre)\n";
+            debug << "Could not map shared memory (pre)\n";
             return NULL;   
         }
         #else
         client->memmap = CreateFileMapping(client->file,NULL,PAGE_READWRITE,0,sizeof(shm_data),shmfile);
         if (client->memmap == INVALID_HANDLE_VALUE) {
-            cout << "Could not map shared file (pre)\n";
+            debug << "Could not map shared file (pre)\n";
             return NULL;   
         }
         client->data = (shm_data*)MapViewOfFile(client->memmap,FILE_MAP_ALL_ACCESS,0,0,sizeof(shm_data));
         if (!client->data) {
-            cout << "Could not map shared memory (pre)\n";
+            debug << "Could not map shared memory (pre)\n";
             return NULL;   
         }
         #endif
@@ -224,7 +227,7 @@ SMARTClient* pairClient(int id) {
         CloseHandle(client->memmap);
         #endif
         if (client_paired && client_paired != tid) { 
-            cout << "Failed to pair - Client appears to be paired\n";
+            debug << "Failed to pair - Client appears to be paired\n";
             #ifndef _WIN32
             close(client->fd);
             #else
@@ -237,24 +240,24 @@ SMARTClient* pairClient(int id) {
         client->memmap = mmap(NULL,2*client_width*client_height*4+sizeof(shm_data),PROT_READ|PROT_WRITE, MAP_SHARED, client->fd, 0);
         client->data = (shm_data*)client->memmap;
         if (!client->data) {
-            cout << "Could not map shared memory (post)\n";
+            debug << "Could not map shared memory (post)\n";
             return NULL;   
         }
         #else
         client->memmap = CreateFileMapping(client->file,NULL,PAGE_READWRITE,0,sizeof(shm_data)+2*client_width*client_height*4,shmfile);
         if (client->memmap == INVALID_HANDLE_VALUE) {
-            cout << "Could not map shared file (post)\n";
+            debug << "Could not map shared file (post)\n";
             return NULL;   
         }
         client->data = (shm_data*)MapViewOfFile(client->memmap,FILE_MAP_ALL_ACCESS,0,0,sizeof(shm_data)+2*client_width*client_height*4);
         if (!client->data) {
-            cout << "Could not map shared memory (post)\n";
+            debug << "Could not map shared memory (post)\n";
             return NULL;   
         }
         #endif
         
         client->data->paired = tid;
-        cout << "Setting the client's controller to our TID\n";
+        debug << "Setting the client's controller to our TID\n";
         client->socket = 0;
         if (!resock(client)) {
             freeClient(client);
@@ -264,7 +267,7 @@ SMARTClient* pairClient(int id) {
         (*pairedClients)[id] = client;
         return client;
     } else {
-        cout << "Failed to pair - No client by that ID\n";
+        debug << "Failed to pair - No client by that ID\n";
         delete client;
         return NULL;
     }
@@ -302,7 +305,7 @@ SMARTClient* spawnClient(char* remote_path, char *root, char *params, int width,
     ShellExecuteEx(&info);
     delete args;
     if (!info.hProcess) {
-        cout << "Failed to spawn process. Make sure java.exe is on your path and that SMART is installed correctly.\n";
+        debug << "Failed to spawn process. Make sure java.exe is on your path and that SMART is installed correctly.\n";
         return NULL;
     }
     int pid = GetProcessId(info.hProcess);
@@ -329,7 +332,7 @@ SMARTClient* spawnClient(char* remote_path, char *root, char *params, int width,
         return client;
     } else {
         execlp("java","java",bootclasspath,"smart.Main",library,root,params,_width,_height,initseq,useragent,NULL);
-        cout << "Process terminating. If nothing happened, make sure java is on your path and that SMART is installed correctly.\n";
+        debug << "Process terminating. If nothing happened, make sure java is on your path and that SMART is installed correctly.\n";
         exit(1);
     }
     #endif
@@ -415,7 +418,7 @@ int getClients(bool only_unpaired, int **_clients) {
  * Returns the number of clients in the structure
  */
 int exp_clientID(int idx) {
-    cout << "Returning index " << idx << '\n';
+    debug << "Returning index " << idx << '\n';
     if (idx < clients.count && idx >= 0) {
         return clients.ids[idx];
     }
@@ -443,7 +446,7 @@ int exp_getCurrent() {
  * !!!Fails if the client is paired with ANOTHER controller!!!
  */
 bool exp_killClient(int pid) {
-    cout << "Killing client " << pid << '\n';
+    debug << "Killing client " << pid << '\n';
     SMARTClient *client = pairClient(pid);
     if (!client) return false;
     killClient(client);
@@ -701,17 +704,18 @@ SMARTClient* spawnFromString(char* initarg) {
 }
 
 Target EIOS_RequestTarget(char *initargs) {
-    cout << "EIOS Paired\n";
+    debug << "EIOS Requesting Target\n";
     if (initargs != 0 && strlen(initargs) > 0) {
         SMARTClient *client = spawnFromString(initargs); //This seems silly, could use exp_SpawnClient instead
         if (!client) client = pairClient(atoi(initargs));
+        debug << "Target Identifier: " << client << '\n';
         return client;
     }
     return NULL; //This result signifies a failure
 } 
 
 void EIOS_ReleaseTarget(Target t) {
-    cout << "EIOS Unpaired\n";
+    debug << "EIOS Releasing Target\n";
     freeClient(t);
 } 
 
@@ -723,7 +727,10 @@ void EIOS_GetTargetDimensions(Target t, int* width, int* height) {
 } 
 
 rgb* EIOS_GetImageBuffer(Target t) {
-    cout << "EIOS requested image buffer\n";
+    debug << "EIOS requested image buffer\n";
+    if (t) {
+        debug << "Base: " << t->data << " Off: " << t->data->imgoff << '\n';
+    }
     return t ? (rgb*)(((char*)t->data) + t->data->imgoff) : 0;
 } 
 
@@ -829,14 +836,14 @@ int GetPluginABIVersion() {
 /*int main(int argc, char **argv) {
     internalConstructor();
     
-    cout << "Client Count: " << exp_getClients(false) << '\n';
-    cout << "Unpaired Clients: " << exp_getClients(true) << '\n';
+    debug << "Client Count: " << exp_getClients(false) << '\n';
+    debug << "Unpaired Clients: " << exp_getClients(true) << '\n';
     
-    cout << "Attempting to spawn...\n";
+    debug << "Attempting to spawn...\n";
     int id = exp_spawnClient(".", "http://world37.runescape.com/", ",f68198595478491590", 765, 553, NULL, NULL, NULL);
-    cout << "Spawned client " << id << " now sleeping...\n";
+    debug << "Spawned client " << id << " now sleeping...\n";
     sleep(5);
-    cout << "Kill it with fire!\n";
+    debug << "Kill it with fire!\n";
     exp_killClient(id);
     
     internalDestructor();

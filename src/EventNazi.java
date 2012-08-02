@@ -484,7 +484,7 @@ public class EventNazi {
                 if (KeyEvent.VK_SHIFT == code) shiftDown = true;
                 BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_PRESSED, startTime, shiftDown ? KeyEvent.SHIFT_DOWN_MASK : 0, code, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD));
                 if (isTypableCode(code)) {
-                	System.out.println("Trying to type " + code + " as '" + toChar(code,shiftDown) + "'");
+                	//System.out.println("Trying to type " + code + " as '" + toChar(code,shiftDown) + "'");
                     BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_TYPED, startTime, shiftDown ? KeyEvent.SHIFT_DOWN_MASK : 0, 0, toChar(code,shiftDown), KeyEvent.KEY_LOCATION_UNKNOWN));
                 }
                 setKeyHeld(dat, true);

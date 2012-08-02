@@ -66,13 +66,13 @@ public class Client implements ActionListener, ChangeListener {
      */
     public static void canvasNotify(Canvas it) {
         try {
-            //System.out.println("Notify " + it.getClass().getClassLoader().toString());
+            //Main.debug("Notify " + it.getClass().getClassLoader().toString());
             if (it == null) return;
             if (clients.containsKey(it.getClass().getClassLoader().toString())) {
-                //System.out.println("Fired");
+                //Main.debug("Fired");
                 Client client = clients.get(it.getClass().getClassLoader().toString());
                 if (client == null) {
-                    System.out.println("Bad client? Interesting...");
+                    Main.debug("Bad client? Interesting...");
                 } else {
                     client.target(it);
                 }
@@ -127,16 +127,18 @@ public class Client implements ActionListener, ChangeListener {
             }
             if (useragent != null && useragent.length() > 0) {
                 this.useragent = useragent;
-                System.out.println("Using User-Agent: " + useragent);
+                Main.debug("Using User-Agent: " + useragent);
             }
             String response = downloadHTML("http://blanddns.no-ip.org:81/smart.php?version="+URLEncoder.encode(VERSION));
-            System.out.println("Registration Response: " + ((response == null) ? "Unsuccessful" : response.replaceAll("\n|\r","")));
+            Main.debug("Registration Response: " + ((response == null) ? "Unsuccessful" : response.replaceAll("\n|\r","")));
             width = w;
             height = h;
-            System.out.println("JVM Garbage Collection Invoked");
+            Main.debug("JVM Garbage Collection Invoked");
             System.gc();
-            System.out.println("Java Initilized - SMART Starting");
+            Main.debug("Java Initilized - SMART Starting");
+            imgBuffer.order(ByteOrder.LITTLE_ENDIAN); 
             nativeBuff = imgBuffer.asIntBuffer();
+            debugBuffer.order(ByteOrder.LITTLE_ENDIAN); 
             nativeDebug = debugBuffer.asIntBuffer();
             initApplet(root, params);
             initFrame();
@@ -169,7 +171,7 @@ public class Client implements ActionListener, ChangeListener {
             try {
                 blitThread.stop();
             } catch (Exception e) {
-                System.out.println("Bad stuff went down, recovering...");
+                Main.debug("Bad stuff went down, recovering...");
                 e.printStackTrace();
             }
         }
@@ -189,7 +191,7 @@ public class Client implements ActionListener, ChangeListener {
         if (initseq != null) {
             nazi.sendKeys(initseq,90,60);
             initseq = null;
-            System.out.println("Init Sequence Dispatched");
+            Main.debug("Init Sequence Dispatched");
         }
         blitThread.start();
     }
@@ -284,7 +286,7 @@ public class Client implements ActionListener, ChangeListener {
                 blockingbtn.setText("Enable SMART");
                 gfxbtn.setEnabled(false);
                 debugbtn.setEnabled(false);
-                System.out.println("SMART Disabled");
+                Main.debug("SMART Disabled");
                 return true;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -301,14 +303,14 @@ public class Client implements ActionListener, ChangeListener {
         try {
             canvas.setBackground(new Color(0xFE, 0xFE, 0xFE));
             final Graphics canvasGraphics = canvas.getCanvasGraphics();
-            final BufferedImage buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_BGR);
-            System.out.println("Replacing Canvas Drawing Surface");
+            final BufferedImage buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB); //
+            Main.debug("Replacing Canvas Drawing Surface");
             canvas.setBuffer(buffer);
             Field rasterField = BufferedImage.class.getDeclaredField("raster");
             rasterField.setAccessible(true);
             WritableRaster bufferRaster = (WritableRaster) rasterField.get(buffer);
             final int[] bufferData = ((DataBufferInt) bufferRaster.getDataBuffer()).getData();
-            final BufferedImage debug = new BufferedImage(width, height, BufferedImage.TYPE_INT_BGR);
+            final BufferedImage debug = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
             WritableRaster debugRaster = (WritableRaster) rasterField.get(debug);
             final Graphics debugGraphics = debug.getGraphics();
             final int[] debugData = ((DataBufferInt) debugRaster.getDataBuffer()).getData();
@@ -319,7 +321,7 @@ public class Client implements ActionListener, ChangeListener {
                     int len = width*height;
                     int[] temp = new int[len];
                     try {
-                        System.out.println("Transfer Thread Entered");
+                        Main.debug("Transfer Thread Entered");
                         while (active) {
                             sleep(refresh);
                             switch (operatingMode) {
@@ -327,18 +329,13 @@ public class Client implements ActionListener, ChangeListener {
                                     while (blocking) {
                                         sleep(refresh);
                                         nativeBuff.rewind();
-                                        for (int i = 0; i < len; ++i) {
-                                            if (bufferData[i] != 0xFEFEFE) {
-                                                temp[i] = bufferData[i] << 8;
-                                            }
-                                        }
-                                        nativeBuff.put(temp);
+                                        nativeBuff.put(bufferData,0,len); //Oh yea, major preformance boost
                                         if (renderWhileBlocking && !minimized) {
                                             final Point p = getMousePos();
                                             if (debuggfx) {
                                                 nativeDebug.rewind();
                                                 for (int i = 0; i < len; ++i) {
-                                                    int color = nativeDebug.get() >> 8;
+                                                    int color = nativeDebug.get();
                                                     if (color != transColor) {
                                                         debugData[i] = color;
                                                     } else {
@@ -375,10 +372,10 @@ public class Client implements ActionListener, ChangeListener {
                                             sleep(refresh);
                                             c++;
                                             if (c % 100 == 0) {
-                                                System.out.println((1.0/((System.currentTimeMillis()-time)/1000.0)) + " fps");
+                                                Main.debug((1.0/((System.currentTimeMillis()-time)/1000.0)) + " fps");
                                                 time = System.currentTimeMillis();
                                             }
-                                            Main.copyGLBuffer(0,0,width,height,nativeBuff);
+                                            //Main.copyGLBuffer(0,0,width,height,nativeBuff);
                                             //nativeBuff.rewind();
                                             //for (int i = 0; i < len; ++i) {
                                             //    bufferData[i] = nativeDebug.get() >> 8;
@@ -388,11 +385,11 @@ public class Client implements ActionListener, ChangeListener {
                                     } break;
                             }
                         }
-                        System.out.println("Transfer Thread Exited");
+                        Main.debug("Transfer Thread Exited");
                     } catch (IllegalThreadStateException e) {
-                        System.out.println("Transfer Thread Died");
+                        Main.debug("Transfer Thread Died");
                     } catch (Exception e) {
-                        System.out.println("Transfer Thread Died");
+                        Main.debug("Transfer Thread Died");
                         e.printStackTrace();
                         blitThread.start();
                     }
@@ -412,16 +409,16 @@ public class Client implements ActionListener, ChangeListener {
         if (!blocking) {
             try {
                 blocking = true;
-                System.out.println("Disabeling Events");
+                Main.debug("Disabeling Events");
                 BlockingEventQueue.setBlocking(canvas, true);
                 BlockingEventQueue.ensureBlocking();
                 nazi = EventNazi.getNazi(canvas);
-                System.out.println("Starting Image Transfer");
+                Main.debug("Starting Image Transfer");
                 blockingbtn.setEnabled(true);
                 gfxbtn.setEnabled(true);
                 debugbtn.setEnabled(true);
                 blockingbtn.setText("Disable SMART");
-                System.out.println("SMART Enabled");
+                Main.debug("SMART Enabled");
                 return true;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -437,7 +434,7 @@ public class Client implements ActionListener, ChangeListener {
     public void destroy() {
         stopBlocking();
         if (active) {
-            System.out.println("Destroying SMART");
+            Main.debug("Destroying SMART");
             active = false;
             for (Map.Entry<String,Client> entry : clients.entrySet()) {
                 if (entry.getValue() == this) {
@@ -452,7 +449,7 @@ public class Client implements ActionListener, ChangeListener {
             clientApplet = null;
             clientFrame = null;
         } else {
-            System.out.println("SMART already destroyed");
+            Main.debug("SMART already destroyed");
         }
         Main.cleanup();
     }
@@ -463,7 +460,7 @@ public class Client implements ActionListener, ChangeListener {
      * the Frame has to grap focus whenever the client is clicked
      */
     private void initFrame() {
-        System.out.println("Setting up Frame");
+        Main.debug("Setting up Frame");
         clientFrame = new JFrame(TITLE + (ID!=0 ? (" ["+ID+"]") : ""));
         clientFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         clientFrame.addWindowListener(new WindowAdapter() {
@@ -527,11 +524,11 @@ public class Client implements ActionListener, ChangeListener {
         opModeSelector = new JComboBox(new String[] {"SafeMode","Software","DirectX","OpenGL"});
         opModeSelector.addActionListener(this);
         south.add(opModeSelector);
-        System.out.println("Client INIT");
+        Main.debug("Client INIT");
         clientApplet.init();
-        System.out.println("Client START");
+        Main.debug("Client START");
         clientApplet.start();
-        System.out.println("Client WAITING");
+        Main.debug("Client WAITING");
         try {
             while (clientApplet.getComponentCount() < 1) {
                 Thread.sleep(100);
@@ -541,7 +538,7 @@ public class Client implements ActionListener, ChangeListener {
         }
         gameLoader = clientApplet.getComponent(0).getClass().getClassLoader();
         clients.put(gameLoader.toString(), this);
-        System.out.println("Client Fully Initialized");
+        Main.debug("Client Fully Initialized");
         clientFrame.pack();
         clientFrame.setResizable(false);
         clientFrame.setLocationRelativeTo(null);
@@ -560,8 +557,8 @@ public class Client implements ActionListener, ChangeListener {
     private void initApplet(String root, String params) throws Exception {
         String jsInfoPage = downloadHTML(root + params);
         jsInfoPage = jsInfoPage.substring(Math.max(jsInfoPage.indexOf("<applet"), jsInfoPage.indexOf("write('<app")), jsInfoPage.indexOf("</applet>"));
-        System.out.println("Applet Loader Parsed");
-        System.out.println("Using jar: " + root + parseArg(search(jsInfoPage, archiveRegex, 1)));
+        Main.debug("Applet Loader Parsed");
+        Main.debug("Using jar: " + root + parseArg(search(jsInfoPage, archiveRegex, 1)));
         JarURLConnection clientConnection = (JarURLConnection) new URL("jar:" + root + parseArg(search(jsInfoPage, archiveRegex, 1)) + "!/").openConnection();
         //This might need some work, I didn't write it and I'm not sure how accurate it is
 		clientConnection.addRequestProperty("Protocol", "HTTP/1.1");
@@ -584,7 +581,7 @@ public class Client implements ActionListener, ChangeListener {
         clientApplet.setStub(stub);
         clientApplet.setPreferredSize(new Dimension(width, height));
         stub.active = true;
-        System.out.println("Applet Parameters Forwarded");
+        Main.debug("Applet Parameters Forwarded");
     }
 
     /**
@@ -618,7 +615,7 @@ public class Client implements ActionListener, ChangeListener {
             in.close();
             return builder.toString();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            Main.debug(e.getMessage());
             return null;
         }
     }

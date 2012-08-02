@@ -64,7 +64,7 @@ public class ClientStub implements AppletStub {
     
     @Override
     public String getParameter(String name) {
-        System.out.println("GET PARAM: " + name + "=>" + params.get(name));
+        //System.out.println("GET PARAM: " + name + "=>" + params.get(name));
         String value = params.get(name);
         return value == null ? "" : value;
     }

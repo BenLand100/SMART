@@ -64,6 +64,7 @@ public class Main {
     private static final int Ping =               ExtraFuncs+0;
     private static final int Die =                ExtraFuncs+1;
 
+    private static int id, port;
     private static ByteBuffer mem;
     private static ByteBuffer args;
     private static Client client;
@@ -92,14 +93,19 @@ public class Main {
         mem.putInt(6*4,off);
     }
     
+    public static void setDims(int width, int height) {
+        mem.putInt(2*4,width);
+        mem.putInt(3*4,width);
+    }
+    
     public static native boolean checkAlive(int tid);
     
     public static native int getPID();
     
     public static native void copyGLBuffer(int x, int y, int w, int h, IntBuffer dest);
     
-    public static void debug(String str) {
-        System.out.println("REMOTE: " + str);
+    public static void debug(Object wat) {
+        System.out.println("SMART["+id+"]: " + wat);
     }
     
     private static int handle(int funid) {
@@ -209,7 +215,7 @@ public class Main {
         int dbgoff = imgoff + imgLen;
         
         try {
-            int id = getPID();
+            id = getPID();
             debug("Starting remote " + id);
             File f = new File("SMART."+id);
             if (f.exists()) f.delete();
@@ -234,8 +240,10 @@ public class Main {
             ByteBuffer dbg = mem.slice();
             mem.rewind();
             
+            setDims(width,height);
+            
             ServerSocket listen = new ServerSocket(0);
-            int port = listen.getLocalPort();
+            port = listen.getLocalPort();
             
             setID(id);
             setPort(port);
