@@ -165,9 +165,7 @@ public class Main {
                 StringBuilder keys = new StringBuilder();
                 byte c;
                 args.position(8);
-                while ((c=args.get()) != 0) { 
-                    keys.append(c); 
-                }
+                while ((c=args.get()) != 0) keys.append((char)c);
                 client.sendKeys(keys.toString(),args.getInt(0*4),args.getInt(1*4));
                 } break;
             case holdKey:
@@ -202,7 +200,7 @@ public class Main {
         String initseq = exec_args[5];
         String useragent = exec_args[6]; 
         
-        int nVars = 5;
+        int nVars = 7;
         int argsSpace = 4096;
         int imgLen = width*height*4;
         
@@ -227,6 +225,7 @@ public class Main {
             mem.order(ByteOrder.LITTLE_ENDIAN);
             mem.position(nVars*4);
             args = mem.slice();
+            args.order(ByteOrder.LITTLE_ENDIAN);
             setImgOff(imgoff);
             mem.position(imgoff);
             ByteBuffer img = mem.slice();

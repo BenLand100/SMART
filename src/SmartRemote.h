@@ -19,7 +19,7 @@
  
 #ifndef _SMARTREMOTE_H
 #define	_SMARTREMOTE_H
-int port, width, height, paired, imgoff, dbgoff;
+
 typedef struct {
     int port;           //The port the client listens on
     int id;             //ID of the client: SMART.id

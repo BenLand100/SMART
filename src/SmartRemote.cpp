@@ -159,11 +159,15 @@ SMARTClient* pairClient(int id) {
     if (it != pairedClients->end()) {
         cout << "Client possibly paired to us\n";
         if (it->second->data->paired == tid) {
+            cout << "Already paired: Incrementing refcount\n";
+            it->second->refcount++;
             return it->second;
         }
         if (it->second->data->paired == 0) {
+            cout << "Repairing: Incrementing refcount\n";
             it->second->refcount++;
-            if (resock(it->second)) {   
+            it->second->data->paired = tid; 
+            if (resock(it->second)) {  
                 return it->second;
             } else {
                 cout << "Zombie detected (no socket response)\n";
