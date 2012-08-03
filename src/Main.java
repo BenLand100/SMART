@@ -95,7 +95,7 @@ public class Main {
     
     public static void setDims(int width, int height) {
         mem.putInt(2*4,width);
-        mem.putInt(3*4,width);
+        mem.putInt(3*4,height);
     }
     
     public static native boolean checkAlive(int tid);
@@ -150,7 +150,7 @@ public class Main {
                 client.holdMouse(args.getInt(0*4),args.getInt(1*4),args.getInt(2*4));
                 break;
             case releaseMousePlus:
-                client.releaseMouse(args.getInt(0*4),args.getInt(2*4),args.getInt(2*4));
+                client.releaseMouse(args.getInt(0*4),args.getInt(1*4),args.getInt(2*4));
                 break;
             case moveMouse:
                 client.moveMouse(args.getInt(0*4),args.getInt(1*4));
