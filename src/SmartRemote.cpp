@@ -1,24 +1,23 @@
 /**
  *  Copyright 2012 by Benjamin J. Land (a.k.a. BenLand100)
  *
- *  This file is part of the SMART-Remote
+ *  This file is part of the SMART
  *
- *  SMART-Remote is free software: you can redistribute it and/or modify
+ *  SMART is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  SMART-Remote is distributed in the hope that it will be useful,
+ *  SMART is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with SMART-Remote. If not, see <http://www.gnu.org/licenses/>.
+ *  along with SMART. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Local.h"
-#include "Bridge.h"
+#include "SmartRemote.h"
 #include <time.h>
 #include <stdio.h>
 #include <cstring>
@@ -26,12 +25,14 @@
 #include <stdlib.h>
 #include <map>
 #ifndef _WIN32
-#include <sys/syscall.h>
-#include <sys/mman.h>
-#include <fcntl.h>
-#include <dirent.h>
-#include <errno.h>
+    #include <sys/syscall.h>
+    #include <sys/mman.h>
+    #include <fcntl.h>
+    #include <dirent.h>
+    #include <errno.h>
 #endif
+
+#define debug cout << "SMART: "
 
 using namespace std;
 
@@ -42,8 +43,9 @@ static clients_dat clients;
 void freeClient(SMARTClient *client) {
     if (!client) return;
     if (client->memmap) {
+        debug << "Decrementing refcount [" << client->data->id << "]\n";
         if (--client->refcount == 0) {
-            cout << "Freeing client data [" << client->data->id << "]\n";
+            debug << "Freeing client data [" << client->data->id << "]\n";
             if (client->socket) {
                 #ifndef _WIN32
                     close(client->socket);
@@ -69,15 +71,6 @@ void freeClient(SMARTClient *client) {
     }
 }
 
-/**
- * Kills the client 
- */
-void killClient(SMARTClient *client) {
-    if (client->data) {
-        client->data->die = 1;
-    }
-}
-
 bool resock(SMARTClient *client) {
     if (client->socket) 
         #ifndef _WIN32
@@ -88,7 +81,7 @@ bool resock(SMARTClient *client) {
     client->socket = 0;
     struct hostent *localhost = gethostbyname("localhost");
     if (!localhost) {
-        cout << "Could not resolve localhost, check your network settings\n";
+        debug << "Could not resolve localhost, check your network settings\n";
         return false;
     }
     client->socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -97,15 +90,15 @@ bool resock(SMARTClient *client) {
     local.sin_family = AF_INET;
     memcpy((char *)&local.sin_addr.s_addr,(char *)localhost->h_addr, localhost->h_length);
     local.sin_port = htons(client->data->port);
-    cout << "Attempting to connect to localhost:" << client->data->port << "\n";
+    debug << "Attempting to connect to localhost:" << client->data->port << "\n";
     int res;
     if ((res=connect(client->socket,(struct sockaddr *) &local,sizeof(local))) < 0) {
-        cout << "Could not connect socket: ";
+        debug << "Could not connect socket: ";
         #ifndef _WIN32
-            cout << errno << '\n';
+            debug << errno << '\n';
             close(client->socket);
         #else
-            cout << WSAGetLastError() << '\n';
+            debug << WSAGetLastError() << '\n';
             closesocket(client->socket);
         #endif
         client->socket = 0;
@@ -118,9 +111,9 @@ bool resock(SMARTClient *client) {
  * Invokes a remote method. Might free your client if the client died.
  * Assumes arguments are already set and results are set according to the comm protocol
  */
-void callClient(SMARTClient *client, int funid) {
-    if (send(client->socket,(const char*)&funid,sizeof(int),0)!=sizeof(int)) {
-        cout << "Could Not Call\n";
+void callClient(SMARTClient *client, char funid) {
+    if (send(client->socket,(const char*)&funid,sizeof(char),0)!=sizeof(char)) {
+        debug << "Could Not Call\n";
         return;
     }
     struct timeval tv;
@@ -129,20 +122,24 @@ void callClient(SMARTClient *client, int funid) {
     fd_set rfds;
     FD_ZERO(&rfds);
     FD_SET(client->socket, &rfds);
-    for (;;) {
-        if (client->data->time && time(0) - client->data->time > TIMEOUT) {
-            cout << "Client appears to have died: aborting\n";
-            break;
-        }
+    for (int i = 0; i < 600; i++) {
         if (select(client->socket+1, &rfds, &rfds, NULL, &tv)) {
-            if (recv(client->socket,(char*)&funid,sizeof(int),0)!=sizeof(int)) {
-                cout << "Call appears to have failed\n";
+            if (recv(client->socket,(char*)&funid,sizeof(char),0)!=sizeof(char)) {
+                debug << "Call appears to have failed, or client successfully killed.\n";
             }
-            break;
+            return;
         }
         tv.tv_sec = 0;
         tv.tv_usec = 100000;
     }
+    debug << "Client timed out\n";
+}
+
+/**
+ * Kills the client 
+ */
+void killClient(SMARTClient *client) {
+    callClient(client,Die);
 }
 
 /**
@@ -163,17 +160,25 @@ SMARTClient* pairClient(int id) {
     #endif
     map<int,SMARTClient*>::iterator it = pairedClients->find(id);
     if (it != pairedClients->end()) {
-        cout << "Client possibly paired to us\n";
-        if (it->second->data->paired == 0 || it->second->data->paired == tid) {
+        debug << "Client possibly paired to us\n";
+        if (it->second->data->paired == tid) {
+            debug << "Already paired: Incrementing refcount\n";
             it->second->refcount++;
-            if (resock(it->second)) {   
+            return it->second;
+        }
+        if (it->second->data->paired == 0) {
+            debug << "Repairing: Incrementing refcount\n";
+            it->second->refcount++;
+            it->second->data->paired = tid; 
+            if (resock(it->second)) {  
                 return it->second;
             } else {
-                cout << "Zombie detected (no socket response)\n";
+                debug << "Zombie detected (no socket response)\n";
+                // ***FIXME*** Issue process kill here
                 return NULL;
             }
         } else {
-            cout << "Client is otherwise paired\n";
+            debug << "Client is otherwise paired\n";
             return NULL;
         }
     }
@@ -189,7 +194,7 @@ SMARTClient* pairClient(int id) {
         GENERIC_READ|GENERIC_WRITE,
         FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE,
         NULL,
-        OPEN_ALWAYS,FILE_ATTRIBUTE_TEMPORARY|FILE_FLAG_RANDOM_ACCESS|FILE_FLAG_OVERLAPPED,
+        OPEN_EXISTING,FILE_ATTRIBUTE_TEMPORARY|FILE_FLAG_RANDOM_ACCESS|FILE_FLAG_OVERLAPPED,
         NULL);
     if (client->file != INVALID_HANDLE_VALUE) {
     #endif
@@ -197,22 +202,21 @@ SMARTClient* pairClient(int id) {
         client->memmap = mmap(NULL,sizeof(shm_data),PROT_READ|PROT_WRITE, MAP_SHARED, client->fd, 0);
         client->data = (shm_data*)client->memmap;
         if (!client->data) {
-            cout << "Could not map shared memory (pre)\n";
+            debug << "Could not map shared memory (pre)\n";
             return NULL;   
         }
         #else
         client->memmap = CreateFileMapping(client->file,NULL,PAGE_READWRITE,0,sizeof(shm_data),shmfile);
         if (client->memmap == INVALID_HANDLE_VALUE) {
-            cout << "Could not map shared file (pre)\n";
+            debug << "Could not map shared file (pre)\n";
             return NULL;   
         }
         client->data = (shm_data*)MapViewOfFile(client->memmap,FILE_MAP_ALL_ACCESS,0,0,sizeof(shm_data));
         if (!client->data) {
-            cout << "Could not map shared memory (pre)\n";
+            debug << "Could not map shared memory (pre)\n";
             return NULL;   
         }
         #endif
-        int client_time = client->data->time;
         int client_paired = client->data->paired;
         int client_width = client->data->width;
         int client_height = client->data->height;
@@ -222,20 +226,8 @@ SMARTClient* pairClient(int id) {
         UnmapViewOfFile(client->data);
         CloseHandle(client->memmap);
         #endif
-        if (client_time != 0 && time(0) - client_time > TIMEOUT) {
-            cout << "Failed to pair - Zombie client detected\n";
-            #ifndef _WIN32
-            close(client->fd);
-            unlink(shmfile);
-            #else
-            CloseHandle(client->file);
-            DeleteFile(shmfile);
-            #endif
-            delete client;
-            return NULL;
-        }
         if (client_paired && client_paired != tid) { 
-            cout << "Failed to pair - Client appears to be paired\n";
+            debug << "Failed to pair - Client appears to be paired\n";
             #ifndef _WIN32
             close(client->fd);
             #else
@@ -248,29 +240,29 @@ SMARTClient* pairClient(int id) {
         client->memmap = mmap(NULL,2*client_width*client_height*4+sizeof(shm_data),PROT_READ|PROT_WRITE, MAP_SHARED, client->fd, 0);
         client->data = (shm_data*)client->memmap;
         if (!client->data) {
-            cout << "Could not map shared memory (post)\n";
+            debug << "Could not map shared memory (post)\n";
             return NULL;   
         }
         #else
         client->memmap = CreateFileMapping(client->file,NULL,PAGE_READWRITE,0,sizeof(shm_data)+2*client_width*client_height*4,shmfile);
         if (client->memmap == INVALID_HANDLE_VALUE) {
-            cout << "Could not map shared file (post)\n";
+            debug << "Could not map shared file (post)\n";
             return NULL;   
         }
         client->data = (shm_data*)MapViewOfFile(client->memmap,FILE_MAP_ALL_ACCESS,0,0,sizeof(shm_data)+2*client_width*client_height*4);
         if (!client->data) {
-            cout << "Could not map shared memory (post)\n";
+            debug << "Could not map shared memory (post)\n";
             return NULL;   
         }
         #endif
         
+        client->data->paired = tid;
+        debug << "Setting the client's controller to our TID\n";
         client->socket = 0;
         if (!resock(client)) {
             freeClient(client);
             return false;
         } 
-        
-        client->data->paired = tid;
         client->refcount = 1;
         #ifdef _WIN32
         FlushFileBuffers(client->file);
@@ -278,7 +270,7 @@ SMARTClient* pairClient(int id) {
         (*pairedClients)[id] = client;
         return client;
     } else {
-        cout << "Failed to pair - No client by that ID\n";
+        debug << "Failed to pair - No client by that ID\n";
         delete client;
         return NULL;
     }
@@ -286,8 +278,9 @@ SMARTClient* pairClient(int id) {
 
 /**
  * Creates a remote SMART client and pairs to it
+ * FIXME javaargs not handled for linux
  */
-SMARTClient* spawnClient(char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char *jvmpath, int maxmem) {
+SMARTClient* spawnClient(char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char* javaargs) {
     SMARTClient *client;
     if (!remote_path || !root || !params) return 0;
     char _width[256],_height[256];
@@ -296,39 +289,40 @@ SMARTClient* spawnClient(char* remote_path, char *root, char *params, int width,
     char empty = '\0';
     if (!initseq) initseq = &empty;
     if (!useragent) useragent = &empty;
-    if (!jvmpath) jvmpath = &empty;
-    char _maxmem[256];
-    if (maxmem<=0) {
-        _maxmem[0]='\0';
-    } else {
-        sprintf(_maxmem,"%i",maxmem);
-    }
+    if (!javaargs) javaargs = &empty;
+    char bootclasspath[512];
+    sprintf(bootclasspath,"-Xbootclasspath/p:%s/%s",remote_path,"smart.jar");
+    char library[512];
     #ifdef _WIN32
-    int len = 2*strlen(remote_path)+strlen(root)+strlen(params)+strlen(_width)+strlen(_height)+strlen(initseq)+strlen(useragent)+strlen(jvmpath)+strlen(_maxmem);
-    char *args = new char[len+10*3+20];
-    sprintf(args,"\"%ssmartremote%s.exe\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\"",remote_path,bits,remote_path,root,params,_width,_height,initseq,useragent,jvmpath,_maxmem);
-    char *exec = new char[strlen(remote_path)+20];
-    sprintf(exec,"%ssmartremote%s.exe",remote_path,bits);
-    cout << exec << '\n';
-    PROCESS_INFORMATION procinfo;
-    STARTUPINFO startupinfo;
-    memset(&startupinfo, 0, sizeof(STARTUPINFO));
-    memset(&procinfo, 0, sizeof(PROCESS_INFORMATION));
-    startupinfo.cb = sizeof(STARTUPINFOW); 
-    CreateProcess(exec,args,NULL,NULL,FALSE,CREATE_DEFAULT_ERROR_MODE,NULL,NULL,&startupinfo,&procinfo);
-    CloseHandle(procinfo.hProcess);
-    CloseHandle(procinfo.hThread);
-    delete exec;
+    sprintf(library,"%s/libsmartjni%s.dll",remote_path,bits);
+    int len = strlen(javaargs)+strlen(bootclasspath)+strlen(library)+strlen(root)+strlen(params)+strlen(_width)+strlen(_height)+strlen(initseq)+strlen(useragent)+7*3+50; //A little extra
+    char *args = new char[len];
+    sprintf(args,"%s %s smart.Main \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\"",javaargs,bootclasspath,library,root,params,_width,_height,initseq,useragent);
+    SHELLEXECUTEINFO info;
+    memset(&info, 0, sizeof(SHELLEXECUTEINFO));
+    info.cbSize = sizeof(SHELLEXECUTEINFO); 
+    info.fMask = SEE_MASK_NOCLOSEPROCESS;
+    info.lpFile = "java.exe";
+    info.lpParameters = args;
+    info.nShow = SW_SHOWNORMAL;
+    ShellExecuteEx(&info);
     delete args;
+    if (!info.hProcess) {
+        debug << "Failed to spawn process. Make sure java.exe is on your path and that SMART is installed correctly.\n";
+        return NULL;
+    }
+    int pid = GetProcessId(info.hProcess);
+    CloseHandle(info.hProcess);
     int count = 0;
     do {
         Sleep(1000);
         count++;
-    } while  (!(client=pairClient(procinfo.dwProcessId))&&count<10);
+    } while  (!(client=pairClient(pid))&&count<10);
     if (count >= 10) return NULL;
     callClient(client,Ping);
     return client;
     #else
+    sprintf(library,"%s/libsmartjni%s.so",remote_path,bits);
     int v = fork();
     if (v) {
         int count = 0;
@@ -340,11 +334,8 @@ SMARTClient* spawnClient(char* remote_path, char *root, char *params, int width,
         callClient(client,Ping);
         return client;
     } else {
-        char *exec = new char[strlen(remote_path)+20];
-        sprintf(exec,"%s/smartremote%s",remote_path,bits);
-        cout << exec << '\n';
-        execl(exec,exec,remote_path,root,params,_width,_height,initseq,useragent,jvmpath,_maxmem,NULL);
-        delete exec;
+        execlp("java","java",bootclasspath,"smart.Main",library,root,params,_width,_height,initseq,useragent,NULL);
+        debug << "Process terminating. If nothing happened, make sure java is on your path and that SMART is installed correctly.\n";
         exit(1);
     }
     #endif
@@ -358,7 +349,6 @@ SMARTClient* spawnClient(char* remote_path, char *root, char *params, int width,
  * This will also clean up any zombies left hanging.
  */
 int getClients(bool only_unpaired, int **_clients) {
-    cout << "Polling for SMARTs\n";
     int count = 0;
     if (_clients) *_clients = NULL;
     #ifndef _WIN32
@@ -369,12 +359,6 @@ int getClients(bool only_unpaired, int **_clients) {
 		if (name == dp->d_name) {
 	        int fd = open(name,O_RDWR);
             shm_data *temp = (shm_data*)mmap(NULL,sizeof(shm_data),PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-	        if (temp->time && time(0) - temp->time > TIMEOUT) {
-	            munmap(temp,sizeof(shm_data));
-	            close(fd);
-                unlink(name);
-                continue;
-            }
 		    if (only_unpaired && temp->paired) {
 	            munmap(temp,sizeof(shm_data));
 	            close(fd);
@@ -405,17 +389,6 @@ int getClients(bool only_unpaired, int **_clients) {
             NULL);
         HANDLE memmap = CreateFileMapping(file,NULL,PAGE_READWRITE,0,sizeof(shm_data),name);
         shm_data *temp = (shm_data*)MapViewOfFile(memmap,FILE_MAP_ALL_ACCESS,0,0,sizeof(shm_data));
-        if (temp->time && time(0) - temp->time > TIMEOUT) {
-            UnmapViewOfFile(temp);
-            CloseHandle(memmap);
-            CloseHandle(file);
-            DeleteFile(name);
-            if (!FindNextFile(hfind,&find)) {
-                FindClose(hfind);
-                break;
-            }
-            continue;
-        }
         if (only_unpaired && temp->paired) {
             UnmapViewOfFile(temp);
             CloseHandle(memmap);
@@ -448,7 +421,7 @@ int getClients(bool only_unpaired, int **_clients) {
  * Returns the number of clients in the structure
  */
 int exp_clientID(int idx) {
-    cout << "Returning index " << idx << '\n';
+    debug << "Returning index " << idx << '\n';
     if (idx < clients.count && idx >= 0) {
         return clients.ids[idx];
     }
@@ -476,7 +449,7 @@ int exp_getCurrent() {
  * !!!Fails if the client is paired with ANOTHER controller!!!
  */
 bool exp_killClient(int pid) {
-    cout << "Killing client " << pid << '\n';
+    debug << "Killing client " << pid << '\n';
     SMARTClient *client = pairClient(pid);
     if (!client) return false;
     killClient(client);
@@ -487,9 +460,9 @@ bool exp_killClient(int pid) {
 /**
  * Creates a remote SMART client and pairs to it, returning its ID or 0 if failed
  */
-int exp_spawnClient(char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char *jvmpath, int maxmem) {
+int exp_spawnClient(char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char* javaargs) {
     freeClient(local);
-    local = spawnClient(remote_path,root,params,width,height,initseq,useragent,jvmpath,maxmem);
+    local = spawnClient(remote_path,root,params,width,height,initseq,useragent,javaargs);
     return local ? local->data->id : 0;
 }
 
@@ -687,86 +660,10 @@ bool exp_isKeyDown(int code) {
     } else return false;
 }
 
-int exp_getColor(int x, int y) {
-    if (local) {
-        ((int*)(local->data->args))[0] = x;
-        ((int*)(local->data->args))[1] = y;
-        callClient(local,getColor);
-        return *(int*)(local->data->args);
-    } else return false;
-}
-
-bool exp_findColor(int &x, int& y, int color, int sx, int sy, int ex, int ey) {
-    if (local) {
-        ((int*)(local->data->args))[0] = x;
-        ((int*)(local->data->args))[1] = y;
-        ((int*)(local->data->args))[2] = color;
-        ((int*)(local->data->args))[3] = sx;
-        ((int*)(local->data->args))[4] = sy;
-        ((int*)(local->data->args))[5] = ex;
-        ((int*)(local->data->args))[6] = ey;
-        callClient(local,findColor);
-        x = ((int*)(local->data->args))[0];
-        y = ((int*)(local->data->args))[1];
-        return (bool)(((int*)(local->data->args))[2]);
-    } else return false;
-}
-
-bool exp_findColorTol(int &x, int& y, int color, int sx, int sy, int ex, int ey, int tol) {
-    if (local) {
-        ((int*)(local->data->args))[0] = x;
-        ((int*)(local->data->args))[1] = y;
-        ((int*)(local->data->args))[2] = color;
-        ((int*)(local->data->args))[3] = sx;
-        ((int*)(local->data->args))[4] = sy;
-        ((int*)(local->data->args))[5] = ex;
-        ((int*)(local->data->args))[6] = ey;
-        ((int*)(local->data->args))[7] = tol;
-        callClient(local,findColorTol);
-        x = ((int*)(local->data->args))[0];
-        y = ((int*)(local->data->args))[1];
-        return (bool)(((int*)(local->data->args))[2]);
-    } else return false;
-}
-
-bool exp_findColorSpiral(int &x, int& y, int color, int sx, int sy, int ex, int ey) {
-    if (local) {
-        ((int*)(local->data->args))[0] = x;
-        ((int*)(local->data->args))[1] = y;
-        ((int*)(local->data->args))[2] = color;
-        ((int*)(local->data->args))[3] = sx;
-        ((int*)(local->data->args))[4] = sy;
-        ((int*)(local->data->args))[5] = ex;
-        ((int*)(local->data->args))[6] = ey;
-        callClient(local,findColorSpiral);
-        x = ((int*)(local->data->args))[0];
-        y = ((int*)(local->data->args))[1];
-        return (bool)(((int*)(local->data->args))[2]);
-    } else return false;
-}
-
-bool exp_findColorSpiralTol(int &x, int& y, int color, int sx, int sy, int ex, int ey, int tol) {
-    if (local){
-        ((int*)(local->data->args))[0] = x;
-        ((int*)(local->data->args))[1] = y;
-        ((int*)(local->data->args))[2] = color;
-        ((int*)(local->data->args))[3] = sx;
-        ((int*)(local->data->args))[4] = sy;
-        ((int*)(local->data->args))[5] = ex;
-        ((int*)(local->data->args))[6] = ey;
-        ((int*)(local->data->args))[7] = tol;
-        callClient(local,findColorSpiralTol);
-        x = ((int*)(local->data->args))[0];
-        y = ((int*)(local->data->args))[1];
-        return (bool)(((int*)(local->data->args))[2]);
-    } else return false;
-}
-
-
 SMARTClient* spawnFromString(char* initarg) {
     int len = strlen(initarg);
-    char *path,*root,*params,*initseq,*useragent,*jvmpath;
-    int width,height,maxmem;
+    char *path,*root,*params,*initseq,*useragent,*javaargs;
+    int width,height;
     char *buffer = new char[len+1];
     int ida=0,idb=0,idx;
     while (ida < len && (buffer[idb++]=initarg[ida++]) != ','); buffer[idb-1]=0;
@@ -801,30 +698,27 @@ SMARTClient* spawnFromString(char* initarg) {
         while (ida < len && (buffer[idb++]=initarg[ida++]) != '"'); buffer[idb-1]=0;
         if (initarg[ida++] != ',') return NULL;
         if (initarg[ida++] != '"') return NULL;
-        jvmpath = &buffer[idb];
-        while (ida < len && (buffer[idb++]=initarg[ida++]) != '"'); buffer[idb-1]=0;
-        if (initarg[ida++] != ',') return NULL;
-        idx = idb;
-        while (ida < len && (buffer[idb++]=initarg[ida++]) != ','); buffer[idb-1]=0;
-        if (initarg[ida-1] != ',') return NULL;
-        maxmem = atoi(&buffer[idx]);
-        return spawnClient(path,root,params,width,height,initseq,useragent,jvmpath,maxmem);
+        javaargs = &buffer[idb];
+        while (ida < len && (buffer[idb++]=initarg[ida++]) != 0); buffer[idb-1]=0;
+        if (initarg[ida++] != 0) return NULL;
+        return spawnClient(path,root,params,width,height,initseq,useragent,javaargs);
     }
     return NULL;
 }
 
 Target EIOS_RequestTarget(char *initargs) {
-    cout << "EIOS Paired\n";
+    debug << "EIOS Requesting Target\n";
     if (initargs != 0 && strlen(initargs) > 0) {
         SMARTClient *client = spawnFromString(initargs); //This seems silly, could use exp_SpawnClient instead
         if (!client) client = pairClient(atoi(initargs));
+        debug << "Target Identifier: " << client << '\n';
         return client;
     }
     return NULL; //This result signifies a failure
 } 
 
 void EIOS_ReleaseTarget(Target t) {
-    cout << "EIOS Unpaired\n";
+    debug << "EIOS Releasing Target\n";
     freeClient(t);
 } 
 
@@ -836,7 +730,10 @@ void EIOS_GetTargetDimensions(Target t, int* width, int* height) {
 } 
 
 rgb* EIOS_GetImageBuffer(Target t) {
-    cout << "EIOS requested image buffer\n";
+    debug << "EIOS requested image buffer\n";
+    if (t) {
+        debug << "Base: " << t->data << " Off: " << t->data->imgoff << '\n';
+    }
     return t ? (rgb*)(((char*)t->data) + t->data->imgoff) : 0;
 } 
 
@@ -938,6 +835,22 @@ int GetFunctionCount() {
 int GetPluginABIVersion() {
 	return 2; //cdecl everything
 }
+
+/*int main(int argc, char **argv) {
+    internalConstructor();
+    
+    debug << "Client Count: " << exp_getClients(false) << '\n';
+    debug << "Unpaired Clients: " << exp_getClients(true) << '\n';
+    
+    debug << "Attempting to spawn...\n";
+    int id = exp_spawnClient(".", "http://world37.runescape.com/", ",f68198595478491590", 765, 553, NULL, NULL, NULL);
+    debug << "Spawned client " << id << " now sleeping...\n";
+    sleep(5);
+    debug << "Kill it with fire!\n";
+    exp_killClient(id);
+    
+    internalDestructor();
+}*/
 
 #ifndef _WIN32
 

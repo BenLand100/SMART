@@ -4,11 +4,6 @@ EXPORTS
     GetFunctionInfo
     exp_clickMouse
     exp_clickMousePlus
-    exp_findColor
-    exp_findColorSpiral
-    exp_findColorSpiralTol
-    exp_findColorTol
-    exp_getColor
     exp_getDebugArray
     exp_getImageArray
     exp_getMousePos

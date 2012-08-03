@@ -1,5 +1,5 @@
 /**
- *  Copyright 2010 by Benjamin J. Land (a.k.a. BenLand100)
+ *  Copyright 2012 by Benjamin J. Land (a.k.a. BenLand100)
  *
  *  This file is part of the SMART Minimizing Autoing Resource Thing (SMART)
  *
@@ -484,7 +484,7 @@ public class EventNazi {
                 if (KeyEvent.VK_SHIFT == code) shiftDown = true;
                 BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_PRESSED, startTime, shiftDown ? KeyEvent.SHIFT_DOWN_MASK : 0, code, KeyEvent.CHAR_UNDEFINED, KeyEvent.KEY_LOCATION_STANDARD));
                 if (isTypableCode(code)) {
-                	System.out.println("Trying to type " + code + " as '" + toChar(code,shiftDown) + "'");
+                	//System.out.println("Trying to type " + code + " as '" + toChar(code,shiftDown) + "'");
                     BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_TYPED, startTime, shiftDown ? KeyEvent.SHIFT_DOWN_MASK : 0, 0, toChar(code,shiftDown), KeyEvent.KEY_LOCATION_UNKNOWN));
                 }
                 setKeyHeld(dat, true);
@@ -548,15 +548,15 @@ public class EventNazi {
                     long time = System.currentTimeMillis();
                     BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_PRESSED, time, KeyEvent.SHIFT_MASK, code, c, keyLoc));
                     BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_TYPED, time, KeyEvent.SHIFT_MASK, 0, c, KeyEvent.KEY_LOCATION_UNKNOWN));
-                    try { Thread.sleep((int)((Math.random() * 0.1 + 1) + keywait)); } catch (Exception e) { e.printStackTrace(); }
+                    try { Thread.sleep((int)((Math.random() * 0.1 + 1) * keywait)); } catch (Exception e) { e.printStackTrace(); }
                     BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_RELEASED, System.currentTimeMillis(), KeyEvent.SHIFT_MASK, code, c, keyLoc));
-                    try { Thread.sleep((int)((Math.random() * 0.1 + 1) + keymodwait)); } catch (Exception e) { e.printStackTrace(); }
+                    try { Thread.sleep((int)((Math.random() * 0.1 + 1) * keymodwait)); } catch (Exception e) { e.printStackTrace(); }
                     BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_RELEASED, System.currentTimeMillis(), 0, KeyEvent.VK_SHIFT, KeyEvent.CHAR_UNDEFINED, shiftLoc));
                 } else {
                     long time = System.currentTimeMillis();
                     BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_PRESSED, time, 0, code, c, keyLoc));
                     BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_TYPED, time, 0, 0, c, KeyEvent.KEY_LOCATION_UNKNOWN));
-                    try { Thread.sleep((int)((Math.random() * 0.1 + 1) + keywait)); } catch (Exception e) { e.printStackTrace(); }
+                    try { Thread.sleep((int)((Math.random() * 0.1 + 1) * keywait)); } catch (Exception e) { e.printStackTrace(); }
                     BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_RELEASED, System.currentTimeMillis(), 0, code, c, keyLoc));
                 }
             }

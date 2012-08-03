@@ -1,5 +1,5 @@
 /**
- *  Copyright 2010 by Benjamin J. Land (a.k.a. BenLand100)
+ *  Copyright 2012 by Benjamin J. Land (a.k.a. BenLand100)
  *
  *  This file is part of the SMART Minimizing Autoing Resource Thing (SMART)
  *
@@ -64,7 +64,7 @@ public class ClientStub implements AppletStub {
     
     @Override
     public String getParameter(String name) {
-        System.out.println("GET PARAM: " + name + "=>" + params.get(name));
+        //System.out.println("GET PARAM: " + name + "=>" + params.get(name));
         String value = params.get(name);
         return value == null ? "" : value;
     }

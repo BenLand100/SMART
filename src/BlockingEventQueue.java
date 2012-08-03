@@ -1,5 +1,5 @@
 /**
- *  Copyright 2010 by Benjamin J. Land (a.k.a. BenLand100)
+ *  Copyright 2012 by Benjamin J. Land (a.k.a. BenLand100)
  *
  *  This file is part of the SMART Minimizing Autoing Resource Thing (SMART)
  *
