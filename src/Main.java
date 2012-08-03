@@ -138,7 +138,7 @@ public class Main {
             case getMousePos: {
                 Point pt = client.getMousePos();
                 args.putInt(0*4,pt.x);
-                args.putInt(0*4,pt.y);
+                args.putInt(1*4,pt.y);
                 } break;
             case holdMouse:
                 client.holdMouse(args.getInt(0*4),args.getInt(1*4),args.getInt(2*4)!=0 ? 1 : 3);
