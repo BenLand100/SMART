@@ -208,16 +208,16 @@ public class Main {
 		
 		String pluginspath = exec_args[7];
 		String pluginsinfo = exec_args[8];
-		String pluginslist [] = pluginsinfo.split("[,]+");
 		
-		if(pluginsinfo.length() > 0) {	
-			for (int I = 0; I < pluginslist.length; ++I) {
-				File pluginsfile = new File(pluginspath + "/" + pluginslist[I].trim());
+		if (pluginsinfo.length() > 0) {	
+		    String[] pluginslist = pluginsinfo.split("[,]+");
+			for (int i = 0; i < pluginslist.length; i++) {
+				File pluginsfile = new File(pluginspath + "/" + pluginslist[i].trim());
 				if (pluginsfile.isFile()) {
 					System.load(pluginsfile.getAbsolutePath());
-					debug("Smart_"+pluginslist[I].trim()+" Successfully Loaded!\n");
+					debug("Smart_"+pluginslist[i].trim()+" Successfully Loaded!\n");
 				} else {
-					debug("File Missing: Smart_"+pluginslist[I].trim()+" Failed To Load!\n");
+					debug("File Missing: Smart_"+pluginslist[i].trim()+" Failed To Load!\n");
 				}
 			}
 		}
