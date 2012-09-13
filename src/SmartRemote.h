@@ -155,7 +155,7 @@ extern "C" bool EIOS_IsKeyHeld(Target t, int key) __attribute__((stdcall));
 
 extern "C" int exp_clientID(int idx);
 extern "C" int exp_getClients(bool only_unpaired);
-extern "C" int exp_spawnClient(char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char* javaargs);
+extern "C" int exp_spawnClient(char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char* javaargs, char* Plugins);
 extern "C" bool exp_pairClient(int pid);
 extern "C" int exp_getCurrent();
 extern "C" bool exp_killClient(int pid);
@@ -189,7 +189,7 @@ extern "C" bool exp_isKeyDown(int code);
 static char* exports[] = {
     (char*)"exp_clientID", (char*)"function SmartClientID(idx: integer): integer;",
     (char*)"exp_getClients", (char*)"function SmartGetClients(only_unpaired: boolean): integer;",
-    (char*)"exp_spawnClient",(char*)"function SmartSpawnClient(remote_path, root, params: string; width, height: integer; initseq, useragent, javaargs: string): integer;",
+    (char*)"exp_spawnClient",(char*)"function SmartSpawnClient(remote_path, root, params: string; width, height: integer; initseq, useragent, javaargs, Plugins: string): integer;",
     (char*)"exp_pairClient", (char*)"function SmartPairClient(pid: integer): boolean;",
     (char*)"exp_killClient", (char*)"function SmartKillClient(pid: integer): boolean;",
     (char*)"exp_getCurrent", (char*)"function SmartCurrentClient(): integer;",

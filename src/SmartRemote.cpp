@@ -280,7 +280,7 @@ SMARTClient* pairClient(int id) {
  * Creates a remote SMART client and pairs to it
  * FIXME javaargs not handled for linux
  */
-SMARTClient* spawnClient(char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char* javaargs) {
+SMARTClient* spawnClient(char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char* javaargs, char* plugins) {
     SMARTClient *client;
     if (!remote_path || !root || !params) return 0;
     char _width[256],_height[256];
@@ -290,15 +290,16 @@ SMARTClient* spawnClient(char* remote_path, char *root, char *params, int width,
     if (!initseq) initseq = &empty;
     if (!useragent) useragent = &empty;
     if (!javaargs) javaargs = &empty;
+	if (!plugins) plugins = &empty;
     char bootclasspath[512];
     sprintf(bootclasspath,"-Xbootclasspath/p:%s/%s",remote_path,"smart.jar");
     char library[512];
     #ifdef _WIN32
     sprintf(library,"%s/libsmartjni%s.dll",remote_path,bits);
-    int len = strlen(javaargs)+strlen(bootclasspath)+strlen(library)+strlen(root)+strlen(params)+strlen(_width)+strlen(_height)+strlen(initseq)+strlen(useragent)+7*3+50; //A little extra
+    int len = strlen(javaargs)+strlen(bootclasspath)+strlen(library)+strlen(root)+strlen(params)+strlen(_width)+strlen(_height)+strlen(initseq)+strlen(useragent)+strlen(remote_path)+strlen(plugins)+7*3+50; //A little extra
     char *args = new char[len];
-    sprintf(args,"%s %s smart.Main \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\"",javaargs,bootclasspath,library,root,params,_width,_height,initseq,useragent);
-    SHELLEXECUTEINFO info;
+    sprintf(args,"%s %s smart.Main \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\"",javaargs,bootclasspath,library,root,params,_width,_height,initseq,useragent, remote_path, plugins);
+	SHELLEXECUTEINFO info;
     memset(&info, 0, sizeof(SHELLEXECUTEINFO));
     info.cbSize = sizeof(SHELLEXECUTEINFO); 
     info.fMask = SEE_MASK_NOCLOSEPROCESS;
@@ -334,7 +335,7 @@ SMARTClient* spawnClient(char* remote_path, char *root, char *params, int width,
         callClient(client,Ping);
         return client;
     } else {
-        execlp("java","java",bootclasspath,"smart.Main",library,root,params,_width,_height,initseq,useragent,NULL);
+        execlp("java","java",bootclasspath,"smart.Main",library,root,params,_width,_height,initseq,useragent, remote_path, plugins, NULL);
         debug << "Process terminating. If nothing happened, make sure java is on your path and that SMART is installed correctly.\n";
         exit(1);
     }
@@ -460,9 +461,9 @@ bool exp_killClient(int pid) {
 /**
  * Creates a remote SMART client and pairs to it, returning its ID or 0 if failed
  */
-int exp_spawnClient(char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char* javaargs) {
+int exp_spawnClient(char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char* javaargs, char* plugins) {
     freeClient(local);
-    local = spawnClient(remote_path,root,params,width,height,initseq,useragent,javaargs);
+    local = spawnClient(remote_path,root,params,width,height,initseq,useragent,javaargs,plugins);
     return local ? local->data->id : 0;
 }
 
@@ -662,7 +663,7 @@ bool exp_isKeyDown(int code) {
 
 SMARTClient* spawnFromString(char* initarg) {
     int len = strlen(initarg);
-    char *path,*root,*params,*initseq,*useragent,*javaargs;
+    char *path,*root,*params,*initseq,*useragent,*javaargs,*plugins;
     int width,height;
     char *buffer = new char[len+1];
     int ida=0,idb=0,idx;
@@ -699,9 +700,13 @@ SMARTClient* spawnFromString(char* initarg) {
         if (initarg[ida++] != ',') return NULL;
         if (initarg[ida++] != '"') return NULL;
         javaargs = &buffer[idb];
+        while (ida < len && (buffer[idb++]=initarg[ida++]) != '"'); buffer[idb-1]=0;
+        if (initarg[ida++] != ',') return NULL;
+        if (initarg[ida++] != '"') return NULL;
+        plugins = &buffer[idb];
         while (ida < len && (buffer[idb++]=initarg[ida++]) != 0); buffer[idb-1]=0;
         if (initarg[ida++] != 0) return NULL;
-        return spawnClient(path,root,params,width,height,initseq,useragent,javaargs);
+        return spawnClient(path,root,params,width,height,initseq,useragent,javaargs,plugins);
     }
     return NULL;
 }

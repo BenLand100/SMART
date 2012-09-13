@@ -195,7 +195,7 @@ public class Main {
     }
     
     public static void main(String[] exec_args) {
-        if (exec_args.length != 7) System.exit(1);
+        if (exec_args.length != 9) System.exit(1);
          
         String path = new File(exec_args[0]).getAbsolutePath();
         System.load(path);
@@ -204,7 +204,24 @@ public class Main {
         int width = Integer.parseInt(exec_args[3]);
         int height = Integer.parseInt(exec_args[4]);
         String initseq = exec_args[5];
-        String useragent = exec_args[6]; 
+        String useragent = exec_args[6];
+		
+		String pluginspath = exec_args[7];
+		String pluginsinfo = exec_args[8];
+		String pluginslist [] = pluginsinfo.split("[,]+");
+		
+		if(pluginsinfo.length() > 0) {	
+			for (int I = 0; I < pluginslist.length; ++I) {
+				File pluginsfile = new File(pluginspath + "/" + pluginslist[I].trim());
+				if (pluginsfile.isFile()) {
+					System.load(pluginsfile.getAbsolutePath());
+					debug("Smart_"+pluginslist[I].trim()+" Successfully Loaded!\n");
+				} else {
+					debug("File Missing: Smart_"+pluginslist[I].trim()+" Failed To Load!\n");
+				}
+			}
+		}
+		
         
         int nVars = 7;
         int argsSpace = 4096;
