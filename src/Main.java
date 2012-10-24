@@ -218,7 +218,7 @@ public class Main {
 				if (pluginsfile.isFile()) {
 					System.load(pluginsfile.getAbsolutePath());
 					debug("Smart_"+pluginslist[I].trim()+" Successfully Loaded!\n");
-					if ("opengl32.dll".equalsIgnoreCase(pluginslist[i].trim())) {
+					if ("opengl32.dll".equalsIgnoreCase(pluginslist[I].trim())) {
 						GLLibrary.LibraryLoaded = true;
 					}
 				} else {
