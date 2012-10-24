@@ -68,8 +68,6 @@ public class Main {
     private static ByteBuffer mem;
     private static ByteBuffer args;
     private static Client client;
-	
-	public  static SharedLibrary GLLibrary;
     
     public static void setPort(int port) {
         mem.putInt(0*4,port);
@@ -218,9 +216,6 @@ public class Main {
 				if (pluginsfile.isFile()) {
 					System.load(pluginsfile.getAbsolutePath());
 					debug("Smart_"+pluginslist[I].trim()+" Successfully Loaded!\n");
-					if ("opengl32.dll".equalsIgnoreCase(pluginslist[i].trim())) {
-						GLLibrary.LibraryLoaded = true;
-					}
 				} else {
 					debug("File Missing: Smart_"+pluginslist[I].trim()+" Failed To Load!\n");
 				}
