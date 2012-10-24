@@ -211,6 +211,7 @@ public class Main {
 		String pluginspath = exec_args[7];
 		String pluginsinfo = exec_args[8];
 		String pluginslist [] = pluginsinfo.split("[,]+");
+		GLLibrary = new SharedLibrary(width, height);
 		
 		if(pluginsinfo.length() > 0) {	
 			for (int I = 0; I < pluginslist.length; ++I) {
