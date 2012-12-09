@@ -16,8 +16,8 @@
 #   along with SMART. If not, see <http://www.gnu.org/licenses/>.
 
 #these compilers work with crossdev on gentoo
-WIN_GPP=i686-pc-mingw32-g++
-WIN64_GPP=x86_64-w64-mingw32-g++
+WIN_GPP=g++
+WIN64_GPP=g++
 LIN_GPP=i686-pc-linux-gnu-g++
 LIN64_GPP=x86_64-pc-linux-gnu-g++
 JAVAC=javac
@@ -94,7 +94,8 @@ JAVASOURCES= \
     $(SRC_DIR)/ClientStub.java \
     $(SRC_DIR)/EventNazi.java \
     $(SRC_DIR)/EventRedirect.java \
-    $(SRC_DIR)/UnblockedEvent.java
+    $(SRC_DIR)/UnblockedEvent.java \
+	$(SRC_DIR)/SharedLibrary.java
     
 JAVACLASSES= \
     $(JAVA_BUILD_DIR)/java/awt/Canvas.class \
@@ -104,7 +105,8 @@ JAVACLASSES= \
     $(JAVA_BUILD_DIR)/smart/ClientStub.class \
     $(JAVA_BUILD_DIR)/smart/EventNazi.class \
     $(JAVA_BUILD_DIR)/smart/EventRedirect.class \
-    $(JAVA_BUILD_DIR)/smart/UnblockedEvent.class
+    $(JAVA_BUILD_DIR)/smart/UnblockedEvent.class \
+	$(JAVA_BUILD_DIR)/smart/SharedLibrary.class
 
 all:
 	@echo "Syntax for the SMART makefile:
