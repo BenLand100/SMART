@@ -708,5 +708,53 @@ public class Client implements ActionListener, ChangeListener {
     public void stateChanged(ChangeEvent e) {
         setRefresh(refreshSlider.getValue());
     }
+    
+     /**
+     * Used for all reflection methods, this takes an object refrence which is known
+     * as the parent, or zero for static scope, and a path that basically amounts to fields
+     * in objects or classes and static fields (if in the static scope), and return the
+     * value of the field. The proper return type should ALWAYS be used. Conveniance methods
+     * are provided for 1, 2, and 3 dimensional arrays
+     */
+    public Object findObjectFromPath(Object o, String path) throws Exception {
+        String[] parts = path.split("\\.");
+        Stack<String> stack = new Stack<String>();
+        Field field;
+        if (o == null) {
+            Class c = gameLoader.loadClass(parts[0]);
+            for (int i = parts.length - 1; i > 0; i--) {
+                stack.push(parts[i]);
+            }
+            field = c.getDeclaredField(stack.pop());
+            field.setAccessible(true);
+            o = field.get(null);
+        } else {
+            for (int i = parts.length - 1; i >= 0; i--) {
+                stack.push(parts[i]);
+            }
+        }
+        if (!stack.empty()) {
+            while (!stack.empty()) {
+                String theField = stack.pop();
+                Class theClass = o.getClass();
+                field = null;
+                while (field == null && theClass != Object.class) {
+                    try {
+                        field = theClass.getDeclaredField(theField);
+                    } catch (Exception e) {
+                        try {
+                            theClass = theClass.getSuperclass();
+                        } catch (Exception x) {
+                            break;
+                        }
+                    }
+                }
+                field.setAccessible(true);
+                o = field.get(o);
+            }
+        }
+        return o;
+    }
+    
 
 }
