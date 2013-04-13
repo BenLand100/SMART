@@ -144,7 +144,7 @@ public class Main {
     
     public static native Object getGlobalRef(ByteBuffer org);
     
-    public static native void storeGlobalRef(Object obj, ByteBuffer dest);
+    public static native void putGlobalRef(Object obj, ByteBuffer dest);
     
     public static native void freeGlobalRef(ByteBuffer dest);
     
@@ -241,17 +241,17 @@ public class Main {
                 Object o = getGlobalRef(args);
                 String path = pathFromAddress(args);
                 try {
-                    storeGlobalRef(client.findObjectFromPath(o,path),args);
+                    putGlobalRef(client.findObjectFromPath(o,path),args);
                 } catch (Exception e) {
                     debug("Field not found: " + path);
-                    storeGlobalRef(null,args);
+                    putGlobalRef(null,args);
                 }
                 } break;
             case isPathValid: {
                 Object o = getGlobalRef(args);
                 String path = pathFromAddress(args);
                 try {
-                    storeGlobalRef(client.findObjectFromPath(o,path),args);
+                    putGlobalRef(client.findObjectFromPath(o,path),args);
                     args.putInt(0*4,1);
                 } catch (Exception e) {
                     args.putInt(0*4,0);
@@ -345,9 +345,9 @@ public class Main {
                 int z = indexFromAddress(args,2);
                 try {
                     Object n = client.findObjectFromPath(o,path);
-                    storeGlobalRef(Array.get(Array.get(Array.get(n, x), y), z),args);
+                    putGlobalRef(Array.get(Array.get(Array.get(n, x), y), z),args);
                 } catch (Exception e) {
-                    storeGlobalRef(null,args);
+                    putGlobalRef(null,args);
                 }
                 } break;
             case getFieldArray3DByte: {
@@ -474,9 +474,9 @@ public class Main {
                 int y = indexFromAddress(args,1);
                 try {
                     Object n = client.findObjectFromPath(o,path);
-                    storeGlobalRef(Array.get(Array.get(n, x), y),args);
+                    putGlobalRef(Array.get(Array.get(n, x), y),args);
                 } catch (Exception e) {
-                    storeGlobalRef(null,args);
+                    putGlobalRef(null,args);
                 }
                 } break;
             case getFieldArray2DByte: {
@@ -593,9 +593,9 @@ public class Main {
                 int x = indexFromAddress(args,0);
                 try {
                     Object n = client.findObjectFromPath(o,path);
-                    storeGlobalRef(Array.get(n,x),args);
+                    putGlobalRef(Array.get(n,x),args);
                 } catch (Exception e) {
-                    storeGlobalRef(null,args);
+                    putGlobalRef(null,args);
                 }
                 } break;
             case getFieldArray1DByte: {

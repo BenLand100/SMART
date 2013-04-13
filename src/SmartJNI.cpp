@@ -56,6 +56,31 @@ extern "C" JNIEXPORT jint JNICALL Java_smart_Main_getPID(JNIEnv *env, jclass cls
     #endif
 }
 
+extern "C" JNIEXPORT jobject JNICALL Java_smart_Main_getGlobalRef(JNIEnv *env, jclass cls, jobject org) {
+    return *((jobject*)env->GetDirectBufferAddress(org));
+}
+
+extern "C" JNIEXPORT void JNICALL Java_smart_Main_putGlobalRef(JNIEnv *env, jclass cls, jobject obj, jobject org) {
+    *((jobject*)env->GetDirectBufferAddress(org)) = env->NewGlobalRef(obj);
+}
+
+extern "C" JNIEXPORT void JNICALL Java_smart_Main_freeGlobalRef(JNIEnv *env, jclass cls, jobject org) {
+    env->DeleteGlobalRef(*((jobject*)env->GetDirectBufferAddress(org)));
+}
+
+extern "C" JNIEXPORT jstring JNICALL Java_smart_Main_pathFromAddress(JNIEnv *env, jclass cls, jobject org) {
+    char *path = ((char*)env->GetDirectBufferAddress(org));
+    path += sizeof(jobject); //skip the object reference
+    return env->NewStringUTF(path);
+}
+
+extern "C" JNIEXPORT jint JNICALL Java_smart_Main_indexFromAddress(JNIEnv *env, jclass cls, jobject org, int idx) {
+    char *data = ((char*)env->GetDirectBufferAddress(org));
+    data += sizeof(jobject); //skip the object reference
+    data += strlen(data)+1; //skip the path
+    return ((int*)data)[idx];
+}
+
 extern "C" JNIEXPORT void JNICALL Java_smart_Main_copyGLBuffer(JNIEnv *env, jclass cls, jint x, jint y, jint w, jint h, jobject dest) {
     void *data = env->GetDirectBufferAddress(dest);
     #ifndef _WIN32
