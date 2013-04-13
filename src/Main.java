@@ -24,6 +24,7 @@ import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
 import java.net.*;
+import java.lang.reflect.Array;
 
 /**
  
@@ -59,8 +60,51 @@ public class Main {
     private static final int holdKey =            FirstFunc+19;
     private static final int releaseKey =         FirstFunc+20;
     private static final int isKeyDown =          FirstFunc+21;
+    
+    private static final int getFieldObject =           FirstFunc+22;
+    private static final int isPathValid =              FirstFunc+23;
+    private static final int getFieldBoolean =          FirstFunc+24;
+    private static final int getFieldLongH =            FirstFunc+25;
+    private static final int getFieldLongL =            FirstFunc+26;
+    private static final int getFieldInt =              FirstFunc+27;
+    private static final int getFieldShort =            FirstFunc+28;
+    private static final int getFieldFLoat =            FirstFunc+29;
+    private static final int getFieldDouble =           FirstFunc+30;
+    private static final int getFieldByte =             FirstFunc+31;
+    private static final int getFieldArray3DObject =    FirstFunc+32;
+    private static final int getFieldArray3DByte =      FirstFunc+33;
+    private static final int getFieldArray3DChar =      FirstFunc+34;
+    private static final int getFieldArray3DShort =     FirstFunc+35;
+    private static final int getFieldArray3DInt =       FirstFunc+36;
+    private static final int getFieldArray3DFloat =     FirstFunc+37;
+    private static final int getFieldArray3DDouble =    FirstFunc+38;
+    private static final int getFieldArray3DBoolean =   FirstFunc+39;
+    private static final int getFieldArray3DLongL =     FirstFunc+40;
+    private static final int getFieldArray3DLongH =     FirstFunc+41;
+    private static final int getFieldArray2DObject =    FirstFunc+42;
+    private static final int getFieldArray2DByte =      FirstFunc+43;
+    private static final int getFieldArray2DChar =      FirstFunc+44;
+    private static final int getFieldArray2DShort =     FirstFunc+45;
+    private static final int getFieldArray2DInt =       FirstFunc+46;
+    private static final int getFieldArray2DFloat =     FirstFunc+47;
+    private static final int getFieldArray2DDouble =    FirstFunc+48;
+    private static final int getFieldArray2DBoolean =   FirstFunc+49;
+    private static final int getFieldArray2DLongL =     FirstFunc+50;
+    private static final int getFieldArray2DLongH =     FirstFunc+51;
+    private static final int getFieldArray1DObject =    FirstFunc+52;
+    private static final int getFieldArray1DByte =      FirstFunc+53;
+    private static final int getFieldArray1DChar =      FirstFunc+54;
+    private static final int getFieldArray1DShort =     FirstFunc+55;
+    private static final int getFieldArray1DInt =       FirstFunc+56;
+    private static final int getFieldArray1DFloat =     FirstFunc+57;
+    private static final int getFieldArray1DDouble =    FirstFunc+58;
+    private static final int getFieldArray1DBoolean =   FirstFunc+59;
+    private static final int getFieldArray1DLongL =     FirstFunc+60;
+    private static final int getFieldArray1DLongH =     FirstFunc+61;
+    private static final int getFieldArraySize =        FirstFunc+62;
 
-    private static final int ExtraFuncs =         FirstFunc+22;
+
+    private static final int ExtraFuncs =         FirstFunc+63;
     private static final int Ping =               ExtraFuncs+0;
     private static final int Die =                ExtraFuncs+1;
 
@@ -102,9 +146,11 @@ public class Main {
     
     public static native void storeGlobalRef(Object obj, ByteBuffer dest);
     
-    public static native void freeGlobalRed(ByteBuffer dest);
+    public static native void freeGlobalRef(ByteBuffer dest);
     
     public static native String pathFromAddress(ByteBuffer org);
+    
+    public static native int indexFromAddress(ByteBuffer org, int idx);
     
     public static native boolean checkAlive(int tid);
     
@@ -192,7 +238,7 @@ public class Main {
                 args.putInt(0*4,client.isKeyDown(args.getInt(0*4)) ? 1 : 0);
                 break;
             case getFieldObject: {
-                Object o = objFromAddress(args);
+                Object o = getGlobalRef(args);
                 String path = pathFromAddress(args);
                 try {
                     storeGlobalRef(client.findObjectFromPath(o,path),args);
@@ -202,383 +248,472 @@ public class Main {
                 }
                 } break;
             case isPathValid: {
-                Object o = objFromAddress(args);
+                Object o = getGlobalRef(args);
                 String path = pathFromAddress(args);
                 try {
-                    storeGlobalRef(client.findObjectFromPath(o,path);
+                    storeGlobalRef(client.findObjectFromPath(o,path),args);
                     args.putInt(0*4,1);
                 } catch (Exception e) {
                     args.putInt(0*4,0);
                 }
                 } break;
             case getFieldBoolean: {
-                Object o = objFromAddress(args);
+                Object o = getGlobalRef(args);
                 String path = pathFromAddress(args);
                 try {
                     Object n = client.findObjectFromPath(o,path);
-                    args.putInt(0*4, ((Boolean) o).booleanValue() ? 1 : 0);
+                    args.putInt(0*4, ((Boolean)n).booleanValue() ? 1 : 0);
                 } catch (Exception e) {
                     args.putInt(0*4,0);
                 }
                 } break;
             case getFieldLongH: {
-                Object o = objFromAddress(args);
+                Object o = getGlobalRef(args);
                 String path = pathFromAddress(args);
                 try {
                     Object n = client.findObjectFromPath(o,path);
-                    args.putInt(0*4,(int) ((((Long) o).longValue() >> 32) & 0xFFFFFFFF));
+                    args.putInt(0*4,(int) ((((Long)n).longValue() >> 32) & 0xFFFFFFFF));
                 } catch (Exception e) {
                     args.putInt(0*4,-1);
                 }
                 } break;
             case getFieldLongL: {
-                Object o = objFromAddress(args);
+                Object o = getGlobalRef(args);
                 String path = pathFromAddress(args);
                 try {
                     Object n = client.findObjectFromPath(o,path);
-                    args.putInt(0*4,(int) ((((Long) o).longValue()) & 0xFFFFFFFF));
+                    args.putInt(0*4,(int) ((((Long)n).longValue()) & 0xFFFFFFFF));
                 } catch (Exception e) {
                     args.putInt(0*4,-1);
                 }
                 } break;
             case getFieldInt: {
-                Object o = objFromAddress(args);
+                Object o = getGlobalRef(args);
                 String path = pathFromAddress(args);
                 try {
                     Object n = client.findObjectFromPath(o,path);
-                    args.putInt(0*4,((Integer) o).intValue());
+                    args.putInt(0*4,((Integer)n).intValue());
                 } catch (Exception e) {
                     args.putInt(0*4,-1);
                 }
                 } break;
             case getFieldShort: {
-                Object o = objFromAddress(args);
+                Object o = getGlobalRef(args);
                 String path = pathFromAddress(args);
                 try {
                     Object n = client.findObjectFromPath(o,path);
-                    args.putInt(0*4,((Short) o).intValue());
+                    args.putInt(0*4,((Short)n).intValue());
                 } catch (Exception e) {
                     args.putInt(0*4,-1);
                 }
                 } break; 
             case getFieldFLoat: {
-                Object o = objFromAddress(args);
+                Object o = getGlobalRef(args);
                 String path = pathFromAddress(args);
                 try {
                     Object n = client.findObjectFromPath(o,path);
-                    args.putFloat(0*4,((Float) o).floatValue());
+                    args.putFloat(0*4,((Float)n).floatValue());
                 } catch (Exception e) {
-                    args.putFloat(0*4,Float.NAN);
+                    args.putFloat(0*4,Float.NaN);
                 }
                 } break; 
             case getFieldDouble: {
-                Object o = objFromAddress(args);
+                Object o = getGlobalRef(args);
                 String path = pathFromAddress(args);
                 try {
                     Object n = client.findObjectFromPath(o,path);
-                    args.putDouble(0*4,((Double) o).doubleValue());
+                    args.putDouble(0*4,((Double)n).doubleValue());
                 } catch (Exception e) {
-                    args.putDouble(0*4,Float.NAN);
+                    args.putDouble(0*4,Float.NaN);
                 }
                 } break;
             case getFieldByte: {
-                Object o = objFromAddress(args);
+                Object o = getGlobalRef(args);
                 String path = pathFromAddress(args);
                 try {
                     Object n = client.findObjectFromPath(o,path);
-                    args.putInt(0*4,(((Byte) o).intValue();
+                    args.putInt(0*4,((Byte)n).intValue());
                 } catch (Exception e) {
                     args.putInt(0*4,-1);
                 }
                 } break;
             case getFieldArray3DObject: {
-                Object o = objFromAddress(args);
+                Object o = getGlobalRef(args);
                 String path = pathFromAddress(args);
+                int x = indexFromAddress(args,0);
+                int y = indexFromAddress(args,1);
+                int z = indexFromAddress(args,2);
                 try {
                     Object n = client.findObjectFromPath(o,path);
                     storeGlobalRef(Array.get(Array.get(Array.get(n, x), y), z),args);
                 } catch (Exception e) {
-                    storeGlobalRed(null,args);
+                    storeGlobalRef(null,args);
                 }
                 } break;
             case getFieldArray3DByte: {
-                Object o = objFromAddress(args);
+                Object o = getGlobalRef(args);
                 String path = pathFromAddress(args);
+                int x = indexFromAddress(args,0);
+                int y = indexFromAddress(args,1);
+                int z = indexFromAddress(args,2);
                 try {
                     Object n = client.findObjectFromPath(o,path);
-                    args.putInt(0,(int)Array.getByte(Array.get(Array.get(o, x), y), z));
+                    args.putInt(0,(int)Array.getByte(Array.get(Array.get(n, x), y), z));
                 } catch (Exception e) {
                     args.putInt(-1);
                 }
                 } break;
-            case getFieldArray3DByte: {
-                Object o = objFromAddress(args);
+            case getFieldArray3DChar: {
+                Object o = getGlobalRef(args);
                 String path = pathFromAddress(args);
+                int x = indexFromAddress(args,0);
+                int y = indexFromAddress(args,1);
+                int z = indexFromAddress(args,2);
                 try {
                     Object n = client.findObjectFromPath(o,path);
-                    args.putInt(0,(int)Array.getChar(Array.get(Array.get(o, x), y), z));
+                    args.putInt(0,(int)Array.getChar(Array.get(Array.get(n, x), y), z));
                 } catch (Exception e) {
                     args.putInt(-1);
                 }
                 } break;
             case getFieldArray3DShort: {
-                Object o = objFromAddress(args);
+                Object o = getGlobalRef(args);
                 String path = pathFromAddress(args);
+                int x = indexFromAddress(args,0);
+                int y = indexFromAddress(args,1);
+                int z = indexFromAddress(args,2);
                 try {
                     Object n = client.findObjectFromPath(o,path);
-                    args.putInt(0,(int)Array.getShort(Array.get(Array.get(o, x), y), z));
+                    args.putInt(0,(int)Array.getShort(Array.get(Array.get(n, x), y), z));
                 } catch (Exception e) {
                     args.putInt(-1);
                 }
                 } break;
             case getFieldArray3DInt: {
-                Object o = objFromAddress(args);
+                Object o = getGlobalRef(args);
                 String path = pathFromAddress(args);
+                int x = indexFromAddress(args,0);
+                int y = indexFromAddress(args,1);
+                int z = indexFromAddress(args,2);
                 try {
                     Object n = client.findObjectFromPath(o,path);
-                    args.putInt(0,(int)Array.getInt(Array.get(Array.get(o, x), y), z));
+                    args.putInt(0,(int)Array.getInt(Array.get(Array.get(n, x), y), z));
                 } catch (Exception e) {
                     args.putInt(-1);
                 }
                 } break;
             case getFieldArray3DFloat: {
-                Object o = objFromAddress(args);
+                Object o = getGlobalRef(args);
                 String path = pathFromAddress(args);
+                int x = indexFromAddress(args,0);
+                int y = indexFromAddress(args,1);
+                int z = indexFromAddress(args,2);
                 try {
                     Object n = client.findObjectFromPath(o,path);
-                    args.putFloat(0,Array.getFloat(Array.get(Array.get(o, x), y), z));
+                    args.putFloat(0,Array.getFloat(Array.get(Array.get(n, x), y), z));
                 } catch (Exception e) {
-                    args.putFloat(Float.NAN);
+                    args.putFloat(Float.NaN);
                 }
                 } break;
             case getFieldArray3DDouble: {
-                Object o = objFromAddress(args);
+                Object o = getGlobalRef(args);
                 String path = pathFromAddress(args);
+                int x = indexFromAddress(args,0);
+                int y = indexFromAddress(args,1);
+                int z = indexFromAddress(args,2);
                 try {
                     Object n = client.findObjectFromPath(o,path);
-                    args.putDouble(0,Array.getDouble(Array.get(Array.get(o, x), y), z));
+                    args.putDouble(0,Array.getDouble(Array.get(Array.get(n, x), y), z));
                 } catch (Exception e) {
-                    args.putDouble(Double.NAN);
+                    args.putDouble(Double.NaN);
+                }
+                } break;
+            case getFieldArray3DBoolean: {
+                Object o = getGlobalRef(args);
+                String path = pathFromAddress(args);
+                int x = indexFromAddress(args,0);
+                int y = indexFromAddress(args,1);
+                int z = indexFromAddress(args,2);
+                try {
+                    Object n = client.findObjectFromPath(o,path);
+                    args.putInt(0,Array.getBoolean(Array.get(Array.get(n, x), y), z) ? 1 : 0);
+                } catch (Exception e) {
+                    args.putInt(0);
+                }
+                } break;
+            case getFieldArray3DLongL: {
+                Object o = getGlobalRef(args);
+                String path = pathFromAddress(args);
+                int x = indexFromAddress(args,0);
+                int y = indexFromAddress(args,1);
+                int z = indexFromAddress(args,2);
+                try {
+                    Object n = client.findObjectFromPath(o,path);
+                    args.putInt(0,(int) (Array.getLong(Array.get(Array.get(n, x), y), z) & 0xFFFFFFFF));
+                } catch (Exception e) {
+                    args.putInt(0);
+                }
+                } break;
+            case getFieldArray3DLongH: {
+                Object o = getGlobalRef(args);
+                String path = pathFromAddress(args);
+                int x = indexFromAddress(args,0);
+                int y = indexFromAddress(args,1);
+                int z = indexFromAddress(args,2);
+                try {
+                    Object n = client.findObjectFromPath(o,path);
+                    args.putInt(0,(int) ((Array.getLong(Array.get(Array.get(n, x), y), z) >> 32) & 0xFFFFFFFF));
+                } catch (Exception e) {
+                    args.putInt(0);
+                }
+                } break;
+            case getFieldArray2DObject: {
+                Object o = getGlobalRef(args);
+                String path = pathFromAddress(args);
+                int x = indexFromAddress(args,0);
+                int y = indexFromAddress(args,1);
+                try {
+                    Object n = client.findObjectFromPath(o,path);
+                    storeGlobalRef(Array.get(Array.get(n, x), y),args);
+                } catch (Exception e) {
+                    storeGlobalRef(null,args);
+                }
+                } break;
+            case getFieldArray2DByte: {
+                Object o = getGlobalRef(args);
+                String path = pathFromAddress(args);
+                int x = indexFromAddress(args,0);
+                int y = indexFromAddress(args,1);
+                try {
+                    Object n = client.findObjectFromPath(o,path);
+                    args.putInt(0,(int)Array.getByte(Array.get(n, x), y));
+                } catch (Exception e) {
+                    args.putInt(-1);
+                }
+                } break;
+            case getFieldArray2DChar: {
+                Object o = getGlobalRef(args);
+                String path = pathFromAddress(args);
+                int x = indexFromAddress(args,0);
+                int y = indexFromAddress(args,1);
+                try {
+                    Object n = client.findObjectFromPath(o,path);
+                    args.putInt(0,(int)Array.getChar(Array.get(n, x), y));
+                } catch (Exception e) {
+                    args.putInt(-1);
+                }
+                } break;
+            case getFieldArray2DShort: {
+                Object o = getGlobalRef(args);
+                String path = pathFromAddress(args);
+                int x = indexFromAddress(args,0);
+                int y = indexFromAddress(args,1);
+                try {
+                    Object n = client.findObjectFromPath(o,path);
+                    args.putInt(0,(int)Array.getShort(Array.get(n, x), y));
+                } catch (Exception e) {
+                    args.putInt(-1);
+                }
+                } break;
+            case getFieldArray2DInt: {
+                Object o = getGlobalRef(args);
+                String path = pathFromAddress(args);
+                int x = indexFromAddress(args,0);
+                int y = indexFromAddress(args,1);
+                try {
+                    Object n = client.findObjectFromPath(o,path);
+                    args.putInt(0,(int)Array.getInt(Array.get(n, x), y));
+                } catch (Exception e) {
+                    args.putInt(-1);
+                }
+                } break;
+            case getFieldArray2DFloat: {
+                Object o = getGlobalRef(args);
+                String path = pathFromAddress(args);
+                int x = indexFromAddress(args,0);
+                int y = indexFromAddress(args,1);
+                try {
+                    Object n = client.findObjectFromPath(o,path);
+                    args.putFloat(0,Array.getFloat(Array.get(n, x), y));
+                } catch (Exception e) {
+                    args.putFloat(Float.NaN);
+                }
+                } break;
+            case getFieldArray2DDouble: {
+                Object o = getGlobalRef(args);
+                String path = pathFromAddress(args);
+                int x = indexFromAddress(args,0);
+                int y = indexFromAddress(args,1);
+                try {
+                    Object n = client.findObjectFromPath(o,path);
+                    args.putDouble(0,Array.getDouble(Array.get(n, x), y));
+                } catch (Exception e) {
+                    args.putDouble(Double.NaN);
+                }
+                } break;
+            case getFieldArray2DBoolean: {
+                Object o = getGlobalRef(args);
+                String path = pathFromAddress(args);
+                int x = indexFromAddress(args,0);
+                int y = indexFromAddress(args,1);
+                try {
+                    Object n = client.findObjectFromPath(o,path);
+                    args.putInt(0,Array.getBoolean(Array.get(n, x), y) ? 1 : 0);
+                } catch (Exception e) {
+                    args.putInt(0);
+                }
+                } break;
+            case getFieldArray2DLongL: {
+                Object o = getGlobalRef(args);
+                String path = pathFromAddress(args);
+                int x = indexFromAddress(args,0);
+                int y = indexFromAddress(args,1);
+                try {
+                    Object n = client.findObjectFromPath(o,path);
+                    args.putInt(0,(int) (Array.getLong(Array.get(n, x), y) & 0xFFFFFFFF));
+                } catch (Exception e) {
+                    args.putInt(0);
+                }
+                } break;
+            case getFieldArray2DLongH: {
+                Object o = getGlobalRef(args);
+                String path = pathFromAddress(args);
+                int x = indexFromAddress(args,0);
+                int y = indexFromAddress(args,1);
+                try {
+                    Object n = client.findObjectFromPath(o,path);
+                    args.putInt(0,(int) ((Array.getLong(Array.get(n, x), y) >> 32) & 0xFFFFFFFF));
+                } catch (Exception e) {
+                    args.putInt(0);
+                }
+                } break;
+            case getFieldArray1DObject: {
+                Object o = getGlobalRef(args);
+                String path = pathFromAddress(args);
+                int x = indexFromAddress(args,0);
+                try {
+                    Object n = client.findObjectFromPath(o,path);
+                    storeGlobalRef(Array.get(n,x),args);
+                } catch (Exception e) {
+                    storeGlobalRef(null,args);
+                }
+                } break;
+            case getFieldArray1DByte: {
+                Object o = getGlobalRef(args);
+                String path = pathFromAddress(args);
+                int x = indexFromAddress(args,0);
+                try {
+                    Object n = client.findObjectFromPath(o,path);
+                    args.putInt(0,(int)Array.getByte(n,x));
+                } catch (Exception e) {
+                    args.putInt(-1);
+                }
+                } break;
+            case getFieldArray1DChar: {
+                Object o = getGlobalRef(args);
+                String path = pathFromAddress(args);
+                int x = indexFromAddress(args,0);
+                try {
+                    Object n = client.findObjectFromPath(o,path);
+                    args.putInt(0,(int)Array.getChar(n,x));
+                } catch (Exception e) {
+                    args.putInt(-1);
+                }
+                } break;
+            case getFieldArray1DShort: {
+                Object o = getGlobalRef(args);
+                String path = pathFromAddress(args);
+                int x = indexFromAddress(args,0);
+                try {
+                    Object n = client.findObjectFromPath(o,path);
+                    args.putInt(0,(int)Array.getShort(n,x));
+                } catch (Exception e) {
+                    args.putInt(-1);
+                }
+                } break;
+            case getFieldArray1DInt: {
+                Object o = getGlobalRef(args);
+                String path = pathFromAddress(args);
+                int x = indexFromAddress(args,0);
+                try {
+                    Object n = client.findObjectFromPath(o,path);
+                    args.putInt(0,(int)Array.getInt(n,x));
+                } catch (Exception e) {
+                    args.putInt(-1);
+                }
+                } break;
+            case getFieldArray1DFloat: {
+                Object o = getGlobalRef(args);
+                String path = pathFromAddress(args);
+                int x = indexFromAddress(args,0);
+                try {
+                    Object n = client.findObjectFromPath(o,path);
+                    args.putFloat(0,Array.getFloat(n,x));
+                } catch (Exception e) {
+                    args.putFloat(Float.NaN);
+                }
+                } break;
+            case getFieldArray1DDouble: {
+                Object o = getGlobalRef(args);
+                String path = pathFromAddress(args);
+                int x = indexFromAddress(args,0);
+                try {
+                    Object n = client.findObjectFromPath(o,path);
+                    args.putDouble(0,Array.getDouble(n,x));
+                } catch (Exception e) {
+                    args.putDouble(Double.NaN);
+                }
+                } break;
+            case getFieldArray1DBoolean: {
+                Object o = getGlobalRef(args);
+                String path = pathFromAddress(args);
+                int x = indexFromAddress(args,0);
+                try {
+                    Object n = client.findObjectFromPath(o,path);
+                    args.putInt(0,Array.getBoolean(n,x) ? 1 : 0);
+                } catch (Exception e) {
+                    args.putInt(0);
+                }
+                } break;
+            case getFieldArray1DLongL: {
+                Object o = getGlobalRef(args);
+                String path = pathFromAddress(args);
+                int x = indexFromAddress(args,0);
+                try {
+                    Object n = client.findObjectFromPath(o,path);
+                    args.putInt(0,(int) (Array.getLong(n,x) & 0xFFFFFFFF));
+                } catch (Exception e) {
+                    args.putInt(0);
+                }
+                } break;
+            case getFieldArray1DLongH: {
+                Object o = getGlobalRef(args);
+                String path = pathFromAddress(args);
+                int x = indexFromAddress(args,0);
+                try {
+                    Object n = client.findObjectFromPath(o,path);
+                    args.putInt(0,(int) ((Array.getLong(n,x) >> 32) & 0xFFFFFFFF));
+                } catch (Exception e) {
+                    args.putInt(0);
                 }
                 } break;
 
-    public boolean getFieldArray3DBoolean(Object o, String path, int x, int y, int z) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.getBoolean(Array.get(Array.get(o, x), y), z);
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public int getFieldArray3DLongL(Object o, String path, int x, int y, int z) {
-        o = getFieldObject(o, path);
-        try {
-            return (int) (Array.getLong(Array.get(Array.get(o, x), y), z) & 0xFFFFFFFF);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    public int getFieldArray3DLongH(Object o, String path, int x, int y, int z) {
-        o = getFieldObject(o, path);
-        try {
-            return (int) ((Array.getLong(Array.get(Array.get(o, x), y), z) >> 32) & 0xFFFFFFFF);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    public Object getFieldArray2DObject(Object o, String path, int x, int y) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.get(Array.get(o, x), y);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    public int getFieldArray2DByte(Object o, String path, int x, int y) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.getByte(Array.get(o, x), y);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    public int getFieldArray2DChar(Object o, String path, int x, int y) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.getChar(Array.get(o, x), y);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    public int getFieldArray2DShort(Object o, String path, int x, int y) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.getShort(Array.get(o, x), y);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    public int getFieldArray2DInt(Object o, String path, int x, int y) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.getInt(Array.get(o, x), y);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    public float getFieldArray2DFloat(Object o, String path, int x, int y) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.getFloat(Array.get(o, x), y);
-        } catch (Exception e) {
-            return -1F;
-        }
-    }
-
-    public double getFieldArray2DDouble(Object o, String path, int x, int y) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.getDouble(Array.get(o, x), y);
-        } catch (Exception e) {
-            return -1D;
-        }
-    }
-
-    public boolean getFieldArray2DBoolean(Object o, String path, int x, int y) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.getBoolean(Array.get(o, x), y);
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public int getFieldArray2DLongL(Object o, String path, int x, int y) {
-        o = getFieldObject(o, path);
-        try {
-            return (int) (Array.getLong(Array.get(o, x), y) & 0xFFFFFFFF);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    public int getFieldArray2DLongH(Object o, String path, int x, int y) {
-        o = getFieldObject(o, path);
-        try {
-            return (int) ((Array.getLong(Array.get(o, x), y) >> 32) & 0xFFFFFFFF);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    public int getFieldArrayByte(Object o, String path, int index) {
-        o = getFieldObject(o, path);
-        try {
-            return (int) Array.getByte(o, index);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    public int getFieldArrayShort(Object o, String path, int index) {
-        o = getFieldObject(o, path);
-        try {
-            return (int) Array.getShort(o, index);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    public int getFieldArrayChar(Object o, String path, int index) {
-        o = getFieldObject(o, path);
-        try {
-            return (int) Array.getChar(o, index);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    public int getFieldArrayInt(Object o, String path, int index) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.getInt(o, index);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    public float getFieldArrayFloat(Object o, String path, int index) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.getFloat(o, index);
-        } catch (Exception e) {
-            return -1F;
-        }
-    }
-
-    public double getFieldArrayDouble(Object o, String path, int index) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.getDouble(o, index);
-        } catch (Exception e) {
-            return -1D;
-        }
-    }
-
-    public int getFieldArrayLongH(Object o, String path, int index) {
-        o = getFieldObject(o, path);
-        try {
-            return (int) ((Array.getLong(o, index) >> 32) & 0xFFFFFFFF);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    public int getFieldArrayLongL(Object o, String path, int index) {
-        o = getFieldObject(o, path);
-        try {
-            return (int) (Array.getLong(o, index) & 0xFFFFFFFF);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    public boolean getFieldArrayBoolean(Object o, String path, int index) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.getBoolean(o, index);
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public Object getFieldArrayObject(Object o, String path, int index) {
-        o = getFieldObject(o, path);
-        try {
-            return Array.get(o, index);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    public int getFieldArraySize(Object o, String path, int dim) {
-        o = getFieldObject(o, path);
-        try {
-            if (dim < 1) return -2;
-            while (dim-- > 1) o = Array.get(o,0);
-            return Array.getLength(o);
-        } catch (Exception e) {
-            return -3;
-        }
-    }
+             case getFieldArraySize: {
+                Object o = getGlobalRef(args);
+                String path = pathFromAddress(args);
+                int dim = indexFromAddress(args,0);
+                try {
+                    if (dim < 0) {
+                        args.putInt(0,-2);
+                    } else {
+                        Object n = client.findObjectFromPath(o,path);   
+                        while (dim-- > 0) n = Array.get(n,0);
+                        args.putInt(0,Array.getLength(n));
+                    }
+                } catch (Exception e) {
+                    args.putInt(0,-1);
+                }
+            }
             case Ping:
                 break;
             case Die:

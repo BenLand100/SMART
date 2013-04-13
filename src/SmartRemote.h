@@ -83,7 +83,50 @@ typedef struct {
 #define releaseKey          FirstFunc+20
 #define isKeyDown           FirstFunc+21
 
-#define ExtraFuncs          FirstFunc+22
+#define getFieldObject           FirstFunc+22;
+#define isPathValid              FirstFunc+23;
+#define getFieldBoolean          FirstFunc+24;
+#define getFieldLongH            FirstFunc+25;
+#define getFieldLongL            FirstFunc+26;
+#define getFieldInt              FirstFunc+27;
+#define getFieldShort            FirstFunc+28;
+#define getFieldFLoat            FirstFunc+29;
+#define getFieldDouble           FirstFunc+30;
+#define getFieldByte             FirstFunc+31;
+#define getFieldArray3DObject    FirstFunc+32;
+#define getFieldArray3DByte      FirstFunc+33;
+#define getFieldArray3DChar      FirstFunc+34;
+#define getFieldArray3DShort     FirstFunc+35;
+#define getFieldArray3DInt       FirstFunc+36;
+#define getFieldArray3DFloat     FirstFunc+37;
+#define getFieldArray3DDouble    FirstFunc+38;
+#define getFieldArray3DBoolean   FirstFunc+39;
+#define getFieldArray3DLongL     FirstFunc+40;
+#define getFieldArray3DLongH     FirstFunc+41;
+#define getFieldArray2DObject    FirstFunc+42;
+#define getFieldArray2DByte      FirstFunc+43;
+#define getFieldArray2DChar      FirstFunc+44;
+#define getFieldArray2DShort     FirstFunc+45;
+#define getFieldArray2DInt       FirstFunc+46;
+#define getFieldArray2DFloat     FirstFunc+47;
+#define getFieldArray2DDouble    FirstFunc+48;
+#define getFieldArray2DBoolean   FirstFunc+49;
+#define getFieldArray2DLongL     FirstFunc+50;
+#define getFieldArray2DLongH     FirstFunc+51;
+#define getFieldArray1DObject    FirstFunc+52;
+#define getFieldArray1DByte      FirstFunc+53;
+#define getFieldArray1DChar      FirstFunc+54;
+#define getFieldArray1DShort     FirstFunc+55;
+#define getFieldArray1DInt       FirstFunc+56;
+#define getFieldArray1DFloat     FirstFunc+57;
+#define getFieldArray1DDouble    FirstFunc+58;
+#define getFieldArray1DBoolean   FirstFunc+59;
+#define getFieldArray1DLongL     FirstFunc+60;
+#define getFieldArray1DLongH     FirstFunc+61;
+#define getFieldArraySize        FirstFunc+62;
+
+
+#define ExtraFuncs          FirstFunc+63
 
 #define Ping                ExtraFuncs+0
 #define Die                 ExtraFuncs+1
