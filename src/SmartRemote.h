@@ -83,47 +83,47 @@ typedef struct {
 #define releaseKey          FirstFunc+20
 #define isKeyDown           FirstFunc+21
 
-#define getFieldObject           FirstFunc+22;
-#define isPathValid              FirstFunc+23;
-#define getFieldBoolean          FirstFunc+24;
-#define getFieldLongH            FirstFunc+25;
-#define getFieldLongL            FirstFunc+26;
-#define getFieldInt              FirstFunc+27;
-#define getFieldShort            FirstFunc+28;
-#define getFieldFLoat            FirstFunc+29;
-#define getFieldDouble           FirstFunc+30;
-#define getFieldByte             FirstFunc+31;
-#define getFieldArray3DObject    FirstFunc+32;
-#define getFieldArray3DByte      FirstFunc+33;
-#define getFieldArray3DChar      FirstFunc+34;
-#define getFieldArray3DShort     FirstFunc+35;
-#define getFieldArray3DInt       FirstFunc+36;
-#define getFieldArray3DFloat     FirstFunc+37;
-#define getFieldArray3DDouble    FirstFunc+38;
-#define getFieldArray3DBoolean   FirstFunc+39;
-#define getFieldArray3DLongL     FirstFunc+40;
-#define getFieldArray3DLongH     FirstFunc+41;
-#define getFieldArray2DObject    FirstFunc+42;
-#define getFieldArray2DByte      FirstFunc+43;
-#define getFieldArray2DChar      FirstFunc+44;
-#define getFieldArray2DShort     FirstFunc+45;
-#define getFieldArray2DInt       FirstFunc+46;
-#define getFieldArray2DFloat     FirstFunc+47;
-#define getFieldArray2DDouble    FirstFunc+48;
-#define getFieldArray2DBoolean   FirstFunc+49;
-#define getFieldArray2DLongL     FirstFunc+50;
-#define getFieldArray2DLongH     FirstFunc+51;
-#define getFieldArray1DObject    FirstFunc+52;
-#define getFieldArray1DByte      FirstFunc+53;
-#define getFieldArray1DChar      FirstFunc+54;
-#define getFieldArray1DShort     FirstFunc+55;
-#define getFieldArray1DInt       FirstFunc+56;
-#define getFieldArray1DFloat     FirstFunc+57;
-#define getFieldArray1DDouble    FirstFunc+58;
-#define getFieldArray1DBoolean   FirstFunc+59;
-#define getFieldArray1DLongL     FirstFunc+60;
-#define getFieldArray1DLongH     FirstFunc+61;
-#define getFieldArraySize        FirstFunc+62;
+#define getFieldObject           FirstFunc+22
+#define isPathValid              FirstFunc+23
+#define getFieldBoolean          FirstFunc+24
+#define getFieldLongH            FirstFunc+25
+#define getFieldLongL            FirstFunc+26
+#define getFieldInt              FirstFunc+27
+#define getFieldShort            FirstFunc+28
+#define getFieldFloat            FirstFunc+29
+#define getFieldDouble           FirstFunc+30
+#define getFieldByte             FirstFunc+31
+#define getFieldArray3DObject    FirstFunc+32
+#define getFieldArray3DByte      FirstFunc+33
+#define getFieldArray3DChar      FirstFunc+34
+#define getFieldArray3DShort     FirstFunc+35
+#define getFieldArray3DInt       FirstFunc+36
+#define getFieldArray3DFloat     FirstFunc+37
+#define getFieldArray3DDouble    FirstFunc+38
+#define getFieldArray3DBoolean   FirstFunc+39
+#define getFieldArray3DLongL     FirstFunc+40
+#define getFieldArray3DLongH     FirstFunc+41
+#define getFieldArray2DObject    FirstFunc+42
+#define getFieldArray2DByte      FirstFunc+43
+#define getFieldArray2DChar      FirstFunc+44
+#define getFieldArray2DShort     FirstFunc+45
+#define getFieldArray2DInt       FirstFunc+46
+#define getFieldArray2DFloat     FirstFunc+47
+#define getFieldArray2DDouble    FirstFunc+48
+#define getFieldArray2DBoolean   FirstFunc+49
+#define getFieldArray2DLongL     FirstFunc+50
+#define getFieldArray2DLongH     FirstFunc+51
+#define getFieldArray1DObject    FirstFunc+52
+#define getFieldArray1DByte      FirstFunc+53
+#define getFieldArray1DChar      FirstFunc+54
+#define getFieldArray1DShort     FirstFunc+55
+#define getFieldArray1DInt       FirstFunc+56
+#define getFieldArray1DFloat     FirstFunc+57
+#define getFieldArray1DDouble    FirstFunc+58
+#define getFieldArray1DBoolean   FirstFunc+59
+#define getFieldArray1DLongL     FirstFunc+60
+#define getFieldArray1DLongH     FirstFunc+61
+#define getFieldArraySize        FirstFunc+62
 
 
 #define ExtraFuncs          FirstFunc+63
@@ -227,8 +227,19 @@ extern "C" void exp_holdKey(int code);
 extern "C" void exp_releaseKey(int code);
 extern "C" bool exp_isKeyDown(int code);
 
+extern "C" void* exp_getFieldObject(void* obj, char* path);
+extern "C" bool exp_isPathValid(void* obj, char* path);
+extern "C" bool exp_getFieldBoolean(void* obj, char* path);
+extern "C" unsigned int exp_getFieldLongH(void* obj, char* path);
+extern "C" unsigned int exp_getFieldLongL(void* obj, char* path);
+extern "C" int exp_getFieldInt(void* obj, char* path);
+extern "C" int exp_getFieldShort(void* obj, char* path);
+extern "C" double exp_getFieldFloat(void* obj, char* path);
+extern "C" double exp_getFieldDouble(void* obj, char* path);
+extern "C" char exp_getFieldByte(void* obj, char* path);
+
 //Exports for Local
-#define NumExports 30
+#define NumExports 40
 static char* exports[] = {
     (char*)"exp_clientID", (char*)"function SmartClientID(idx: integer): integer;",
     (char*)"exp_getClients", (char*)"function SmartGetClients(only_unpaired: boolean): integer;",
@@ -248,7 +259,7 @@ static char* exports[] = {
     #else
         "64;",
     #endif
-    (char*)"exp_getRefresh", (char*)"function SmartGetRefresh: integer;",
+    (char*)"exp_getRefresh", (char*)"function SmartGetRefresh: integerti;",
     (char*)"exp_setRefresh", (char*)"procedure SmartSetRefresh(x: integer);",
     (char*)"exp_setTransparentColor", (char*)"procedure SmartSetTransparentColor(color: integer);",
     (char*)"exp_setDebug", (char*)"procedure SmartSetDebug(enabled: boolean);",
@@ -269,7 +280,18 @@ static char* exports[] = {
     (char*)"exp_sendKeys", (char*)"procedure SmartSendKeys(Text: String; keywait, keymodwait: integer);",
     (char*)"exp_holdKey", (char*)"procedure SmartHoldKey(Code: Integer);",
     (char*)"exp_releaseKey", (char*)"procedure SmartReleaseKey(Code: Integer);",
-    (char*)"exp_isKeyDown", (char*)"function SmartIsKeyDown(Code: Integer): Boolean;"
+    (char*)"exp_isKeyDown", (char*)"function SmartIsKeyDown(Code: Integer): Boolean;",
+    (char*)"exp_getFieldObject", (char*)"function SmartGetFieldObject(objref: integer; path: string);",
+    (char*)"exp_isPathValid", (char*)"function SmartIsPathValid(objref: integer; path: string);",
+    (char*)"exp_getFieldBoolean", (char*)"function SmartGetFieldBoolean(objref: integer; path: string);",
+    (char*)"exp_getFieldLongH", (char*)"function SmartGetFieldLongH(objref: integer; path: string);",
+    (char*)"exp_getFieldLongL", (char*)"function SmartGetFieldLongL(objref: integer; path: string);",
+    (char*)"exp_getFieldInt", (char*)"function SmartGetFieldInt(objref: integer; path: string);",
+    (char*)"exp_getFieldShort", (char*)"function SmartGetFieldShort(objref: integer; path: string);",
+    (char*)"exp_getFieldFloat", (char*)"function SmartGetFieldFloat(objref: integer; path: string);",
+    (char*)"exp_getFieldDouble", (char*)"function SmartGetFieldDouble(objref: integer; path: string);",
+    (char*)"exp_getFieldByte", (char*)"function SmartGetFieldByte(objref: integer; path: string);",
+    
 };
 
 #endif	/* _LOCAL_H */

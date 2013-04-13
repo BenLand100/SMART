@@ -68,7 +68,7 @@ public class Main {
     private static final int getFieldLongL =            FirstFunc+26;
     private static final int getFieldInt =              FirstFunc+27;
     private static final int getFieldShort =            FirstFunc+28;
-    private static final int getFieldFLoat =            FirstFunc+29;
+    private static final int getFieldFloat =            FirstFunc+29;
     private static final int getFieldDouble =           FirstFunc+30;
     private static final int getFieldByte =             FirstFunc+31;
     private static final int getFieldArray3DObject =    FirstFunc+32;
@@ -307,7 +307,7 @@ public class Main {
                     args.putInt(0*4,-1);
                 }
                 } break; 
-            case getFieldFLoat: {
+            case getFieldFloat: {
                 Object o = getGlobalRef(args);
                 String path = pathFromAddress(args);
                 try {

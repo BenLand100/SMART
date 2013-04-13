@@ -661,6 +661,97 @@ bool exp_isKeyDown(int code) {
     } else return false;
 }
 
+void* exp_getFieldObject(void* obj, char* path) {
+    if (local) {
+        ((void**)local->data->args)[0] = obj;
+        strcpy((char*)local->data->args+sizeof(void*),path);
+        callClient(local,getFieldObject);
+        return ((void**)local->data->args)[0];
+    } else return 0;
+}
+
+bool exp_isPathValid(void* obj, char* path) {
+    if (local) {
+        ((void**)local->data->args)[0] = obj;
+        strcpy((char*)local->data->args+sizeof(void*),path);
+        callClient(local,isPathValid);
+        return ((bool*)local->data->args)[0];
+    } else return false;
+}
+
+bool exp_getFieldBoolean(void* obj, char* path) {
+    if (local) {
+        ((void**)local->data->args)[0] = obj;
+        strcpy((char*)local->data->args+sizeof(void*),path);
+        callClient(local,getFieldBoolean);
+        return ((bool*)local->data->args)[0];
+    } else return false;
+}
+
+unsigned int exp_getFieldLongH(void* obj, char* path) {
+    if (local) {
+        ((void**)local->data->args)[0] = obj;
+        strcpy((char*)local->data->args+sizeof(void*),path);
+        callClient(local,getFieldLongH);
+        return ((unsigned int*)local->data->args)[0];
+    } else return -1;
+}
+
+unsigned int exp_getFieldLongL(void* obj, char* path) {
+    if (local) {
+        ((void**)local->data->args)[0] = obj;
+        strcpy((char*)local->data->args+sizeof(void*),path);
+        callClient(local,getFieldLongL);
+        return ((unsigned int*)local->data->args)[0];
+    } else return -1;
+}
+
+int exp_getFieldInt(void* obj, char* path) {
+    if (local) {
+        ((void**)local->data->args)[0] = obj;
+        strcpy((char*)local->data->args+sizeof(void*),path);
+        callClient(local,getFieldInt);
+        return ((int*)local->data->args)[0];
+    } else return -1;
+}
+
+int exp_getFieldShort(void* obj, char* path) {
+    if (local) {
+        ((void**)local->data->args)[0] = obj;
+        strcpy((char*)local->data->args+sizeof(void*),path);
+        callClient(local,getFieldShort);
+        return ((int*)local->data->args)[0];
+    } else return -1;
+}
+
+double exp_getFieldFloat(void* obj, char* path) {
+    if (local) {
+        ((void**)local->data->args)[0] = obj;
+        strcpy((char*)local->data->args+sizeof(void*),path);
+        callClient(local,getFieldFloat);
+        return ((float*)local->data->args)[0];
+    } else return -1;
+}
+
+double exp_getFieldDouble(void* obj, char* path) {
+    if (local) {
+        ((void**)local->data->args)[0] = obj;
+        strcpy((char*)local->data->args+sizeof(void*),path);
+        callClient(local,getFieldDouble);
+        return ((double*)local->data->args)[0];
+    } else return -1;
+}
+
+char exp_getFieldByte(void* obj, char* path) {
+    if (local) {
+        ((void**)local->data->args)[0] = obj;
+        strcpy((char*)local->data->args+sizeof(void*),path);
+        callClient(local,getFieldByte);
+        return ((char*)local->data->args)[0];
+    } else return -1;
+}
+
+
 SMARTClient* spawnFromString(char* initarg) {
     int len = strlen(initarg);
     char *path,*root,*params,*initseq,*useragent,*javaargs,*plugins;
