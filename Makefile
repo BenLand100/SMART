@@ -1,3 +1,4 @@
+#/usr/bin/make
 #   Copyright 2012 by Benjamin J. Land (a.k.a. BenLand100)
 # 
 #   This file is part of the SMART Minimizing Autoing Resource Thing (SMART)
@@ -107,7 +108,7 @@ JAVACLASSES= \
     $(JAVA_BUILD_DIR)/smart/UnblockedEvent.class
 
 all:
-	@echo "Syntax for the SMART makefile:
+	@echo "Syntax for the SMART makefile:"
 	@echo "    For Windows distributions: make windows windows64"
 	@echo "    For Linux distributions: make linux linux64"
 	@echo "    For All distributions: make everything"
@@ -133,16 +134,16 @@ windows64: $(JAVACLASSES) $(DIST)/$(WIN64_NAME) $(DIST)/$(JNI_WIN64_NAME)
 	
 test-linux:
 	@mkdir -p $(DIST)
-	@$(LIN_GPP) -ldl -o $(DIST)/test-spawn32 test-apps/test-spawn.cpp
-	@$(LIN_GPP) -ldl -o $(DIST)/test-eios32 test-apps/test-eios.cpp
-	@$(LIN_GPP) -ldl -o $(DIST)/test-exports32 test-apps/test-exports.cpp
+	@$(LIN_GPP) -o $(DIST)/test-spawn32 test-apps/test-spawn.cpp -ldl
+	@$(LIN_GPP) -o $(DIST)/test-eios32 test-apps/test-eios.cpp -ldl
+	@$(LIN_GPP) -o $(DIST)/test-exports32 test-apps/test-exports.cpp -ldl
 	@echo "Finished building Linux 32bit test files"
 	
 test-linux64:
 	@mkdir -p $(DIST)
-	@$(LIN64_GPP) -ldl -o $(DIST)/test-spawn64 test-apps/test-spawn.cpp
-	@$(LIN64_GPP) -ldl -o $(DIST)/test-eios64 test-apps/test-eios.cpp
-	@$(LIN64_GPP) -ldl -o $(DIST)/test-exports64 test-apps/test-exports.cpp
+	@$(LIN64_GPP) -o $(DIST)/test-spawn64 test-apps/test-spawn.cpp -ldl
+	@$(LIN64_GPP) -o $(DIST)/test-eios64 test-apps/test-eios.cpp -ldl
+	@$(LIN64_GPP) -o $(DIST)/test-exports64 test-apps/test-exports.cpp -ldl
 	@echo "Finished building Linux 64bit test files"
 	
 test-windows: 
