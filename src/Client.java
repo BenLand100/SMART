@@ -169,7 +169,7 @@ public class Client implements ActionListener, ChangeListener {
         canvas = it;
         if (blitThread != null) {
             try {
-                blitThread.stop();
+                blitThread = null;
             } catch (Exception e) {
                 Main.debug("Bad stuff went down, recovering...");
                 e.printStackTrace();
