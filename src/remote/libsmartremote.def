@@ -30,6 +30,7 @@ EXPORTS
     exp_setKeyInput
     exp_setMouseInput
     exp_setMode
+    exp_smartShowConsole
     exp_spawnClient
     exp_getClients
     exp_clientID

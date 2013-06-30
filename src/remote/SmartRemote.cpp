@@ -39,6 +39,7 @@ using namespace std;
 static map<int,SMARTClient*> *pairedClients;
 static SMARTClient *local;
 static clients_dat clients;
+static bool showConsole = true;
 
 void freeClient(SMARTClient *client) {
     if (!client) return;
@@ -303,7 +304,7 @@ SMARTClient* spawnClient(char* remote_path, char *root, char *params, int width,
     memset(&info, 0, sizeof(SHELLEXECUTEINFO));
     info.cbSize = sizeof(SHELLEXECUTEINFO); 
     info.fMask = SEE_MASK_NOCLOSEPROCESS;
-    info.lpFile = "java.exe";
+    info.lpFile = showConsole ? "java.exe" : "javaw.exe";
     info.lpParameters = args;
     info.nShow = SW_SHOWNORMAL;
     ShellExecuteEx(&info);
@@ -416,6 +417,10 @@ int getClients(bool only_unpaired, int **_clients) {
     }
     #endif
     return count;
+}
+
+void exp_smartShowConsole(bool show) {
+    showConsole = show;
 }
 
 /**
