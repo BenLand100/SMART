@@ -58,14 +58,14 @@ public class Client {
     public void stop() {
         if (this.active) {
             this.active = false;
-            for (Map.Entry<Integer, Client> entry : Clients.entrySet()) {
+            /*for (Map.Entry<Integer, Client> entry : Clients.entrySet()) {
                 if (entry.getValue() == this) {
                     Clients.remove(entry.getKey());
                     break;
                 }
             }
             EventHandler.remove(this.canvas);
-            this.loader.stop();
+            this.loader.stop();*/
             this.loader = null;
         }
     }
