@@ -1,274 +1,131 @@
-#   Copyright 2012 by Benjamin J. Land (a.k.a. BenLand100)
-# 
-#   This file is part of the SMART Minimizing Autoing Resource Thing (SMART)
-# 
-#   SMART is free software: you can redistribute it and/or modify
-#   it under the terms of the GNU General Public License as published by
-#   the Free Software Foundation, either version 3 of the License, or
-#   (at your option) any later version.
-# 
-#   SMART is distributed in the hope that it will be useful,
-#   but WITHOUT ANY WARRANTY; without even the implied warranty of
-#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-#   GNU General Public License for more details.
-# 
-#   You should have received a copy of the GNU General Public License
-#   along with SMART. If not, see <http://www.gnu.org/licenses/>.
+WinGPP = g++
+LinGPP = g++
+Javac = javac
+JavacPath = "C:\Program Files\Java\jdk1.7.0_21\bin"
 
-#these compilers work with crossdev on gentoo
-WIN_GPP=g++
-WIN64_GPP=g++
-LIN_GPP=i686-pc-linux-gnu-g++
-LIN64_GPP=x86_64-pc-linux-gnu-g++
-JAVAC=javac
-JAR=jar
+BinDIR = bin
+ObjDIR = obj
+SrcDIR = src
+IcoDIR = icons
+RmDIR  = remote
+BitFLG = -m32
 
-DIST=dist
-BUILD=build
-WIN_NAME=libsmartremote32.dll
-WIN64_NAME=libsmartremote64.dll
-LIN_NAME=libsmartremote32.so
-LIN64_NAME=libsmartremote64.so
+JavaOUT = smart.jar
+RemoteOUT = libsmartremote$(subst -m,,$(BitFLG))
+JniOUT = libsmartjni$(subst -m,,$(BitFLG))
 
-JNI_WIN_NAME=libsmartjni32.dll
-JNI_WIN64_NAME=libsmartjni64.dll
-JNI_LIN_NAME=libsmartjni32.so
-JNI_LIN64_NAME=libsmartjni64.so
+WinDEP = -static -static-libgcc -static-libstdc++ -shared -s -o
+LinDEP = -static -static-libgcc -static-libstdc++ -shared -s -o
+WinARGS = -std=c++11 -O3 -DWINDOWS -s -c $(BitFLG)
+LinARGS = -FPIC -std=c++11 -O3 -DLINUX -s -c $(BitFLG)
 
-JAVA_NAME=smart.jar
 
-WIN_COMPILE_ARGS=-DWINDOWS -O3 -s -c
-WIN64_COMPILE_ARGS=-DWINDOWS -O3 -s -c
-LIN_COMPILE_ARGS=-fPIC -DLINUX -O3 -s -c
-LIN64_COMPILE_ARGS=-fPIC -DLINUX -O3 -s -c
-
-SRC_DIR=src
-LIN_BUILD_DIR=$(BUILD)/linux32
-LIN64_BUILD_DIR=$(BUILD)/linux64
-WIN_BUILD_DIR=$(BUILD)/windows32
-WIN64_BUILD_DIR=$(BUILD)/windows64
-JAVA_BUILD_DIR=$(BUILD)/java
-
-CPPSOURCEFILES= \
-	$(SRC_DIR)/SmartRemote.cpp
+REMOUT = NONE
+GPP = NONE
+ARGS = NONE
+DEPS = NONE
+JNI = NONE
+OBJ = NONE
+LINKER = NONE
 	
-JNI_CPPSOURCEFILES= \
-	$(SRC_DIR)/SmartJNI.cpp
+CppFiles = \
+	$(wildcard $(SrcDIR)/$(RmDIR)/*.cpp)
 	
-CPPHEADERFILES= \
-	$(SRC_DIR)/SmartRemote.h \
-	$(SRC_DIR)/libsmartremote.def
-
-JNI_CPPHEADERFILES= \
-    $(SRC_DIR)/jni.h \
+ObjFiles = \
+	$(patsubst $(SrcDIR)/%.cpp,$(OBJ)/%.o,$(CppFiles))
 	
-WINOBJFILES= \
-	$(WIN_BUILD_DIR)/SmartRemote.o
-	 
-JNI_WINOBJFILES= \
-	$(WIN_BUILD_DIR)/SmartJNI.o 
+JniFiles = \
+	$(wildcard $(SrcDIR)/libsmartjni/*.cpp)
 	
-WIN64OBJFILES= \
-	$(WIN64_BUILD_DIR)/SmartRemote.o 
+JniObjFiles = \
+	$(patsubst $(SrcDIR)/%.cpp,$(OBJ)/%.o,$(JniFiles))
 	
-JNI_WIN64OBJFILES= \
-	$(WIN64_BUILD_DIR)/SmartJNI.o 
+JavaFiles = \
+	$(wildcard $(SrcDIR)/smart/*.java) \
+	$(wildcard $(SrcDIR)/java.awt/*.java)
 	
-LINOBJFILES= \
-	$(LIN_BUILD_DIR)/SmartRemote.o 
+JavaObjs = \
+	$(wildcard $(OBJ)/smart/*.class) \
+	$(wildcard $(OBJ)/java.awt/*.class) \
+	$(wildcard $(OBJ)/$(IcoDIR)/*)
 	
-JNI_LINOBJFILES= \
-	$(LIN_BUILD_DIR)/SmartJNI.o 
 	
-LIN64OBJFILES= \
-	$(LIN64_BUILD_DIR)/SmartRemote.o
-	
-JNI_LIN64OBJFILES= \
-	$(LIN64_BUILD_DIR)/SmartJNI.o 
-	
-JAVASOURCES= \
-    $(SRC_DIR)/Canvas.java \
-    $(SRC_DIR)/Main.java \
-    $(SRC_DIR)/BlockingEventQueue.java \
-    $(SRC_DIR)/Client.java \
-    $(SRC_DIR)/ClientStub.java \
-    $(SRC_DIR)/EventNazi.java \
-    $(SRC_DIR)/EventRedirect.java \
-    $(SRC_DIR)/UnblockedEvent.java \
-	$(SRC_DIR)/SharedLibrary.java
-    
-JAVACLASSES= \
-    $(JAVA_BUILD_DIR)/java/awt/Canvas.class \
-    $(JAVA_BUILD_DIR)/smart/Main.class \
-    $(JAVA_BUILD_DIR)/smart/BlockingEventQueue.class \
-    $(JAVA_BUILD_DIR)/smart/Client.class \
-    $(JAVA_BUILD_DIR)/smart/ClientStub.class \
-    $(JAVA_BUILD_DIR)/smart/EventNazi.class \
-    $(JAVA_BUILD_DIR)/smart/EventRedirect.class \
-    $(JAVA_BUILD_DIR)/smart/UnblockedEvent.class \
-	$(JAVA_BUILD_DIR)/smart/SharedLibrary.class
-
 all:
-	@echo "Syntax for the SMART makefile:
-	@echo "    For Windows distributions: make windows windows64"
-	@echo "    For Linux distributions: make linux linux64"
-	@echo "    For All distributions: make everything"
-	@echo "    For test apps: make test-python test-linux test-linux64 test-windows test-windows64"
-	@echo "    For all test apps: make test-all"
-	@echo "    To clean build files: make clean"
-	
-everything: linux linux64 windows windows64
+	@echo
+	@echo "  Instructions For Making Smart:"
+	@echo
+	@echo "    For Windows:     make windows"
+	@echo "    For Linux:       make linux"
+	@echo "    For Both:        make both"
+	@echo "    For x64 Builds:  make windows BitFLG=-m64"
+	@echo "                     make linux BitFLG=-m64"
+	@echo "    To Clean Files:  make clean"
+    
+everything: linux windows
 
-test-all: test-python test-windows test-windows64 test-linux test-linux64
+linux:
+GPP = $(LinGPP)
+ARGS = $(LinARGS)
+DEPS = $(LinDEP)
+OBJ = $(ObjDIR)/Linux$(subst -m,,$(BitFLG))
+ICONIN = $(SrcDIR)/$(IcoDIR)/*
+ICONOUT = $(OBJ)/$(IcoDIR)
+REMOUT = $(RemoteOUT).so
+JNI = $(JniOUT).so
+LINKER = 
 
-linux: $(JAVACLASSES) $(DIST)/$(LIN_NAME) $(DIST)/$(JNI_LIN_NAME)
-	@echo "Finished Building the Linux 32bit SMART distribution"
-	
-linux64: $(JAVACLASSES) $(DIST)/$(LIN64_NAME) $(DIST)/$(JNI_LIN64_NAME)
-	@echo "Finished Building the Linux 64bit SMART distribution"
+linux: $(BinDIR)/Java $(BinDIR)/$(OUT) $(BinDIR)/$(JNI)
+	@echo
+	@echo "Finished Building Smart Linux Distribution."
 
-windows: $(JAVACLASSES) $(DIST)/$(WIN_NAME) $(DIST)/$(JNI_WIN_NAME)
-	@echo "Finished Building the Windows 32bit SMART distribution"
 
-windows64: $(JAVACLASSES) $(DIST)/$(WIN64_NAME) $(DIST)/$(JNI_WIN64_NAME)
-	@echo "Finished Building the Windows 64bit SMART distribution"
-	
-test-linux:
-	@mkdir -p $(DIST)
-	@$(LIN_GPP) -ldl -o $(DIST)/test-spawn32 test-apps/test-spawn.cpp
-	@$(LIN_GPP) -ldl -o $(DIST)/test-eios32 test-apps/test-eios.cpp
-	@$(LIN_GPP) -ldl -o $(DIST)/test-exports32 test-apps/test-exports.cpp
-	@echo "Finished building Linux 32bit test files"
-	
-test-linux64:
-	@mkdir -p $(DIST)
-	@$(LIN64_GPP) -ldl -o $(DIST)/test-spawn64 test-apps/test-spawn.cpp
-	@$(LIN64_GPP) -ldl -o $(DIST)/test-eios64 test-apps/test-eios.cpp
-	@$(LIN64_GPP) -ldl -o $(DIST)/test-exports64 test-apps/test-exports.cpp
-	@echo "Finished building Linux 64bit test files"
-	
-test-windows: 
-	@mkdir -p $(DIST)
-	@$(WIN_GPP) -o $(DIST)/test-spawn32.exe test-apps/test-spawn.cpp
-	@$(WIN_GPP) -o $(DIST)/test-eios32.exe test-apps/test-eios.cpp
-	@$(WIN_GPP) -o $(DIST)/test-exports32.exe test-apps/test-exports.cpp
-	@echo "Finished building Windows 32bit test files"
-	
-test-windows64:
-	@mkdir -p $(DIST)
-	@$(WIN64_GPP) -o $(DIST)/test-spawn64.exe test-apps/test-spawn.cpp
-	@$(WIN64_GPP) -o $(DIST)/test-eios64.exe test-apps/test-eios.cpp
-	@$(WIN64_GPP) -o $(DIST)/test-exports64.exe test-apps/test-exports.cpp
-	@echo "Finished building Windows 64bit test files"
-	
-test-python:
-	@mkdir -p $(DIST)
-	@cp test-apps/test-python.py $(DIST)/test-python
-	@echo "Finished building Python test files"
-	
-clean: 
-	@echo "Cleaning build files..."
-	@rm -rf $(BUILD) $(DIST)  
-	
-#### LINUX BUILDING DIRECTIVES ####
+windows:
+GPP = $(WinGPP)
+ARGS = $(WinARGS)
+DEPS = $(WinDEP)
+OBJ = $(ObjDIR)/Windows$(subst -m,,$(BitFLG))
+ICONIN = $(SrcDIR)/$(IcoDIR)/*
+ICONOUT = $(OBJ)/$(IcoDIR)
+REMOUT = $(RemoteOUT).dll
+JNI = $(JniOUT).dll
+LINKER = -lws2_32 -lole32 -lshell32
 
-$(DIST)/$(LIN_NAME): $(LINOBJFILES)
-	@echo "Linking Linux Remote object files..."
-	@mkdir -p $(DIST)
-	@$(LIN_GPP) -fPIC -shared -s -o $(DIST)/$(LIN_NAME) $(LINOBJFILES)
+windows: $(BinDIR)/Java $(BinDIR)/$(REMOUT) $(BinDIR)/$(JNI)
+	@echo
+	@echo "Finished Building Smart Windows Distribution."
 	
-$(DIST)/$(JNI_LIN_NAME): $(JNI_LINOBJFILES)
-	@echo "Linking Linux JNI object files..."
-	@mkdir -p $(DIST)
-	@$(LIN_GPP) -fPIC -shared -s -o $(DIST)/$(JNI_LIN_NAME) $(JNI_LINOBJFILES)
+clean:
+	@echo "    Cleaning Build Files."
+	@rm -rf $(ObjFiles) $(BinDIR) $(OBJ)
 
-$(LIN_BUILD_DIR)/SmartRemote.o: $(SRC_DIR)/SmartRemote.cpp $(CPPHEADERFILES)
-	@echo "Compiling SmartRemote.cpp"
-	@mkdir -p $(LIN_BUILD_DIR)
-	@$(LIN_GPP) $(LIN_COMPILE_ARGS) -o $(LIN_BUILD_DIR)/SmartRemote.o $(SRC_DIR)/SmartRemote.cpp
+    
+
+
+$(BinDIR)/$(REMOUT): $(ObjFiles)
+	@echo
+	@echo "Linking Remote Object Files.."
+	@mkdir -p $(BinDIR)
+	@mkdir -p $(OBJ)/libsmartjni
+	@$(GPP) -Wl,$(SrcDIR)/$(RmDIR)/libsmartremote.def -Wl,--enable-stdcall-fixup $(DEPS) $(BinDIR)/$(REMOUT) $(ObjFiles) $(BitFLG) $(LINKER)
 	
-$(LIN_BUILD_DIR)/SmartJNI.o: $(SRC_DIR)/SmartJNI.cpp $(JNI_CPPHEADERFILES)
-	@echo "Compiling SmartJNI.cpp"
-	@mkdir -p $(LIN_BUILD_DIR)
-	@$(LIN_GPP) $(LIN_COMPILE_ARGS) -o $(LIN_BUILD_DIR)/SmartJNI.o $(SRC_DIR)/SmartJNI.cpp
+$(BinDIR)/$(JNI): $(JniObjFiles)
+	@echo
+	@echo "Compiling JNI Object Files.."
+	@mkdir -p $(BinDIR)
+	@$(GPP) $(DEPS) $(BinDIR)/$(JNI) $(JniObjFiles) $(BitFLG) $(LINKER)
 
 	
-#### LINUX64 BUILDING DIRECTIVES ####
-
-$(DIST)/$(LIN64_NAME): $(LIN64OBJFILES)
-	@echo "Linking Linux64 Remote object files..."
-	@mkdir -p $(DIST)
-	@$(LIN64_GPP) -fPIC -shared -s -o $(DIST)/$(LIN64_NAME) $(LIN64OBJFILES)
+$(OBJ)/%.o: $(SrcDIR)/%.cpp
+	@echo "    Compiling: " $<
+	@mkdir -p $(OBJ)
+	@mkdir -p $(OBJ)/$(RmDIR)
+	@$(GPP) $(ARGS) -o $@ $< $(LINKER)
 	
-$(DIST)/$(JNI_LIN64_NAME): $(JNI_LIN64OBJFILES)
-	@echo "Linking Linux64 JNI object files..."
-	@mkdir -p $(DIST)
-	@$(LIN64_GPP) -lGL -fPIC -shared -s -o $(DIST)/$(JNI_LIN64_NAME) $(JNI_LIN64OBJFILES)
-
-$(LIN64_BUILD_DIR)/SmartRemote.o: $(SRC_DIR)/SmartRemote.cpp $(CPPHEADERFILES)
-	@echo "Compiling SmartRemote.cpp"
-	@mkdir -p $(LIN64_BUILD_DIR)
-	@$(LIN64_GPP) $(LIN64_COMPILE_ARGS) -o $(LIN64_BUILD_DIR)/SmartRemote.o $(SRC_DIR)/SmartRemote.cpp
-	
-$(LIN64_BUILD_DIR)/SmartJNI.o: $(SRC_DIR)/SmartJNI.cpp $(JNI_CPPHEADERFILES)
-	@echo "Compiling SmartJNI.cpp"
-	@mkdir -p $(LIN64_BUILD_DIR)
-	@$(LIN64_GPP) $(LIN64_COMPILE_ARGS) -o $(LIN64_BUILD_DIR)/SmartJNI.o $(SRC_DIR)/SmartJNI.cpp
-
-
-#### WINDOWS BUILDING DIRECTIVES ####
-
-$(DIST)/$(WIN_NAME): $(WINOBJFILES)
-	@echo "Linking Windows Remote object files..."
-	@mkdir -p $(DIST)
-	@$(WIN_GPP) -Wl,$(SRC_DIR)/libsmartremote.def -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(WIN_NAME) $(WINOBJFILES) -lws2_32
-	
-$(DIST)/$(JNI_WIN_NAME): $(JNI_WINOBJFILES)
-	@echo "Linking Windows JNI object files..."
-	@mkdir -p $(DIST)
-	@$(WIN_GPP) -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(JNI_WIN_NAME) $(JNI_WINOBJFILES)
-
-$(WIN_BUILD_DIR)/SmartRemote.o: $(SRC_DIR)/SmartRemote.cpp $(CPPHEADERFILES)
-	@echo "Compiling SmartRemote.cpp"
-	@mkdir -p $(WIN_BUILD_DIR)
-	@$(WIN_GPP) $(WIN_COMPILE_ARGS) -o $(WIN_BUILD_DIR)/SmartRemote.o $(SRC_DIR)/SmartRemote.cpp -lws2_32
-	
-$(WIN_BUILD_DIR)/SmartJNI.o: $(SRC_DIR)/SmartJNI.cpp $(JNI_CPPHEADERFILES)
-	@echo "Compiling SmartJNI.cpp"
-	@mkdir -p $(WIN_BUILD_DIR)
-	@$(WIN_GPP) $(WIN_COMPILE_ARGS) -o $(WIN_BUILD_DIR)/SmartJNI.o $(SRC_DIR)/SmartJNI.cpp
-
-#### WINDOWS64 BUILDING DIRECTIVES ####
-
-$(DIST)/$(WIN64_NAME): $(WIN64OBJFILES)
-	@echo "Linking Windows64 Remote object files..."
-	@mkdir -p $(DIST)
-	@$(WIN64_GPP) -Wl,$(SRC_DIR)/libsmartremote.def -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(WIN64_NAME) $(WIN64OBJFILES) -lws2_32
-
-$(DIST)/$(JNI_WIN64_NAME): $(JNI_WIN64OBJFILES)
-	@echo "Linking Windows64 JNI object files..."
-	@mkdir -p $(DIST)
-	@$(WIN64_GPP) -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(JNI_WIN64_NAME) $(JNI_WIN64OBJFILES)
-
-$(WIN64_BUILD_DIR)/SmartRemote.o: $(SRC_DIR)/SmartRemote.cpp $(CPPHEADERFILES)
-	@echo "Compiling SmartRemote.cpp"
-	@mkdir -p $(WIN64_BUILD_DIR)
-	@$(WIN64_GPP) $(WIN64_COMPILE_ARGS) -o $(WIN64_BUILD_DIR)/SmartRemote.o $(SRC_DIR)/SmartRemote.cpp -lws2_32
-	
-$(WIN64_BUILD_DIR)/SmartJNI.o: $(SRC_DIR)/SmartJNI.cpp $(JNI_CPPHEADERFILES)
-	@echo "Compiling SmartJNI.cpp"
-	@mkdir -p $(WIN64_BUILD_DIR)
-	@$(WIN64_GPP) $(WIN64_COMPILE_ARGS) -o $(WIN64_BUILD_DIR)/SmartJNI.o $(SRC_DIR)/SmartJNI.cpp
-
-
-#### JAVA BUILDING DIRECTIVES ####
-
- $(JAVACLASSES): $(JAVASOURCES)
-	@echo "Compiling Java Classes..."
-	@mkdir -p $(JAVA_BUILD_DIR)
-	@$(JAVAC) -classpath $(JAVA_BUILD_DIR) -sourcepath $(SRC_DIR) -d $(JAVA_BUILD_DIR) $(JAVASOURCES)
-	@echo "Creating JAR Archive..."
-	@mkdir -p $(DIST)
-	@$(JAR) cfe $(DIST)/$(JAVA_NAME) smart.Main -C $(JAVA_BUILD_DIR) .
-
-
+$(BinDIR)/Java:
+	@echo "Compiling Java Files.."
+	@mkdir -p $(OBJ)
+	@mkdir -p $(OBJ)/$(IcoDIR)
+	@cp -r $(ICONIN) $(ICONOUT)
+	@$(JavacPath)/$(Javac) -d $(OBJ) $(JavaFiles) -sourcepath $(SrcDIR) -classpath $(OBJ)
+	@mkdir -p $(BinDIR)
+	@$(JavacPath)/jar cfe $(BinDIR)/$(JavaOUT) smart.Main -C $(OBJ) smart -C $(OBJ) java -C $(OBJ) JNI -C $(OBJ) icons
