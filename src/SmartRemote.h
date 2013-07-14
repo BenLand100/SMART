@@ -236,7 +236,7 @@ extern "C" int exp_getFieldInt(void* obj, char* path);
 extern "C" int exp_getFieldShort(void* obj, char* path);
 extern "C" double exp_getFieldFloat(void* obj, char* path);
 extern "C" double exp_getFieldDouble(void* obj, char* path);
-extern "C" char exp_getFieldByte(void* obj, char* path);
+extern "C" int exp_getFieldByte(void* obj, char* path);
 
 #if __SIZEOF_POINTER__ == 4
     #define PTR "integer"
@@ -255,7 +255,7 @@ static char* exports[] = {
     (char*)"exp_getCurrent", (char*)"function SmartCurrentClient(): integer;",
     (char*)"exp_getImageArray", (char*)"function SmartImageArray(): "PTR";",
     (char*)"exp_getDebugArray", (char*)"function SmartDebugArray(): "PTR";",
-    (char*)"exp_getRefresh", (char*)"function SmartGetRefresh: integerti;",
+    (char*)"exp_getRefresh", (char*)"function SmartGetRefresh: integer;",
     (char*)"exp_setRefresh", (char*)"procedure SmartSetRefresh(x: integer);",
     (char*)"exp_setTransparentColor", (char*)"procedure SmartSetTransparentColor(color: integer);",
     (char*)"exp_setDebug", (char*)"procedure SmartSetDebug(enabled: boolean);",

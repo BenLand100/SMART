@@ -742,7 +742,7 @@ double exp_getFieldDouble(void* obj, char* path) {
     } else return -1;
 }
 
-char exp_getFieldByte(void* obj, char* path) {
+int exp_getFieldByte(void* obj, char* path) {
     if (local) {
         ((void**)local->data->args)[0] = obj;
         strcpy((char*)local->data->args+sizeof(void*),path);
