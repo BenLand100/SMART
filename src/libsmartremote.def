@@ -46,3 +46,13 @@ EXPORTS
     EIOS_HoldKey=EIOS_HoldKey@8
     EIOS_ReleaseKey=EIOS_ReleaseKey@8
     EIOS_IsKeyHeld=EIOS_IsKeyHeld@8
+    exp_getFieldObject
+    exp_isPathValid
+    exp_getFieldBoolean
+    exp_getFieldLongH
+    exp_getFieldLongL
+    exp_getFieldInt
+    exp_getFieldShort
+    exp_getFieldFloat
+    exp_getFieldDouble
+    exp_getFieldByte

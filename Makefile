@@ -20,7 +20,7 @@ WIN_GPP=i686-pc-mingw32-g++
 WIN64_GPP=x86_64-w64-mingw32-g++
 LIN_GPP=i686-pc-linux-gnu-g++
 LIN64_GPP=x86_64-pc-linux-gnu-g++
-JAVAC=javac
+JAVAC=/usr/lib/jvm/sun-jdk-1.6/bin/javac
 JAR=jar
 
 DIST=dist
@@ -107,7 +107,7 @@ JAVACLASSES= \
     $(JAVA_BUILD_DIR)/smart/UnblockedEvent.class
 
 all:
-	@echo "Syntax for the SMART makefile:
+	@echo "Syntax for the SMART makefile:"
 	@echo "    For Windows distributions: make windows windows64"
 	@echo "    For Linux distributions: make linux linux64"
 	@echo "    For All distributions: make everything"

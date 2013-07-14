@@ -238,6 +238,12 @@ extern "C" double exp_getFieldFloat(void* obj, char* path);
 extern "C" double exp_getFieldDouble(void* obj, char* path);
 extern "C" char exp_getFieldByte(void* obj, char* path);
 
+#if __SIZEOF_POINTER__ == 4
+    #define PTR "integer"
+#else
+    #define PTR "int64"
+#endif
+
 //Exports for Local
 #define NumExports 40
 static char* exports[] = {
@@ -247,18 +253,8 @@ static char* exports[] = {
     (char*)"exp_pairClient", (char*)"function SmartPairClient(pid: integer): boolean;",
     (char*)"exp_killClient", (char*)"function SmartKillClient(pid: integer): boolean;",
     (char*)"exp_getCurrent", (char*)"function SmartCurrentClient(): integer;",
-    (char*)"exp_getImageArray", (char*)"function SmartImageArray(): int" 
-    #if __SIZEOF_POINTER__ == 4
-        "eger;",
-    #else
-        "64;",
-    #endif  
-    (char*)"exp_getDebugArray", (char*)"function SmartDebugArray(): int" 
-    #if __SIZEOF_POINTER__ == 4
-        "eger;",
-    #else
-        "64;",
-    #endif
+    (char*)"exp_getImageArray", (char*)"function SmartImageArray(): "PTR";",
+    (char*)"exp_getDebugArray", (char*)"function SmartDebugArray(): "PTR";",
     (char*)"exp_getRefresh", (char*)"function SmartGetRefresh: integerti;",
     (char*)"exp_setRefresh", (char*)"procedure SmartSetRefresh(x: integer);",
     (char*)"exp_setTransparentColor", (char*)"procedure SmartSetTransparentColor(color: integer);",
@@ -281,16 +277,16 @@ static char* exports[] = {
     (char*)"exp_holdKey", (char*)"procedure SmartHoldKey(Code: Integer);",
     (char*)"exp_releaseKey", (char*)"procedure SmartReleaseKey(Code: Integer);",
     (char*)"exp_isKeyDown", (char*)"function SmartIsKeyDown(Code: Integer): Boolean;",
-    (char*)"exp_getFieldObject", (char*)"function SmartGetFieldObject(objref: integer; path: string);",
-    (char*)"exp_isPathValid", (char*)"function SmartIsPathValid(objref: integer; path: string);",
-    (char*)"exp_getFieldBoolean", (char*)"function SmartGetFieldBoolean(objref: integer; path: string);",
-    (char*)"exp_getFieldLongH", (char*)"function SmartGetFieldLongH(objref: integer; path: string);",
-    (char*)"exp_getFieldLongL", (char*)"function SmartGetFieldLongL(objref: integer; path: string);",
-    (char*)"exp_getFieldInt", (char*)"function SmartGetFieldInt(objref: integer; path: string);",
-    (char*)"exp_getFieldShort", (char*)"function SmartGetFieldShort(objref: integer; path: string);",
-    (char*)"exp_getFieldFloat", (char*)"function SmartGetFieldFloat(objref: integer; path: string);",
-    (char*)"exp_getFieldDouble", (char*)"function SmartGetFieldDouble(objref: integer; path: string);",
-    (char*)"exp_getFieldByte", (char*)"function SmartGetFieldByte(objref: integer; path: string);",
+    (char*)"exp_getFieldObject", (char*)"function SmartGetFieldObject(objref: "PTR"; path: string): "PTR";",
+    (char*)"exp_isPathValid", (char*)"function SmartIsPathValid(objref: "PTR"; path: string): boolean;",
+    (char*)"exp_getFieldBoolean", (char*)"function SmartGetFieldBoolean(objref: "PTR"; path: string): boolean;",
+    (char*)"exp_getFieldLongH", (char*)"function SmartGetFieldLongH(objref: "PTR"; path: string): integer;",
+    (char*)"exp_getFieldLongL", (char*)"function SmartGetFieldLongL(objref: "PTR"; path: string): integer;",
+    (char*)"exp_getFieldInt", (char*)"function SmartGetFieldInt(objref: "PTR"; path: string): integer;",
+    (char*)"exp_getFieldShort", (char*)"function SmartGetFieldShort(objref: "PTR"; path: string): integer;",
+    (char*)"exp_getFieldFloat", (char*)"function SmartGetFieldFloat(objref: "PTR"; path: string): extended;",
+    (char*)"exp_getFieldDouble", (char*)"function SmartGetFieldDouble(objref: "PTR"; path: string): extended;",
+    (char*)"exp_getFieldByte", (char*)"function SmartGetFieldByte(objref: "PTR"; path: string): integer;",
     
 };
 
