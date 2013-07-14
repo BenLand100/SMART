@@ -16,10 +16,18 @@
  *  You should have received a copy of the GNU General Public License
  *  along with SMART. If not, see <http://www.gnu.org/licenses/>.
  */
-
+ 
+//Hopefully Oracle will play nice if I keep their copyright.
+/*
+ * Copyright (c) 1995, 2010, Oracle and/or its affiliates. All rights reserved.
+ * ORACLE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
+ *
+ */
+ 
 package java.awt;
 
 import java.awt.image.BufferStrategy;
+import java.awt.peer.CanvasPeer;
 import java.awt.image.BufferedImage;
 import javax.accessibility.*;
 import smart.Client;
@@ -27,18 +35,18 @@ import smart.Client;
 /**
  *
  * Dirty little hack that makes a new Canvas class right where I want it.
- * Uses the code from Sun's API with some additions. 
+ * Uses the code from Oracle's API with some additions. 
  *
  * @author Benjamin J. Land
  */
 public class Canvas extends Component implements Accessible {
 
-    @Override
+	@Override
     public void setVisible(boolean visible) {
         Client.canvasNotify(this);
         super.setVisible(visible);
     }
-    
+
     private static final String base = "canvas";
     private static int nameCounter = 0;
     private BufferedImage buffer = null;
@@ -51,18 +59,39 @@ public class Canvas extends Component implements Accessible {
         this.buffer = buffer;
     }
     
-    private static final long serialVersionUID = -2284879212465893870L;
+    @Override
+    public Graphics getGraphics() {
+        return buffer == null ?  super.getGraphics() : buffer.getGraphics();
+    }
     
+    public Graphics getCanvasGraphics() {
+        return super.getGraphics();
+    }
+    
+
+    private static final long serialVersionUID = -2284879212465893870L;
+
     public Canvas() {
     }
-    
+
     public Canvas(GraphicsConfiguration config) {
         this();
-        graphicsConfig = config;
+        setGraphicsConfiguration(config);
     }
-    
+
+    @Override
+    void setGraphicsConfiguration(GraphicsConfiguration gc) {
+        synchronized(getTreeLock()) {
+            CanvasPeer peer = (CanvasPeer)getPeer();
+            if (peer != null) {
+                gc = peer.getAppropriateGraphicsConfiguration(gc);
+            }
+            super.setGraphicsConfiguration(gc);
+        }
+    }
+
     String constructComponentName() {
-        synchronized (getClass()) {
+        synchronized (Canvas.class) {
             return base + nameCounter++;
         }
     }
@@ -74,52 +103,46 @@ public class Canvas extends Component implements Accessible {
             super.addNotify();
         }
     }
-    
+
     public void paint(Graphics g) {
+        g.clearRect(0, 0, width, height);
     }
-    
+
     public void update(Graphics g) {
+        g.clearRect(0, 0, width, height);
         paint(g);
     }
-    
+
     boolean postsOldMouseEvents() {
         return true;
     }
-    
+
     public void createBufferStrategy(int numBuffers) {
         super.createBufferStrategy(numBuffers);
     }
-    
+
     public void createBufferStrategy(int numBuffers,
-            BufferCapabilities caps) throws AWTException {
+        BufferCapabilities caps) throws AWTException {
         super.createBufferStrategy(numBuffers, caps);
     }
-    
+
     public BufferStrategy getBufferStrategy() {
         return super.getBufferStrategy();
     }
-    
+
     public AccessibleContext getAccessibleContext() {
         if (accessibleContext == null) {
             accessibleContext = new AccessibleAWTCanvas();
         }
         return accessibleContext;
     }
-    
-    public Graphics getGraphics() {
-        return buffer == null ?  super.getGraphics() : buffer.getGraphics();
-    }
-    
-    public Graphics getCanvasGraphics() {
-        return super.getGraphics();
-    }
-    
+
     protected class AccessibleAWTCanvas extends AccessibleAWTComponent {
         private static final long serialVersionUID = -6325592262103146699L;
-        
+
         public AccessibleRole getAccessibleRole() {
             return AccessibleRole.CANVAS;
         }
-        
+
     }
 }
