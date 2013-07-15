@@ -1,0 +1,9 @@
+EXPORTS
+    Java_smart_Main_checkAlive=Java_smart_Main_checkAlive@12
+    Java_smart_Main_getPID=Java_smart_Main_getPID@8
+    Java_smart_Main_getGlobalRef=Java_smart_Main_getGlobalRef@12
+    Java_smart_Main_putGlobalRef=Java_smart_Main_putGlobalRef@16
+    Java_smart_Main_freeGlobalRef=Java_smart_Main_freeGlobalRef@12
+    Java_smart_Main_pathFromAddress=Java_smart_Main_pathFromAddress@12
+    Java_smart_Main_indexFromAddress=Java_smart_Main_indexFromAddress@16
+    Java_smart_Main_copyGLBuffer=Java_smart_Main_copyGLBuffer@28

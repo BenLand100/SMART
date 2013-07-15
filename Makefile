@@ -147,16 +147,16 @@ test-linux64:
 	
 test-windows: 
 	@mkdir -p $(DIST)
-	@$(WIN_GPP) -o $(DIST)/test-spawn32.exe test-apps/test-spawn.cpp
-	@$(WIN_GPP) -o $(DIST)/test-eios32.exe test-apps/test-eios.cpp
-	@$(WIN_GPP) -o $(DIST)/test-exports32.exe test-apps/test-exports.cpp
+	@$(WIN_GPP) -static-libgcc -static-libstdc++ -o $(DIST)/test-spawn32.exe test-apps/test-spawn.cpp
+	@$(WIN_GPP) -static-libgcc -static-libstdc++ -o $(DIST)/test-eios32.exe test-apps/test-eios.cpp
+	@$(WIN_GPP) -static-libgcc -static-libstdc++ -o $(DIST)/test-exports32.exe test-apps/test-exports.cpp
 	@echo "Finished building Windows 32bit test files"
 	
 test-windows64:
 	@mkdir -p $(DIST)
-	@$(WIN64_GPP) -o $(DIST)/test-spawn64.exe test-apps/test-spawn.cpp
-	@$(WIN64_GPP) -o $(DIST)/test-eios64.exe test-apps/test-eios.cpp
-	@$(WIN64_GPP) -o $(DIST)/test-exports64.exe test-apps/test-exports.cpp
+	@$(WIN64_GPP) -static-libgcc -static-libstdc++ -o $(DIST)/test-spawn64.exe test-apps/test-spawn.cpp
+	@$(WIN64_GPP) -static-libgcc -static-libstdc++ -o $(DIST)/test-eios64.exe test-apps/test-eios.cpp
+	@$(WIN64_GPP) -static-libgcc -static-libstdc++ -o $(DIST)/test-exports64.exe test-apps/test-exports.cpp
 	@echo "Finished building Windows 64bit test files"
 	
 test-python:
@@ -224,7 +224,7 @@ $(DIST)/$(WIN_NAME): $(WINOBJFILES)
 $(DIST)/$(JNI_WIN_NAME): $(JNI_WINOBJFILES)
 	@echo "Linking Windows JNI object files..."
 	@mkdir -p $(DIST)
-	@$(WIN_GPP) -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(JNI_WIN_NAME) $(JNI_WINOBJFILES)
+	@$(WIN_GPP) -Wl,$(SRC_DIR)/libsmartjni.def -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(JNI_WIN_NAME) $(JNI_WINOBJFILES)
 
 $(WIN_BUILD_DIR)/SmartRemote.o: $(SRC_DIR)/SmartRemote.cpp $(CPPHEADERFILES)
 	@echo "Compiling SmartRemote.cpp"
@@ -246,7 +246,7 @@ $(DIST)/$(WIN64_NAME): $(WIN64OBJFILES)
 $(DIST)/$(JNI_WIN64_NAME): $(JNI_WIN64OBJFILES)
 	@echo "Linking Windows64 JNI object files..."
 	@mkdir -p $(DIST)
-	@$(WIN64_GPP) -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(JNI_WIN64_NAME) $(JNI_WIN64OBJFILES)
+	@$(WIN64_GPP) -Wl,$(SRC_DIR)/libsmartjni.def -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(JNI_WIN64_NAME) $(JNI_WIN64OBJFILES)
 
 $(WIN64_BUILD_DIR)/SmartRemote.o: $(SRC_DIR)/SmartRemote.cpp $(CPPHEADERFILES)
 	@echo "Compiling SmartRemote.cpp"

@@ -53,8 +53,10 @@ public class Client implements ActionListener, ChangeListener {
 	    USER_AGENT = "Mozilla/5.0 (" + windowing + "; U; " + osname + " " + System.getProperty("os.version") + "; " + Locale.getDefault().getLanguage()+"-"+Locale.getDefault().getCountry()+"; rv:1.9.0.10) Gecko/2009042316 Firefox/3.0.10";    
     }
     
+    //Only SoftCanvas does anything, and this is SMART's historical operating mode
+    //Switch to External if there is some plugin handling color input
     private static enum OperatingMode {
-        SafeMode,Software,DirectX,OpenGL
+        SoftCanvas, External, OpenGL
     } 
         
     //mantains a list of classloader strings and clients associated with it
@@ -108,7 +110,7 @@ public class Client implements ActionListener, ChangeListener {
     private JButton debugbtn;
     private JSlider refreshSlider;
     private JComboBox opModeSelector;
-    private OperatingMode operatingMode = OperatingMode.SafeMode;
+    private OperatingMode operatingMode = OperatingMode.SoftCanvas;
     private Canvas canvas;
     private String initseq = null;
     private String useragent = null;
@@ -325,7 +327,7 @@ public class Client implements ActionListener, ChangeListener {
                         while (active) {
                             sleep(refresh);
                             switch (operatingMode) {
-                                case SafeMode:
+                                case SoftCanvas:
                                     while (blocking) {
                                         sleep(refresh);
                                         nativeBuff.rewind();
@@ -351,23 +353,18 @@ public class Client implements ActionListener, ChangeListener {
                                     }
                                     canvasGraphics.drawImage(buffer, 0, 0, null);
                                     break;
-                                case Software:
-                                    while (blocking) {
-                                        sleep(refresh);
-                                    }
-                                    break;
-                                case DirectX:
+                                case External:
                                     while (blocking) {
                                         sleep(refresh);
                                     }
                                     break;
                                 case OpenGL: {
-                                        int c = 0;
+                                        /*int c = 0;
                                         long time = System.currentTimeMillis();
-                                        //JFrame img = new JFrame("Teh Buffar");
-                                        //ImageIcon icon = new ImageIcon(buffer);
-                                        //img.add(new JLabel(icon));
-                                        //img.setVisible(true);
+                                        JFrame img = new JFrame("Teh Buffar");
+                                        ImageIcon icon = new ImageIcon(buffer);
+                                        img.add(new JLabel(icon));
+                                        img.setVisible(true);
                                         while (operatingMode == OperatingMode.OpenGL) {
                                             sleep(refresh);
                                             c++;
@@ -375,13 +372,13 @@ public class Client implements ActionListener, ChangeListener {
                                                 Main.debug((1.0/((System.currentTimeMillis()-time)/1000.0)) + " fps");
                                                 time = System.currentTimeMillis();
                                             }
-                                            //Main.copyGLBuffer(0,0,width,height,nativeBuff);
-                                            //nativeBuff.rewind();
-                                            //for (int i = 0; i < len; ++i) {
-                                            //    bufferData[i] = nativeDebug.get() >> 8;
-                                            //}
+                                            Main.copyGLBuffer(0,0,width,height,nativeBuff);
+                                            nativeBuff.rewind();
+                                            for (int i = 0; i < len; ++i) {
+                                                bufferData[i] = nativeDebug.get() >> 8;
+                                            }
                                         }
-                                        //img.setVisible(false);
+                                        img.setVisible(false);*/
                                     } break;
                             }
                         }
@@ -521,7 +518,7 @@ public class Client implements ActionListener, ChangeListener {
         debugbtn = new JButton("Enable Debug");
         debugbtn.addActionListener(this);
         south.add(debugbtn);
-        opModeSelector = new JComboBox(new String[] {"SafeMode","Software","DirectX","OpenGL"});
+        opModeSelector = new JComboBox(new String[] {"SoftCanvas","External"});
         opModeSelector.addActionListener(this);
         south.add(opModeSelector);
         Main.debug("Client INIT");
