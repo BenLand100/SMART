@@ -751,6 +751,365 @@ int exp_getFieldByte(void* obj, char* path) {
     } else return -1;
 }
 
+void* exp_getFieldArray3DObject(void* obj, char* path, int x, int y, int z) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		int* idx = (int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1);
+		idx[0] = x;
+		idx[1] = y;
+		idx[2] = z;
+		callClient(local, getFieldArray3DObject);
+		return ((void**)local->data->args)[0];
+	}  else return 0;
+}
+
+int exp_getFieldArray3DByte(void* obj, char* path, int x, int y, int z) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		int* idx = (int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1);
+		idx[0] = x;
+		idx[1] = y;
+		idx[2] = z;
+		callClient(local, getFieldArray3DByte);
+		return ((int*)local->data->args)[0];
+	} else return -1;
+}
+
+int exp_getFieldArray3DChar(void* obj, char* path, int x, int y, int z) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		int* idx = (int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1);
+		idx[0] = x;
+		idx[1] = y;
+		idx[2] = z;
+		callClient(local, getFieldArray3DChar);
+		return ((int*)local->data->args)[0];
+	} else return -1;
+}
+
+int exp_getFieldArray3DShort(void* obj, char* path, int x, int y, int z) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		int* idx = (int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1);
+		idx[0] = x;
+		idx[1] = y;
+		idx[2] = z;
+		callClient(local, getFieldArray3DShort);
+		return ((int*)local->data->args)[0];
+	} else return -1;
+}
+
+int exp_getFieldArray3DInt(void* obj, char* path, int x, int y, int z) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		int* idx = (int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1);
+		idx[0] = x;
+		idx[1] = y;
+		idx[2] = z;
+		callClient(local, getFieldArray3DInt);
+		return ((int*)local->data->args)[0];
+	} else return -1;
+}
+
+float exp_getFieldArray3DFloat(void* obj, char* path, int x, int y, int z) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		int* idx = (int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1);
+		idx[0] = x;
+		idx[1] = y;
+		idx[2] = z;
+		callClient(local, getFieldArray3DFloat);
+		return ((float*)local->data->args)[0];
+	} else return -1;
+}
+
+float exp_getFieldArray3DDouble(void* obj, char* path, int x, int y, int z) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		int* idx = (int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1);
+		idx[0] = x;
+		idx[1] = y;
+		idx[2] = z;
+		callClient(local, getFieldArray3DDouble);
+		return ((float*)local->data->args)[0];
+	} else return -1;
+}
+
+bool exp_getFieldArray3DBool(void* obj, char* path, int x, int y, int z) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		int* idx = (int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1);
+		idx[0] = x;
+		idx[1] = y;
+		idx[2] = z;
+		callClient(local, getFieldArray3DBoolean);
+		return ((bool*)local->data->args)[0];
+	} else return false;
+}
+
+int exp_getFieldArray3DLongH(void* obj, char* path, int x, int y, int z) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		int* idx = (int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1);
+		idx[0] = x;
+		idx[1] = y;
+		idx[2] = z;
+		callClient(local, getFieldArray3DLongH);
+		return ((int*)local->data->args)[0];
+	} else return -1;
+}
+
+int exp_getFieldArray3DLongL(void* obj, char* path, int x, int y, int z) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		int* idx = (int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1);
+		idx[0] = x;
+		idx[1] = y;
+		idx[2] = z;
+		callClient(local, getFieldArray3DLongL);
+		return ((int*)local->data->args)[0];
+	} else return -1;
+}
+
+void* exp_getFieldArray2DObject(void* obj, char* path, int x, int y) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		int* idx = (int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1);
+		idx[0] = x;
+		idx[1] = y;
+		callClient(local, getFieldArray2DObject);
+		return ((void**)local->data->args)[0];
+	} else return 0;
+}
+
+int exp_getFieldArray2DInt(void* obj, char* path, int x, int y) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		int* idx = (int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1);
+		idx[0] = x;
+		idx[1] = y;
+		callClient(local, getFieldArray2DInt);
+		return ((int*)local->data->args)[0];
+	} else return -1;
+}
+
+float exp_getFieldArray2DDouble(void* obj, char* path, int x, int y) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		int* idx = (int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1);
+		idx[0] = x;
+		idx[1] = y;
+		callClient(local, getFieldArray2DDouble);
+		return ((float*)local->data->args)[0];
+	} else return -1;
+}
+
+float exp_getFieldArray2DFloat(void* obj, char* path, int x, int y) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		int* idx = (int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1);
+		idx[0] = x;
+		idx[1] = y;
+		callClient(local, getFieldArray2DFloat);
+		return ((float*)local->data->args)[0];
+	} else return -1;
+}
+
+bool exp_getFieldArray2DBool(void* obj, char* path, int x, int y) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		int* idx = (int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1);
+		idx[0] = x;
+		idx[1] = y;
+		callClient(local, getFieldArray2DBoolean);
+		return ((bool*)local->data->args)[0];
+	} else return false;
+}
+
+int exp_getFieldArray2DLongH(void* obj, char* path, int x, int y) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		int* idx = (int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1);
+		idx[0] = x;
+		idx[1] = y;
+		callClient(local, getFieldArray2DLongH);
+		return ((int*)local->data->args)[0];
+	} else return -1;
+}
+
+int exp_getFieldArray2DLongL(void* obj, char* path, int x, int y) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		int* idx = (int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1);
+		idx[0] = x;
+		idx[1] = y;
+		callClient(local, getFieldArray2DLongL);
+		return ((int*)local->data->args)[0];
+	} else return -1;
+}
+
+int exp_getFieldArray2DByte(void* obj, char* path, int x, int y) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		int* idx = (int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1);
+		idx[0] = x;
+		idx[1] = y;
+		callClient(local, getFieldArray2DByte);
+		return ((int*)local->data->args)[0];
+	} else return -1;
+}
+
+int exp_getFieldArray2DChar(void* obj, char* path, int x, int y) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		int* idx = (int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1);
+		idx[0] = x;
+		idx[1] = y;
+		callClient(local, getFieldArray2DChar);
+		return ((int*)local->data->args)[0];
+	} else return -1;
+}
+
+int exp_getFieldArray2DShort(void* obj, char* path, int x, int y) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		int* idx = (int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1);
+		idx[0] = x;
+		idx[1] = y;
+		callClient(local, getFieldArray2DShort);
+		return ((int*)local->data->args)[0];
+	} else return -1;
+}
+
+int exp_getFieldArraySize(void* obj, char* path, int dim) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		((int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1))[0] = dim;
+		callClient(local, getFieldArraySize);
+		return ((int*)local->data->args)[0];
+	} else return -1;
+}
+
+void* exp_getFieldArrayObject(void* obj, char* path, int index) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		((int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1))[0] = index;
+		callClient(local, getFieldArray1DObject);
+		return ((void**)local->data->args)[0];
+	} else return 0;
+}
+
+int exp_getFieldArrayInt(void* obj, char* path, int index) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		((int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1))[0] = index;
+		callClient(local, getFieldArray1DInt);
+		return ((int*)local->data->args)[0];
+	} else return -1;
+}
+
+float exp_getFieldArrayFloat(void* obj, char* path, int index) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		((int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1))[0] = index;
+		callClient(local, getFieldArray1DFloat);
+		return ((float*)local->data->args)[0];
+	} else return -1;
+}
+
+float exp_getFieldArrayDouble(void* obj, char* path, int index) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		((int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1))[0] = index;
+		callClient(local, getFieldArray1DDouble);
+		return ((float*)local->data->args)[0];
+	} else return -1;
+}
+
+bool exp_getFieldArrayBool(void* obj, char* path, int index) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		((int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1))[0] = index;
+		callClient(local, getFieldArray1DBoolean);
+		return ((bool*)local->data->args)[0];
+	} else return false;
+}
+
+int exp_getFieldArrayLongH(void* obj, char* path, int index) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		((int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1))[0] = index;
+		callClient(local, getFieldArray1DLongH);
+		return ((int*)local->data->args)[0];
+	} else return -1;
+}
+
+int exp_getFieldArrayLongL(void* obj, char* path, int index) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		((int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1))[0] = index;
+		callClient(local, getFieldArray1DLongL);
+		return ((int*)local->data->args)[0];
+	} else return -1;
+}
+
+int exp_getFieldArrayByte(void* obj, char* path, int index) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		((int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1))[0] = index;
+		callClient(local, getFieldArray1DByte);
+		return ((int*)local->data->args)[0];
+	} else return -1;
+}
+
+int exp_getFieldArrayShort(void* obj, char* path, int index) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		((int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1))[0] = index;
+		callClient(local, getFieldArray1DShort);
+		return ((int*)local->data->args)[0];
+	} else return -1;
+}
+
+int exp_getFieldArrayChar(void* obj, char* path, int index) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		((int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1))[0] = index;
+		callClient(local, getFieldArray1DChar);
+		return ((int*)local->data->args)[0];
+	} else return -1;
+}
 
 SMARTClient* spawnFromString(char* initarg) {
     int len = strlen(initarg);

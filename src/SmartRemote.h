@@ -238,6 +238,40 @@ extern "C" double exp_getFieldFloat(void* obj, char* path);
 extern "C" double exp_getFieldDouble(void* obj, char* path);
 extern "C" int exp_getFieldByte(void* obj, char* path);
 
+extern "C" void* exp_getFieldArray3DObject(void* obj, char* path, int x, int y, int z);
+extern "C" int exp_getFieldArray3DByte(void* obj, char* path, int x, int y, int z);
+extern "C" int exp_getFieldArray3DChar(void* obj, char* path, int x, int y, int z);
+extern "C" int exp_getFieldArray3DShort(void* obj, char* path, int x, int y, int z);
+extern "C" int exp_getFieldArray3DInt(void* obj, char* path, int x, int y, int z);
+extern "C" float exp_getFieldArray3DFloat(void* obj, char* path, int x, int y, int z);
+extern "C" float exp_getFieldArray3DDouble(void* obj, char* path, int x, int y, int z);
+extern "C" bool exp_getFieldArray3DBool(void* obj, char* path, int x, int y, int z);
+extern "C" int exp_getFieldArray3DLongH(void* obj, char* path, int x, int y, int z); 
+extern "C" int exp_getFieldArray3DLongL(void* obj, char* path, int x, int y, int z);
+
+extern "C" void* exp_getFieldArray2DObject(void* obj, char* path, int x, int y);
+extern "C" int exp_getFieldArray2DInt(void* obj, char* path, int x, int y);
+extern "C" float exp_getFieldArray2DDouble(void* obj, char* path, int x, int y);
+extern "C" float exp_getFieldArray2DFloat(void* obj, char* path, int x, int y);
+extern "C" bool exp_getFieldArray2DBool(void* obj, char* path, int x, int y);
+extern "C" int exp_getFieldArray2DLongH(void* obj, char* path, int x, int y);
+extern "C" int exp_getFieldArray2DLongL(void* obj, char* path, int x, int y);
+extern "C" int exp_getFieldArray2DByte(void* obj, char* path, int x, int y);
+extern "C" int exp_getFieldArray2DChar(void* obj, char* path, int x, int y);
+extern "C" int exp_getFieldArray2DShort(void* obj, char* path, int x, int y);
+
+extern "C" int exp_getFieldArraySize(void* obj, char* path, int dim);
+extern "C" void* exp_getFieldArrayObject(void* obj, char* path, int index);
+extern "C" int exp_getFieldArrayInt(void* obj, char* path, int index);
+extern "C" float exp_getFieldArrayFloat(void* obj, char* path, int index);
+extern "C" float exp_getFieldArrayDouble(void* obj, char* path, int index);
+extern "C" bool exp_getFieldArrayBool(void* obj, char* path, int index);
+extern "C" int exp_getFieldArrayLongH(void* obj, char* path, int index);
+extern "C" int exp_getFieldArrayLongL(void* obj, char* path, int index);
+extern "C" int exp_getFieldArrayByte(void* obj, char* path, int index);
+extern "C" int exp_getFieldArrayShort(void* obj, char* path, int index);
+extern "C" int exp_getFieldArrayChar(void* obj, char* path, int index);
+
 #if __SIZEOF_POINTER__ == 4
     #define PTR "integer"
 #else
@@ -245,7 +279,7 @@ extern "C" int exp_getFieldByte(void* obj, char* path);
 #endif
 
 //Exports for Local
-#define NumExports 40
+#define NumExports 71
 static char* exports[] = {
     (char*)"exp_clientID", (char*)"function SmartClientID(idx: integer): integer;",
     (char*)"exp_getClients", (char*)"function SmartGetClients(only_unpaired: boolean): integer;",
@@ -287,6 +321,37 @@ static char* exports[] = {
     (char*)"exp_getFieldFloat", (char*)"function SmartGetFieldFloat(objref: "PTR"; path: string): extended;",
     (char*)"exp_getFieldDouble", (char*)"function SmartGetFieldDouble(objref: "PTR"; path: string): extended;",
     (char*)"exp_getFieldByte", (char*)"function SmartGetFieldByte(objref: "PTR"; path: string): integer;",
+	(char*)"exp_getFieldArray3DObject", (char*)"function SmartGetFieldArray3DObject(objref: " PTR"; path: string; x, y, z: integer): " PTR";",
+	(char*)"exp_getFieldArray3DByte", (char*)"function SmartGetFieldArray3DByte(objref: " PTR"; path: string; x, y, z: integer): integer;",
+	(char*)"exp_getFieldArray3DChar", (char*)"function SmartGetFieldArray3DChar(objref: " PTR"; path: string; x, y, z: integer): integer;",
+	(char*)"exp_getFieldArray3DShort", (char*)"function SmartGetFieldArray3DShort(objref: " PTR"; path: string; x, y, z: integer): integer;",
+	(char*)"exp_getFieldArray3DInt", (char*)"function SmartGetFieldArray3DInt(objref: " PTR"; path: string; x, y, z: integer): integer;",
+	(char*)"exp_getFieldArray3DFloat", (char*)"function SmartGetFieldArray3DFloat(objref: " PTR"; path: string; x, y, z: integer): extended;",
+	(char*)"exp_getFieldArray3DDouble", (char*)"function SmartGetFieldArray3DByte(objref: " PTR"; path: string; x, y, z: integer): extended;",
+	(char*)"exp_getFieldArray3DBool", (char*)"function SmartGetFieldArray3DBoolean(objref: " PTR"; path: string; x, y, z: integer): boolean;",
+	(char*)"exp_getFieldArray3DLongH", (char*)"function SmartGetFieldArray3DLongH(objref: " PTR"; path: string; x, y, z: integer): integer;",
+	(char*)"exp_getFieldArray3DLongL", (char*)"function SmartGetFieldArray3DLongL(objref: " PTR"; path: string; x, y, z: integer): integer;",
+	(char*)"exp_getFieldArray2DObject", (char*)"function SmartGetFieldArray2DObject(objref: " PTR"; path: string; x, y: integer): " PTR";",
+	(char*)"exp_getFieldArray2DInt", (char*)"function SmartGetFieldArray2DInt(objref: " PTR"; path: string; x, y: integer): integer;",
+	(char*)"exp_getFieldArray2DDouble", (char*)"function SmartGetFieldArray2DDouble(objref: " PTR"; path: string; x, y: integer): extended;",
+	(char*)"exp_getFieldArray2DFloat", (char*)"function SmartGetFieldArray2DInt(objref: " PTR"; path: string; x, y: integer): extended;",
+	(char*)"exp_getFieldArray2DBool", (char*)"function SmartGetFieldArray2DBoolean(objref: " PTR"; path: string; x, y: integer): boolean;",
+	(char*)"exp_getFieldArray2DLongH", (char*)"function SmartGetFieldArray2DLongH(objref: " PTR"; path: string; x, y: integer): integer;",
+	(char*)"exp_getFieldArray2DLongL", (char*)"function SmartGetFieldArray2DLongL(objref: " PTR"; path: string; x, y: integer): integer;",
+	(char*)"exp_getFieldArray2DByte", (char*)"function SmartGetFieldArray2DByte(objref: " PTR"; path: string; x, y: integer): integer;",
+	(char*)"exp_getFieldArray2DChar", (char*)"function SmartGetFieldArray2DChar(objref: " PTR"; path: string; x, y: integer): integer;",
+	(char*)"exp_getFieldArray2DShort", (char*)"function SmartGetFieldArray2DShort(objref: " PTR"; path: string; x, y: integer): integer;",
+	(char*)"exp_getFieldArraySize", (char*)"function SmartGetFieldArraySize(objref: " PTR"; path: string; dim: integer): integer;",
+	(char*)"exp_getFieldArrayObject", (char*)"function SmartGetFieldArrayObject(objref: " PTR"; path: string; index: integer): " PTR";",
+	(char*)"exp_getFieldArrayInt", (char*)"function SmartGetFieldArrayInt(objref: " PTR"; path: string; index: integer): integer;",
+	(char*)"exp_getFieldArrayFloat", (char*)"function SmartGetFieldArrayFloat(objref: " PTR"; path: string; index: integer): extended;",
+	(char*)"exp_getFieldArrayDouble", (char*)"function SmartGetFieldArrayDouble(objref: " PTR"; path: string; index: integer): extended;",
+	(char*)"exp_getFieldArrayBool", (char*)"function SmartGetFieldArrayBool(objref: " PTR"; path: string; index: integer): boolean;",
+	(char*)"exp_getFieldArrayLongH", (char*)"function SmartGetFieldArrayLongH(objref: " PTR"; path: string; index: integer): integer;",
+	(char*)"exp_getFieldArrayLongL", (char*)"function SmartGetFieldArrayLongL(objref: " PTR"; path: string; index: integer): integer;",
+	(char*)"exp_getFieldArrayByte", (char*)"function SmartGetFieldArrayByte(objref: " PTR"; path: string; index: integer): integer;",
+	(char*)"exp_getFieldArrayShort", (char*)"function SmartGetFieldArrayShort(objref: " PTR"; path: string; index: integer): integer;",
+	(char*)"exp_getFieldArrayChar", (char*)"function SmartGetFieldArrayChar(objref: " PTR"; path: string; index: integer): integer;"
     
 };
 
