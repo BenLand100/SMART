@@ -58,3 +58,34 @@ EXPORTS
     exp_getFieldFloat
     exp_getFieldDouble
     exp_getFieldByte
+    exp_getFieldArray3DObject
+    exp_getFieldArray3DByte
+    exp_getFieldArray3DChar
+    exp_getFieldArray3DShort
+    exp_getFieldArray3DInt
+    exp_getFieldArray3DFloat
+    exp_getFieldArray3DDouble
+    exp_getFieldArray3DBool
+    exp_getFieldArray3DLongH
+    exp_getFieldArray3DLongL
+    exp_getFieldArray2DObject
+    exp_getFieldArray2DInt
+    exp_getFieldArray2DDouble
+    exp_getFieldArray2DFloat
+    exp_getFieldArray2DBool
+    exp_getFieldArray2DLongH
+    exp_getFieldArray2DLongL
+    exp_getFieldArray2DByte
+    exp_getFieldArray2DChar
+    exp_getFieldArray2DShort
+    exp_getFieldArraySize
+    exp_getFieldArrayObject
+    exp_getFieldArrayInt
+    exp_getFieldArrayFloat
+    exp_getFieldArrayDouble
+    exp_getFieldArrayBool
+    exp_getFieldArrayLongH
+    exp_getFieldArrayLongL
+    exp_getFieldArrayByte
+    exp_getFieldArrayShort
+    exp_getFieldArrayChar
