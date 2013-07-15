@@ -25,6 +25,7 @@ import java.awt.Point;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -402,6 +403,19 @@ public class EventNazi {
             case 3: return rightDown;
         }
         return false;
+    }
+    
+    public synchronized Point scrollMouse(int x, int y, int lines) {
+        int btnMask = (isKeyDown(KeyEvent.VK_SHIFT) ? KeyEvent.SHIFT_MASK : 0) | (isKeyDown(KeyEvent.VK_ALT) ? KeyEvent.ALT_MASK : 0) | (isKeyDown(KeyEvent.VK_CONTROL) ? KeyEvent.CTRL_MASK : 0);
+        if (canInteract()) {
+            if (x > 0 && x < comp.getWidth() && y > 0 && y < comp.getHeight()) {
+                if (mousein) {
+                    BlockingEventQueue.sendUnblocked(new MouseWheelEvent(comp, MouseEvent.MOUSE_WHEEL, System.currentTimeMillis(), btnMask, x, y, 0, false, MouseWheelEvent.WHEEL_UNIT_SCROLL, Math.abs(lines), lines < 0 ? -1 : 1));
+                    return new Point(x, y);
+                }
+            }
+        }
+        return null;
     }
     
     /**

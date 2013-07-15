@@ -237,6 +237,13 @@ public class Client implements ActionListener, ChangeListener {
     public boolean isMouseButtonHeld( int button) {
         return nazi != null ? nazi.isMouseButtonHeld(button) : false;
     }
+    
+    //Convenience method for Native code see Main.java
+    public void scrollMouse(int x, int y, int lines) {
+        if (nazi != null) {
+                nazi.scrollMouse(x, y, lines);
+        }
+	}
 
     //Convenience method for Native code see Main.java
     public Point getMousePos() {

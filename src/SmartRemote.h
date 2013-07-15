@@ -59,7 +59,6 @@ typedef struct {
  */
 
 #define FirstFunc           1
-
 #define getRefresh          FirstFunc+0
 #define setRefresh          FirstFunc+1
 #define setTransparentColor FirstFunc+2
@@ -78,56 +77,56 @@ typedef struct {
 #define clickMouse          FirstFunc+15
 #define clickMousePlus      FirstFunc+16
 #define isMouseButtonHeld   FirstFunc+17
-#define sendKeys            FirstFunc+18
-#define holdKey             FirstFunc+19
-#define releaseKey          FirstFunc+20
-#define isKeyDown           FirstFunc+21
+#define scrollMouse         FirstFunc+18
+#define sendKeys            FirstFunc+19
+#define holdKey             FirstFunc+20
+#define releaseKey          FirstFunc+21
+#define isKeyDown           FirstFunc+22
 
-#define getFieldObject           FirstFunc+22
-#define isPathValid              FirstFunc+23
-#define getFieldBoolean          FirstFunc+24
-#define getFieldLongH            FirstFunc+25
-#define getFieldLongL            FirstFunc+26
-#define getFieldInt              FirstFunc+27
-#define getFieldShort            FirstFunc+28
-#define getFieldFloat            FirstFunc+29
-#define getFieldDouble           FirstFunc+30
-#define getFieldByte             FirstFunc+31
-#define getFieldArray3DObject    FirstFunc+32
-#define getFieldArray3DByte      FirstFunc+33
-#define getFieldArray3DChar      FirstFunc+34
-#define getFieldArray3DShort     FirstFunc+35
-#define getFieldArray3DInt       FirstFunc+36
-#define getFieldArray3DFloat     FirstFunc+37
-#define getFieldArray3DDouble    FirstFunc+38
-#define getFieldArray3DBoolean   FirstFunc+39
-#define getFieldArray3DLongL     FirstFunc+40
-#define getFieldArray3DLongH     FirstFunc+41
-#define getFieldArray2DObject    FirstFunc+42
-#define getFieldArray2DByte      FirstFunc+43
-#define getFieldArray2DChar      FirstFunc+44
-#define getFieldArray2DShort     FirstFunc+45
-#define getFieldArray2DInt       FirstFunc+46
-#define getFieldArray2DFloat     FirstFunc+47
-#define getFieldArray2DDouble    FirstFunc+48
-#define getFieldArray2DBoolean   FirstFunc+49
-#define getFieldArray2DLongL     FirstFunc+50
-#define getFieldArray2DLongH     FirstFunc+51
-#define getFieldArray1DObject    FirstFunc+52
-#define getFieldArray1DByte      FirstFunc+53
-#define getFieldArray1DChar      FirstFunc+54
-#define getFieldArray1DShort     FirstFunc+55
-#define getFieldArray1DInt       FirstFunc+56
-#define getFieldArray1DFloat     FirstFunc+57
-#define getFieldArray1DDouble    FirstFunc+58
-#define getFieldArray1DBoolean   FirstFunc+59
-#define getFieldArray1DLongL     FirstFunc+60
-#define getFieldArray1DLongH     FirstFunc+61
-#define getFieldArraySize        FirstFunc+62
+#define ReflectionFuncs			 FirstFunc+23
+#define getFieldObject           ReflectionFuncs+0
+#define isPathValid              ReflectionFuncs+1
+#define getFieldBoolean          ReflectionFuncs+2
+#define getFieldLongH            ReflectionFuncs+3
+#define getFieldLongL            ReflectionFuncs+4
+#define getFieldInt              ReflectionFuncs+5
+#define getFieldShort            ReflectionFuncs+6
+#define getFieldFloat            ReflectionFuncs+7
+#define getFieldDouble           ReflectionFuncs+8
+#define getFieldByte             ReflectionFuncs+9
+#define getFieldArray3DObject    ReflectionFuncs+10
+#define getFieldArray3DByte      ReflectionFuncs+11
+#define getFieldArray3DChar      ReflectionFuncs+12
+#define getFieldArray3DShort     ReflectionFuncs+13
+#define getFieldArray3DInt       ReflectionFuncs+14
+#define getFieldArray3DFloat     ReflectionFuncs+15
+#define getFieldArray3DDouble    ReflectionFuncs+16
+#define getFieldArray3DBoolean   ReflectionFuncs+17
+#define getFieldArray3DLongL     ReflectionFuncs+18
+#define getFieldArray3DLongH     ReflectionFuncs+19
+#define getFieldArray2DObject    ReflectionFuncs+20
+#define getFieldArray2DByte      ReflectionFuncs+21
+#define getFieldArray2DChar      ReflectionFuncs+22
+#define getFieldArray2DShort     ReflectionFuncs+23
+#define getFieldArray2DInt       ReflectionFuncs+24
+#define getFieldArray2DFloat     ReflectionFuncs+25
+#define getFieldArray2DDouble    ReflectionFuncs+26
+#define getFieldArray2DBoolean   ReflectionFuncs+27
+#define getFieldArray2DLongL     ReflectionFuncs+28
+#define getFieldArray2DLongH     ReflectionFuncs+29
+#define getFieldArray1DObject    ReflectionFuncs+30
+#define getFieldArray1DByte      ReflectionFuncs+31
+#define getFieldArray1DChar      ReflectionFuncs+32
+#define getFieldArray1DShort     ReflectionFuncs+33
+#define getFieldArray1DInt       ReflectionFuncs+34
+#define getFieldArray1DFloat     ReflectionFuncs+35
+#define getFieldArray1DDouble    ReflectionFuncs+36
+#define getFieldArray1DBoolean   ReflectionFuncs+37
+#define getFieldArray1DLongL     ReflectionFuncs+38
+#define getFieldArray1DLongH     ReflectionFuncs+39
+#define getFieldArraySize        ReflectionFuncs+40
 
-
-#define ExtraFuncs          FirstFunc+63
-
+#define ExtraFuncs          ReflectionFuncs+41
 #define Ping                ExtraFuncs+0
 #define Die                 ExtraFuncs+1
 
@@ -190,6 +189,7 @@ extern "C" void EIOS_MoveMouse(Target t, int x, int y) __attribute__((stdcall));
 extern "C" void EIOS_HoldMouse(Target t, int x, int y, int button) __attribute__((stdcall)); 
 extern "C" void EIOS_ReleaseMouse(Target t, int x, int y, int button) __attribute__((stdcall)); 
 extern "C" bool EIOS_IsMouseHeld(Target t, int button) __attribute__((stdcall)); 
+extern "C" void EIOS_ScrollMouse(Target t, int x, int y, int lines) __attribute__((stdcall));
 extern "C" void EIOS_SendString(Target t, char* str, int keywait, int keymodwait) __attribute__((stdcall)); 
 extern "C" void EIOS_HoldKey(Target t, int key) __attribute__((stdcall)); 
 extern "C" void EIOS_ReleaseKey(Target t, int key) __attribute__((stdcall)); 
@@ -222,6 +222,7 @@ extern "C" void exp_windMouse(int x, int y);
 extern "C" void exp_clickMouse(int x, int y, bool left);
 extern "C" void exp_clickMousePlus(int x, int y, int button);
 extern "C" bool exp_isMouseButtonHeld(int button);
+extern "C" void exp_scrollMouse(int x, int y, int lines);
 extern "C" void exp_sendKeys(char *text, int keywait, int keymodwait);
 extern "C" void exp_holdKey(int code);
 extern "C" void exp_releaseKey(int code);
@@ -279,7 +280,7 @@ extern "C" int exp_getFieldArrayChar(void* obj, char* path, int index);
 #endif
 
 //Exports for Local
-#define NumExports 71
+#define NumExports 72
 static char* exports[] = {
     (char*)"exp_clientID", (char*)"function SmartClientID(idx: integer): integer;",
     (char*)"exp_getClients", (char*)"function SmartGetClients(only_unpaired: boolean): integer;",
@@ -307,6 +308,7 @@ static char* exports[] = {
     (char*)"exp_clickMouse", (char*)"procedure SmartClickMouse(x, y: integer; left: boolean);",
     (char*)"exp_clickMousePlus", (char*)"procedure SmartClickMousePlus(x, y, button: integer);",
     (char*)"exp_isMouseButtonHeld", (char*)"function SmartIsMouseButtonHeld(button: integer): boolean;",
+    (char*)"exp_scrollMouse", (char*)"procedure SmartScrollMouse(x, y, lines: integer);",
     (char*)"exp_sendKeys", (char*)"procedure SmartSendKeys(Text: String; keywait, keymodwait: integer);",
     (char*)"exp_holdKey", (char*)"procedure SmartHoldKey(Code: Integer);",
     (char*)"exp_releaseKey", (char*)"procedure SmartReleaseKey(Code: Integer);",

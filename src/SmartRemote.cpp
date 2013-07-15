@@ -630,6 +630,15 @@ bool exp_isMouseButtonHeld(int button) {
     } else return false;
 }
 
+void exp_scrollMouse(int x, int y, int lines) {
+        if (local) {
+        ((int*)(local->data->args))[0] = x;
+        ((int*)(local->data->args))[1] = y;
+        ((int*)(local->data->args))[2] = lines;
+        callClient(local,scrollMouse);
+    }
+}
+
 void exp_sendKeys(char *str, int keywait, int keymodwait) {
     if (local) {
         ((int*)local->data->args)[0] = keywait;
@@ -1237,6 +1246,15 @@ bool EIOS_IsMouseHeld(Target t, int button) {
         return *(bool*)(t->data->args);
     } else return false;
 } 
+
+void EIOS_ScrollMouse(Target t, int x, int y, int lines) {
+	if (t) {
+		((int*)(t->data->args))[0] = x;
+		((int*)(t->data->args))[1] = y;
+		((int*)(t->data->args))[2] = lines;
+		callClient(t,scrollMouse);
+	}
+}
 
 void EIOS_SendString(Target t, char* str, int keywait, int keymodwait) {    
     if (t) {
