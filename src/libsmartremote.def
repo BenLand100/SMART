@@ -24,6 +24,7 @@ EXPORTS
     exp_setDebug
     exp_setTransparentColor
     exp_setGraphics
+    exp_setCapture
     exp_setRefresh
     exp_windMouse
     exp_setEnabled

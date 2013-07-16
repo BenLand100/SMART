@@ -63,8 +63,9 @@ public class Main {
     private static final int holdKey =            FirstFunc+20;
     private static final int releaseKey =         FirstFunc+21;
     private static final int isKeyDown =          FirstFunc+22;
+    private static final int setCapture =         FirstFunc+23;
     
-    private static final int ReflectionFuncs =			FirstFunc+23;
+    private static final int ReflectionFuncs =			FirstFunc+24;
     private static final int getFieldObject =           ReflectionFuncs+0;
     private static final int isPathValid =              ReflectionFuncs+1;
     private static final int getFieldBoolean =          ReflectionFuncs+2;
@@ -248,6 +249,9 @@ public class Main {
                 break;
             case isKeyDown:
                 args.putInt(0*4,client.isKeyDown(args.getInt(0*4)) ? 1 : 0);
+                break;
+            case setCapture:
+                client.setCapture(args.getInt(0*4)!=0);
                 break;
             case getFieldObject: {
                 Object o = getGlobalRef(args);

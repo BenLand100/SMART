@@ -53,12 +53,6 @@ public class Client implements ActionListener, ChangeListener {
 	    USER_AGENT = "Mozilla/5.0 (" + windowing + "; U; " + osname + " " + System.getProperty("os.version") + "; " + Locale.getDefault().getLanguage()+"-"+Locale.getDefault().getCountry()+"; rv:1.9.0.10) Gecko/2009042316 Firefox/3.0.10";    
     }
     
-    //Only SoftCanvas does anything, and this is SMART's historical operating mode
-    //Switch to External if there is some plugin handling color input
-    private static enum OperatingMode {
-        SoftCanvas, External, OpenGL
-    } 
-        
     //mantains a list of classloader strings and clients associated with it
     private static Hashtable<String, Client> clients = new Hashtable<String, Client>();
 
@@ -90,6 +84,7 @@ public class Client implements ActionListener, ChangeListener {
     private ClassLoader gameLoader;
     private Applet clientApplet;
     private JFrame clientFrame;
+    BufferedImage buffer;
     private EventNazi nazi;
     private IntBuffer nativeBuff;
     private IntBuffer nativeDebug;
@@ -98,6 +93,7 @@ public class Client implements ActionListener, ChangeListener {
     public boolean blocking;
     public boolean active;
     public boolean debuggfx = false;
+    public boolean capture = true;
     public int transColor = 0;
     public boolean renderWhileBlocking = true;
     public boolean minimized = false;
@@ -108,9 +104,8 @@ public class Client implements ActionListener, ChangeListener {
     private JButton blockingbtn;
     private JButton gfxbtn;
     private JButton debugbtn;
+    private JButton capturebtn;
     private JSlider refreshSlider;
-    private JComboBox opModeSelector;
-    private OperatingMode operatingMode = OperatingMode.SoftCanvas;
     private Canvas canvas;
     private String initseq = null;
     private String useragent = null;
@@ -135,6 +130,7 @@ public class Client implements ActionListener, ChangeListener {
             Main.debug("Registration Response: " + ((response == null) ? "Unsuccessful" : response.replaceAll("\n|\r","")));
             width = w;
             height = h;
+            buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB); 
             Main.debug("JVM Garbage Collection Invoked");
             System.gc();
             Main.debug("Java Initilized - SMART Starting");
@@ -295,6 +291,7 @@ public class Client implements ActionListener, ChangeListener {
                 blockingbtn.setText("Enable SMART");
                 gfxbtn.setEnabled(false);
                 debugbtn.setEnabled(false);
+                capturebtn.setEnabled(false);
                 Main.debug("SMART Disabled");
                 return true;
             } catch (Exception e) {
@@ -312,9 +309,7 @@ public class Client implements ActionListener, ChangeListener {
         try {
             canvas.setBackground(new Color(0xFE, 0xFE, 0xFE));
             final Graphics canvasGraphics = canvas.getCanvasGraphics();
-            final BufferedImage buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB); //
             Main.debug("Replacing Canvas Drawing Surface");
-            canvas.setBuffer(buffer);
             Field rasterField = BufferedImage.class.getDeclaredField("raster");
             rasterField.setAccessible(true);
             WritableRaster bufferRaster = (WritableRaster) rasterField.get(buffer);
@@ -332,61 +327,40 @@ public class Client implements ActionListener, ChangeListener {
                     try {
                         Main.debug("Transfer Thread Entered");
                         while (active) {
-                            sleep(refresh);
-                            switch (operatingMode) {
-                                case SoftCanvas:
-                                    while (blocking) {
-                                        sleep(refresh);
-                                        nativeBuff.rewind();
-                                        nativeBuff.put(bufferData,0,len); //Oh yea, major preformance boost
-                                        if (renderWhileBlocking && !minimized) {
-                                            final Point p = getMousePos();
-                                            if (debuggfx) {
-                                                nativeDebug.rewind();
-                                                for (int i = 0; i < len; ++i) {
-                                                    int color = nativeDebug.get();
-                                                    if (color != transColor) {
-                                                        debugData[i] = color;
-                                                    } else {
-                                                        debugData[i] = bufferData[i];   
-                                                    }
-                                                }
-                                            } else {
-                                                debugGraphics.drawImage(buffer, 0, 0, null);
-                                            }
-                                            debugGraphics.fillOval(p.x - 2, p.y - 2, 4, 4);
-                                            canvasGraphics.drawImage(debug,0,0,null);
-                                        }
-                                    }
-                                    canvasGraphics.drawImage(buffer, 0, 0, null);
-                                    break;
-                                case External:
-                                    while (blocking) {
-                                        sleep(refresh);
-                                    }
-                                    break;
-                                case OpenGL: {
-                                        /*int c = 0;
-                                        long time = System.currentTimeMillis();
-                                        JFrame img = new JFrame("Teh Buffar");
-                                        ImageIcon icon = new ImageIcon(buffer);
-                                        img.add(new JLabel(icon));
-                                        img.setVisible(true);
-                                        while (operatingMode == OperatingMode.OpenGL) {
-                                            sleep(refresh);
-                                            c++;
-                                            if (c % 100 == 0) {
-                                                Main.debug((1.0/((System.currentTimeMillis()-time)/1000.0)) + " fps");
-                                                time = System.currentTimeMillis();
-                                            }
-                                            Main.copyGLBuffer(0,0,width,height,nativeBuff);
-                                            nativeBuff.rewind();
+                            if (capture && blocking) {
+                                Main.debug("Internal color data capture enabled.");
+                                canvas.setBuffer(buffer);
+                                sleep(refresh);
+                                while (capture && blocking) {
+                                    sleep(refresh);
+                                    nativeBuff.rewind();
+                                    nativeBuff.put(bufferData,0,len); //Oh yea, major preformance boost
+                                    if (renderWhileBlocking && !minimized) {
+                                        final Point p = getMousePos();
+                                        if (debuggfx) {
+                                            nativeDebug.rewind();
                                             for (int i = 0; i < len; ++i) {
-                                                bufferData[i] = nativeDebug.get() >> 8;
+                                                int color = nativeDebug.get();
+                                                if (color != transColor) {
+                                                    debugData[i] = color;
+                                                } else {
+                                                    debugData[i] = bufferData[i];   
+                                                }
                                             }
+                                        } else {
+                                            debugGraphics.drawImage(buffer, 0, 0, null);
                                         }
-                                        img.setVisible(false);*/
-                                    } break;
+                                        debugGraphics.fillOval(p.x - 2, p.y - 2, 4, 4);
+                                        canvasGraphics.drawImage(debug,0,0,null);
+                                    }
+                                }
+                                canvas.setBuffer(null);
+                            } else {
+                                Main.debug("Internal color data capture disabled.");
+                                canvas.setBuffer(null);
+                                while (!capture || !blocking) {
+                                    sleep(refresh);
+                                }
                             }
                         }
                         Main.debug("Transfer Thread Exited");
@@ -413,15 +387,14 @@ public class Client implements ActionListener, ChangeListener {
         if (!blocking) {
             try {
                 blocking = true;
-                Main.debug("Disabeling Events");
                 BlockingEventQueue.setBlocking(canvas, true);
                 BlockingEventQueue.ensureBlocking();
                 nazi = EventNazi.getNazi(canvas);
-                Main.debug("Starting Image Transfer");
                 blockingbtn.setEnabled(true);
-                gfxbtn.setEnabled(true);
-                debugbtn.setEnabled(true);
+                gfxbtn.setEnabled(capture);
+                debugbtn.setEnabled(capture);
                 blockingbtn.setText("Disable SMART");
+                capturebtn.setEnabled(true);
                 Main.debug("SMART Enabled");
                 return true;
             } catch (Exception e) {
@@ -519,15 +492,15 @@ public class Client implements ActionListener, ChangeListener {
         blockingbtn = new JButton("Enable SMART");
         blockingbtn.addActionListener(this);
         south.add(blockingbtn);
-        gfxbtn = new JButton("Disable Graphics");
+        capturebtn = new JButton("Disable Capture");
+        capturebtn.addActionListener(this);
+        south.add(capturebtn);
+        gfxbtn = new JButton("Hide Graphics");
         gfxbtn.addActionListener(this);
         south.add(gfxbtn);
-        debugbtn = new JButton("Enable Debug");
+        debugbtn = new JButton("Show Debug");
         debugbtn.addActionListener(this);
         south.add(debugbtn);
-        opModeSelector = new JComboBox(new String[] {"SoftCanvas","External"});
-        opModeSelector.addActionListener(this);
-        south.add(opModeSelector);
         Main.debug("Client INIT");
         clientApplet.init();
         Main.debug("Client START");
@@ -632,10 +605,10 @@ public class Client implements ActionListener, ChangeListener {
         renderWhileBlocking = on;
         if (renderWhileBlocking) {
             debugbtn.setEnabled(true);
-            gfxbtn.setText("Disable Graphics");
+            gfxbtn.setText("Hide Graphics");
         } else {
             debugbtn.setEnabled(false);
-            gfxbtn.setText("Enable Graphics");
+            gfxbtn.setText("Show Graphics");
         }
     }
 
@@ -645,9 +618,22 @@ public class Client implements ActionListener, ChangeListener {
     public void setDebug(boolean on) {
         debuggfx = on;
         if (debuggfx) {
-            debugbtn.setText("Disable Debug");
+            debugbtn.setText("Hide Debug");
         } else {
-            debugbtn.setText("Enable Debug");
+            debugbtn.setText("Show Debug");
+        }
+    }
+
+    public void setCapture(boolean on) {
+        capture = on;
+        if (capture) {
+            debugbtn.setEnabled(true);
+            gfxbtn.setEnabled(true);
+            capturebtn.setText("Disable Capture");
+        } else {
+            debugbtn.setEnabled(false);
+            gfxbtn.setEnabled(false);
+            capturebtn.setText("Enable Capture");
         }
     }
 
@@ -667,12 +653,8 @@ public class Client implements ActionListener, ChangeListener {
             setGraphics(!renderWhileBlocking);
         } else if (e.getSource() == debugbtn) {
             setDebug(!debuggfx);
-        } else if (e.getSource() == opModeSelector) {
-            operatingMode = OperatingMode.valueOf((String)opModeSelector.getSelectedItem());
-            if (blocking) { 
-                stopBlocking();
-                startBlocking();
-            }
+        } else if (e.getSource() == capturebtn) {
+            setCapture(!capture);
         }
     }
 

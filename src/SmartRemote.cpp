@@ -529,6 +529,12 @@ void exp_setDebug(bool enabled) {
     }
 }
 
+void exp_setCapture(bool enabled) {
+    if (local) {
+        *(bool*)(local->data->args) = enabled;
+        callClient(local,setCapture);
+    }
+}
 
 void exp_setGraphics(bool enabled) {
     if (local) {
