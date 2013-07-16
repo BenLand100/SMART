@@ -1340,6 +1340,12 @@ bool EIOS_IsKeyHeld(Target t, int key) {
 
 void internalConstructor() {
     clients.ids = 0;
+    int count = exp_getClients(false);
+    for (int I = 0; I < count; ++I) {
+        remove(("SMART." + std::to_string(exp_clientID(I))).c_str());
+    }
+    
+    clients.ids = 0;
     clients.count = exp_getClients(true);
     local = NULL;
     pairedClients = new map<int,SMARTClient*>();
@@ -1347,6 +1353,12 @@ void internalConstructor() {
 
 void internalDestructor() {
     freeClient(local);
+    
+    int count = exp_getClients(false);
+    for (int I = 0; I < count; ++I) {
+        remove(("SMART." + std::to_string(exp_clientID(I))).c_str());
+    }
+    
     if (clients.ids) delete clients.ids;
     delete pairedClients;
 }
