@@ -6,4 +6,3 @@ EXPORTS
     Java_smart_Main_freeGlobalRef=Java_smart_Main_freeGlobalRef@12
     Java_smart_Main_pathFromAddress=Java_smart_Main_pathFromAddress@12
     Java_smart_Main_indexFromAddress=Java_smart_Main_indexFromAddress@16
-    Java_smart_Main_copyGLBuffer=Java_smart_Main_copyGLBuffer@28

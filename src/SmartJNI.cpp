@@ -21,7 +21,6 @@
 #include "jni.h"
 
 #ifndef _WIN32
-    //#include <GL/gl.h>
     #include <sys/syscall.h>
     #include <sys/mman.h>
     #include <fcntl.h>
@@ -79,13 +78,5 @@ extern "C" JNIEXPORT jint JNICALL Java_smart_Main_indexFromAddress(JNIEnv *env, 
     data += sizeof(jobject); //skip the object reference
     data += strlen(data)+1; //skip the path
     return ((int*)data)[idx];
-}
-
-extern "C" JNIEXPORT void JNICALL Java_smart_Main_copyGLBuffer(JNIEnv *env, jclass cls, jint x, jint y, jint w, jint h, jobject dest) {
-    void *data = env->GetDirectBufferAddress(dest);
-    #ifndef _WIN32
-        //glReadPixels(x,y,w,h,GL_BGR,GL_UNSIGNED_INT_8_8_8_8,data);
-    #else
-    #endif
 }
 
