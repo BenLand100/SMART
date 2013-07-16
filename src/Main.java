@@ -37,6 +37,8 @@ char args[4096];
 
 public class Main {
 
+    public static final int sys_ptr_size = System.getProperty("os.arch").contains("x86") ? 4 : 8;
+
     private static final int FirstFunc =          1;
     private static final int getRefresh =         FirstFunc+0;
     private static final int setRefresh =         FirstFunc+1;
@@ -104,8 +106,14 @@ public class Main {
     private static final int getFieldArray1DLongL =     ReflectionFuncs+38;
     private static final int getFieldArray1DLongH =     ReflectionFuncs+39;
     private static final int getFieldArraySize =        ReflectionFuncs+40;
+    private static final int freeObject =               ReflectionFuncs+41;
+    private static final int stringFromString =         ReflectionFuncs+42;
+    private static final int stringFromChars =          ReflectionFuncs+43;
+    private static final int stringFromBytes =          ReflectionFuncs+44;
+    private static final int isNull =                   ReflectionFuncs+45;
+    private static final int isEqual =                  ReflectionFuncs+46;
 
-    private static final int ExtraFuncs =         ReflectionFuncs+41;
+    private static final int ExtraFuncs =         ReflectionFuncs+47;
     private static final int Ping =               ExtraFuncs+0;
     private static final int Die =                ExtraFuncs+1;
 
@@ -702,7 +710,7 @@ public class Main {
                 }
                 } break;
 
-             case getFieldArraySize: {
+            case getFieldArraySize: {
                 Object o = getGlobalRef(args);
                 String path = pathFromAddress(args);
                 int dim = indexFromAddress(args,0);
@@ -717,7 +725,63 @@ public class Main {
                 } catch (Exception e) {
                     args.putInt(0,-1);
                 }
-            }
+            } break;
+            
+            case freeObject: {
+                freeGlobalRef(args);
+                } break;
+                
+            case stringFromString: {
+                Object o = getGlobalRef(args);
+                if (o instanceof String) {
+                    byte[] bytes = ((String)o).getBytes();
+                    args.rewind();
+                    args.put(bytes);
+                    args.put((byte)0);
+                    args.rewind();
+                } else {
+                    args.put(0,(byte)0);
+                }
+                } break;
+                
+            case stringFromChars: {
+                Object o = getGlobalRef(args);
+                if (o instanceof char[]) {
+                    byte[] bytes = new String((char[])o).getBytes();
+                    args.rewind();
+                    args.put(bytes);
+                    args.put((byte)0);
+                    args.rewind();
+                } else {
+                    args.put(0,(byte)0);
+                }
+                } break;
+                
+            case stringFromBytes: {
+                Object o = getGlobalRef(args);
+                if (o instanceof byte[]) {
+                    byte[] bytes = new String((byte[])o).getBytes();
+                    args.rewind();
+                    args.put(bytes);
+                    args.put((byte)0);
+                    args.rewind();
+                } else {
+                    args.put(0,(byte)0);
+                }
+                } break;
+                
+            case isNull: {
+                Object o = getGlobalRef(args);
+                args.putInt(0, o == null ? 1 : 0);
+                } break;
+                
+            case isEqual: {
+                ByteBuffer slice = args.slice();
+                Object a = getGlobalRef((ByteBuffer)slice.position(0*sys_ptr_size));
+                Object b = getGlobalRef((ByteBuffer)slice.position(1*sys_ptr_size));
+                args.putInt(0, a == b ? 1 : 0);
+                } break;
+                
             case Ping:
                 break;
             case Die:

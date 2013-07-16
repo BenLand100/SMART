@@ -89,3 +89,9 @@ EXPORTS
     exp_getFieldArrayByte
     exp_getFieldArrayShort
     exp_getFieldArrayChar
+    exp_freeObject
+    exp_stringFromString
+    exp_stringFromChars
+    exp_stringFromBytes
+    exp_isNull
+    exp_isEqual

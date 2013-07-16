@@ -125,8 +125,14 @@ typedef struct {
 #define getFieldArray1DLongL     ReflectionFuncs+38
 #define getFieldArray1DLongH     ReflectionFuncs+39
 #define getFieldArraySize        ReflectionFuncs+40
+#define freeObject               ReflectionFuncs+41
+#define stringFromString         ReflectionFuncs+42
+#define stringFromChars          ReflectionFuncs+43
+#define stringFromBytes          ReflectionFuncs+44
+#define isNull                   ReflectionFuncs+45
+#define isEqual                  ReflectionFuncs+46
 
-#define ExtraFuncs          ReflectionFuncs+41
+#define ExtraFuncs          ReflectionFuncs+47
 #define Ping                ExtraFuncs+0
 #define Die                 ExtraFuncs+1
 
@@ -273,6 +279,13 @@ extern "C" int exp_getFieldArrayByte(void* obj, char* path, int index);
 extern "C" int exp_getFieldArrayShort(void* obj, char* path, int index);
 extern "C" int exp_getFieldArrayChar(void* obj, char* path, int index);
 
+extern "C" void exp_freeObject(void* obj);
+extern "C" int exp_stringFromString(void* obj, char* delphistr);
+extern "C" int exp_stringFromChars(void* obj, char* delphistr);
+extern "C" int exp_stringFromBytes(void* obj, char* delphistr);
+extern "C" bool exp_isNull(void* obj);
+extern "C" bool exp_isEqual(void* a, void* b);
+
 #if __SIZEOF_POINTER__ == 4
     #define PTR "integer"
 #else
@@ -280,7 +293,7 @@ extern "C" int exp_getFieldArrayChar(void* obj, char* path, int index);
 #endif
 
 //Exports for Local
-#define NumExports 72
+#define NumExports 78
 static char* exports[] = {
     (char*)"exp_clientID", (char*)"function SmartClientID(idx: integer): integer;",
     (char*)"exp_getClients", (char*)"function SmartGetClients(only_unpaired: boolean): integer;",
@@ -353,8 +366,13 @@ static char* exports[] = {
 	(char*)"exp_getFieldArrayLongL", (char*)"function SmartGetFieldArrayLongL(objref: " PTR"; path: string; index: integer): integer;",
 	(char*)"exp_getFieldArrayByte", (char*)"function SmartGetFieldArrayByte(objref: " PTR"; path: string; index: integer): integer;",
 	(char*)"exp_getFieldArrayShort", (char*)"function SmartGetFieldArrayShort(objref: " PTR"; path: string; index: integer): integer;",
-	(char*)"exp_getFieldArrayChar", (char*)"function SmartGetFieldArrayChar(objref: " PTR"; path: string; index: integer): integer;"
-    
+	(char*)"exp_getFieldArrayChar", (char*)"function SmartGetFieldArrayChar(objref: " PTR"; path: string; index: integer): integer;",
+	(char*)"exp_freeObject", (char*)"procedure SmartFreeObject(obj: "PTR");",
+	(char*)"exp_stringFromString", (char*)"function SmartStringFromString(jstr: "PTR"; str: String): integer;",
+	(char*)"stringFromBytes", (char*)"function SmartStringFromBytes(bytes: "PTR"; str: String): integer;",
+    (char*)"stringFromChars", (char*)"function SmartStringFromChars(chars: "PTR"; str: String): integer;",
+    (char*)"exp_isEqual", (char*)"function SmartIsEqual(obja, objb: "PTR"): boolean;",
+    (char*)"exp_isNull", (char*)"function SmartIsNull(obj: "PTR"): boolean;",
 };
 
 #endif	/* _LOCAL_H */

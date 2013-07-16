@@ -261,7 +261,7 @@ SMARTClient* pairClient(int id) {
         client->socket = 0;
         if (!resock(client)) {
             freeClient(client);
-            return false;
+            return NULL;
         } 
         client->refcount = 1;
         #ifdef _WIN32
@@ -1010,16 +1010,6 @@ int exp_getFieldArray2DShort(void* obj, char* path, int x, int y) {
 	} else return -1;
 }
 
-int exp_getFieldArraySize(void* obj, char* path, int dim) {
-	if (local) {
-		((void**)local->data->args)[0] = obj;
-		strcpy((char*)local->data->args+sizeof(void*),path);
-		((int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1))[0] = dim;
-		callClient(local, getFieldArraySize);
-		return ((int*)local->data->args)[0];
-	} else return -1;
-}
-
 void* exp_getFieldArrayObject(void* obj, char* path, int index) {
 	if (local) {
 		((void**)local->data->args)[0] = obj;
@@ -1118,6 +1108,67 @@ int exp_getFieldArrayChar(void* obj, char* path, int index) {
 		callClient(local, getFieldArray1DChar);
 		return ((int*)local->data->args)[0];
 	} else return -1;
+}
+
+int exp_getFieldArraySize(void* obj, char* path, int dim) {
+	if (local) {
+		((void**)local->data->args)[0] = obj;
+		strcpy((char*)local->data->args+sizeof(void*),path);
+		((int*)(((char*)local->data->args) + sizeof(void*) + strlen(path) + 1))[0] = dim;
+		callClient(local, getFieldArraySize);
+		return ((int*)local->data->args)[0];
+	} else return -1;
+}
+
+void exp_freeObject(void* obj) {
+    if (local) {
+        ((void**)local->data->args)[0] = obj;
+        callClient(local,freeObject);
+    }
+}
+
+bool exp_isNull(void* obj) {
+    if (local) {
+        ((void**)local->data->args)[0] = obj;
+        callClient(local,isNull);
+        return ((int*)local->data->args)[0] ? true : false;
+    } else return false;
+}
+
+bool exp_isEqual(void* a, void* b) {
+    if (local) {
+        ((void**)local->data->args)[0] = a;
+        ((void**)local->data->args)[1] = b;
+        callClient(local,isEqual);
+        return ((int*)local->data->args)[0] ? true : false;
+    } else return false;
+}
+
+int exp_stringFromString(void* obj, char* delphistr) {
+    if (local) {
+        ((void**)local->data->args)[0] = obj;
+        callClient(local,stringFromString);
+        if (delphistr) strcpy(delphistr, (char*)local->data->args);
+        return strlen((char*)local->data->args);
+    } else return -1;
+}
+
+int exp_stringFromChars(void* obj, char* delphistr) {
+    if (local) {
+        ((void**)local->data->args)[0] = obj;
+        callClient(local,stringFromChars);
+        if (delphistr) strcpy(delphistr, (char*)local->data->args);
+        return strlen((char*)local->data->args);
+    } else return -1;
+}
+
+int exp_stringFromBytes(void* obj, char* delphistr) {
+    if (local) {
+        ((void**)local->data->args)[0] = obj;
+        callClient(local,stringFromBytes);
+        if (delphistr) strcpy(delphistr, (char*)local->data->args);
+        return strlen((char*)local->data->args);
+    } else return -1;
 }
 
 SMARTClient* spawnFromString(char* initarg) {
