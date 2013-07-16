@@ -21,6 +21,7 @@
 #include <time.h>
 #include <stdio.h>
 #include <cstring>
+#include <string>
 #include <iostream>
 #include <stdlib.h>
 #include <map>
@@ -140,6 +141,18 @@ void callClient(SMARTClient *client, char funid) {
  */
 void killClient(SMARTClient *client) {
     callClient(client,Die);
+}
+
+/**
+ * Get all the stale SHM files and killem.
+ */
+void cleanupSHM() {    
+    char buff[512];
+    int count = exp_getClients(false);
+    for (int i = 0; i < count; ++i) {
+        sprintf(buff,"SMART.%i",exp_clientID(i));
+        remove(buff);
+    }
 }
 
 /**
@@ -281,6 +294,7 @@ SMARTClient* pairClient(int id) {
  * FIXME javaargs not handled for linux
  */
 SMARTClient* spawnClient(char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char* javaargs, char* plugins) {
+    cleanupSHM();
     SMARTClient *client;
     if (!remote_path || !root || !params) return 0;
     char _width[256],_height[256];
@@ -1340,12 +1354,7 @@ bool EIOS_IsKeyHeld(Target t, int key) {
 
 void internalConstructor() {
     clients.ids = 0;
-    int count = exp_getClients(false);
-    for (int I = 0; I < count; ++I) {
-        remove(("SMART." + std::to_string(exp_clientID(I))).c_str());
-    }
-    
-    clients.ids = 0;
+    cleanupSHM();
     clients.count = exp_getClients(true);
     local = NULL;
     pairedClients = new map<int,SMARTClient*>();
@@ -1353,12 +1362,7 @@ void internalConstructor() {
 
 void internalDestructor() {
     freeClient(local);
-    
-    int count = exp_getClients(false);
-    for (int I = 0; I < count; ++I) {
-        remove(("SMART." + std::to_string(exp_clientID(I))).c_str());
-    }
-    
+    cleanupSHM();
     if (clients.ids) delete clients.ids;
     delete pairedClients;
 }
