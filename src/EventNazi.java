@@ -161,7 +161,7 @@ public class EventNazi {
         int btnMask = (leftDown ? MouseEvent.BUTTON1_DOWN_MASK : 0) | (rightDown ? (MouseEvent.BUTTON3_DOWN_MASK | MouseEvent.META_DOWN_MASK) : 0);
         if (isDragging()) {
             BlockingEventQueue.sendUnblocked(new MouseEvent(comp,MouseEvent.MOUSE_DRAGGED,System.currentTimeMillis(),btnMask,x,y,0,false,0));
-        } else if (x > 0 && x < comp.getWidth() && y > 0 && y < comp.getHeight()) {
+        } else if (x >= 0 && x < comp.getWidth() && y >= 0 && y < comp.getHeight()) {
             if (mousein) {
                 BlockingEventQueue.sendUnblocked(new MouseEvent(comp,MouseEvent.MOUSE_MOVED,System.currentTimeMillis(),btnMask,x,y,0,false,0));
             } else {
@@ -408,14 +408,12 @@ public class EventNazi {
     public synchronized Point scrollMouse(int x, int y, int lines) {
         int btnMask = (isKeyDown(KeyEvent.VK_SHIFT) ? KeyEvent.SHIFT_MASK : 0) | (isKeyDown(KeyEvent.VK_ALT) ? KeyEvent.ALT_MASK : 0) | (isKeyDown(KeyEvent.VK_CONTROL) ? KeyEvent.CTRL_MASK : 0);
         if (canInteract()) {
-            if (x > 0 && x < comp.getWidth() && y > 0 && y < comp.getHeight()) {
-                Point end = moveMouse(x,y);
-                if (mousein) {
-                    BlockingEventQueue.sendUnblocked(new MouseWheelEvent(comp, MouseEvent.MOUSE_WHEEL, System.currentTimeMillis(), btnMask, x, y, 0, false, MouseWheelEvent.WHEEL_UNIT_SCROLL, Math.abs(lines), lines < 0 ? -1 : 1));
-                    return new Point(x, y);
-                }
-                return end;
+            Point end = moveMouse(x,y);
+            if (mousein) {
+                BlockingEventQueue.sendUnblocked(new MouseWheelEvent(comp, MouseEvent.MOUSE_WHEEL, System.currentTimeMillis(), btnMask, x, y, 0, false, MouseWheelEvent.WHEEL_UNIT_SCROLL, Math.abs(lines), lines < 0 ? -1 : 1));
+                return new Point(x, y);
             }
+            return end;
         }
         return null;
     }
