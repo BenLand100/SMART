@@ -822,9 +822,9 @@ public class Main {
 		for (int i = 0; i < pluginslist.length; i++) {
 			File pluginsfile = new File(pluginspath + "/" + pluginslist[i].trim());
 			if (pluginsfile.isFile() && loadPlugin(pluginsfile.getAbsolutePath())) {
-				debug("Smart_"+pluginslist[i].trim()+" Successfully Loaded!\n");
+				debug("Plugin "+pluginslist[i].trim()+" successfully loaded.\n");
 			} else {
-				debug("File Missing: Smart_"+pluginslist[i].trim()+" Failed To Load!\n");
+				debug("Plugin "+pluginslist[i].trim()+" failed to load.\n");
 			}
 		}
 		
@@ -875,7 +875,9 @@ public class Main {
             client = new Client(img,dbg,width,height,root,params,initseq,useragent,id);
             setNatives(client,img,dbg,width,height);
             for (int i = 0; i < pluginslist.length; i++) {
-                initPlugin(i);
+                if (!initPlugin(i)) {
+                    debug("Plugin "+pluginslist[i].trim()+" has no init method.");
+                }
             }
             
             while (client.active) {
