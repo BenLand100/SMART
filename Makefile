@@ -133,6 +133,8 @@ windows64: $(JAVACLASSES) $(DIST)/$(WIN64_NAME) $(DIST)/$(JNI_WIN64_NAME)
 	
 test-linux:
 	@mkdir -p $(DIST)
+	@$(LIN_GPP) -I $(SRC_DIR) -fPIC -shared -s -o $(DIST)/example-plugin32.so test-apps/example-plugin.cpp
+	@$(LIN_GPP) -ldl -o $(DIST)/test-plugin-load32 test-apps/test-plugin-load.cpp
 	@$(LIN_GPP) -ldl -o $(DIST)/test-spawn32 test-apps/test-spawn.cpp
 	@$(LIN_GPP) -ldl -o $(DIST)/test-eios32 test-apps/test-eios.cpp
 	@$(LIN_GPP) -ldl -o $(DIST)/test-exports32 test-apps/test-exports.cpp
@@ -140,6 +142,8 @@ test-linux:
 	
 test-linux64:
 	@mkdir -p $(DIST)
+	@$(LIN64_GPP) -I $(SRC_DIR) -fPIC -shared -s -o $(DIST)/example-plugin64.so test-apps/example-plugin.cpp
+	@$(LIN64_GPP) -ldl -o $(DIST)/test-plugin-load64 test-apps/test-plugin-load.cpp
 	@$(LIN64_GPP) -ldl -o $(DIST)/test-spawn64 test-apps/test-spawn.cpp
 	@$(LIN64_GPP) -ldl -o $(DIST)/test-eios64 test-apps/test-eios.cpp
 	@$(LIN64_GPP) -ldl -o $(DIST)/test-exports64 test-apps/test-exports.cpp
@@ -156,6 +160,8 @@ test-windows:
 	
 test-windows64:
 	@mkdir -p $(DIST)
+	@$(WIN64_GPP) -I $(SRC_DIR) -shared -static-libgcc -static-libstdc++ -s -o $(DIST)/example-plugin64.dll test-apps/example-plugin.cpp
+	@$(WIN64_GPP) -static-libgcc -static-libstdc++ -o $(DIST)/test-plugin-load64.exe test-apps/test-plugin-load.cpp
 	@$(WIN64_GPP) -static-libgcc -static-libstdc++ -o $(DIST)/test-spawn64.exe test-apps/test-spawn.cpp
 	@$(WIN64_GPP) -static-libgcc -static-libstdc++ -o $(DIST)/test-eios64.exe test-apps/test-eios.cpp
 	@$(WIN64_GPP) -static-libgcc -static-libstdc++ -o $(DIST)/test-exports64.exe test-apps/test-exports.cpp
