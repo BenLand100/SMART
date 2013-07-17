@@ -155,8 +155,8 @@ extern "C" JNIEXPORT void JNICALL Java_smart_Main_setNatives(JNIEnv *env, jclass
     info.dbg = env->GetDirectBufferAddress(dbg);
     info.width = width;
     info.height = height;
-    info.getMousePos = (SMARTGetMousePos) LDPROCADDR("getMousePos");
-    info.setCapture = (SMARTSetCapture) LDPROCADDR("setCapture");
+    info.getMousePos = (_SMARTGetMousePos) LDPROCADDR("getMousePos");
+    info.setCapture = (_SMARTSetCapture) LDPROCADDR("setCapture");
     
     env->GetJavaVM(&vm);
     client = env->NewGlobalRef(_client);
@@ -171,9 +171,9 @@ extern "C" JNIEXPORT void JNICALL Java_smart_Main_setNatives(JNIEnv *env, jclass
 extern "C" JNIEXPORT jboolean JNICALL Java_smart_Main_initPlugin(JNIEnv *env, jclass cls, jint i) {
     if (plugins[i]) {
         #ifdef _WIN32
-        SMARTPluginInit init = (SMARTPluginInit) GetProcAddress((HMODULE)plugins[i],"SMARTPluginInit");
+        _SMARTPluginInit init = (_SMARTPluginInit) GetProcAddress((HMODULE)plugins[i],"SMARTPluginInit");
         #else
-        SMARTPluginInit init = (SMARTPluginInit) dlsym(plugins[i],"SMARTPluginInit");
+        _SMARTPluginInit init = (_SMARTPluginInit) dlsym(plugins[i],"SMARTPluginInit");
         #endif 
         if (init) {
             init(&info);

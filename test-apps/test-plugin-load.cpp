@@ -32,14 +32,18 @@ typedef void (*SpawnClient)(char* remote_path, char *root, char *params, int wid
 int main(int argc, char** argv) {
     #ifndef _WIN32
         #if __SIZEOF_POINTER__ == 4
+            #define PLUGIN "./example-plugin32.so"
             void* libsmart = dlopen("./libsmartremote32.so",RTLD_LAZY);
         #else
+            #define PLUGIN "./example-plugin64.so"
             void* libsmart = dlopen("./libsmartremote64.so",RTLD_LAZY);
         #endif
     #else
         #if __SIZEOF_POINTER__ == 4
+            #define PLUGIN "./example-plugin32.dll"
             HMODULE libsmart = LoadLibrary("./libsmartremote32.dll");
         #else
+            #define PLUGIN "./example-plugin64.dll"
             HMODULE libsmart = LoadLibrary("./libsmartremote64.dll");
         #endif
     #endif
@@ -55,7 +59,7 @@ int main(int argc, char** argv) {
         SpawnClient spawn = (SpawnClient)GetProcAddress(libsmart, "exp_spawnClient");
     #endif
     
-    spawn((char*)".",(char*)"http://world37.runescape.com/",(char*)",f681985954784915908",765,553,(char*)"s",NULL,NULL,NULL);
+    spawn((char*)".",(char*)"http://world37.runescape.com/",(char*)",f681985954784915908",765,553,(char*)"s",NULL,NULL,(char*)PLUGIN);
 
     return 0;
 }

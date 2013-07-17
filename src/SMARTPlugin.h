@@ -1,19 +1,18 @@
 #ifndef _SMART_PLUGIN
 #define _SMART_PLUGIN
 
-
-typedef void (*SMARTGetMousePos)(int &x, int &y);
-typedef void (*SMARTSetCapture)(bool enabled);
+typedef void (*_SMARTGetMousePos)(int &x, int &y);
+typedef void (*_SMARTSetCapture)(bool enabled);
  
 typedef struct {
-        int version;
-        void *img,*dbg;
-        int width, height;
-        SMARTGetMousePos getMousePos;
-        SMARTSetCapture setCapture;
+        int version; //Version of SMART to ensure binary compatibility
+        void *img,*dbg; //Pointer to the memory location of the img (to simba) and dbg (from simba) colors
+        int width, height; //Dimensions of client
+        _SMARTGetMousePos getMousePos; //Callback to get the current fake mouse position
+        _SMARTSetCapture setCapture; //Callback to turn set SMART's capture mode
 } SMARTInfo;
  
-typedef void (*SMARTPluginInit)(SMARTInfo *ptr);
+typedef void (*_SMARTPluginInit)(SMARTInfo *ptr);
 
 
 #endif

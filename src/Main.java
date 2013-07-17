@@ -817,17 +817,6 @@ public class Main {
 		
 		String pluginspath = exec_args[7];
 		String pluginsinfo = exec_args[8];
-		String[] pluginslist = pluginsinfo.split("[,]+");
-		setupPlugins(pluginslist.length);
-		for (int i = 0; i < pluginslist.length; i++) {
-			File pluginsfile = new File(pluginspath + "/" + pluginslist[i].trim());
-			if (pluginsfile.isFile() && loadPlugin(pluginsfile.getAbsolutePath())) {
-				debug("Plugin "+pluginslist[i].trim()+" successfully loaded.\n");
-			} else {
-				debug("Plugin "+pluginslist[i].trim()+" failed to load.\n");
-			}
-		}
-		
         
         int nVars = 7;
         int argsSpace = 4096;
@@ -871,6 +860,18 @@ public class Main {
             setID(id);
             setPort(port);
             setPaired(0);
+            
+            String[] pluginslist = pluginsinfo.split("[,]+");
+		    setupPlugins(pluginslist.length);
+		    for (int i = 0; i < pluginslist.length; i++) {
+			    File pluginsfile = new File(pluginspath + "/" + pluginslist[i].trim());
+			    if (pluginsfile.isFile() && loadPlugin(pluginsfile.getAbsolutePath())) {
+				    debug("Plugin "+pluginslist[i].trim()+" successfully loaded.\n");
+			    } else {
+				    debug("Plugin "+pluginslist[i].trim()+" failed to load.\n");
+			    }
+		    }
+            
             
             client = new Client(img,dbg,width,height,root,params,initseq,useragent,id);
             setNatives(client,img,dbg,width,height);
