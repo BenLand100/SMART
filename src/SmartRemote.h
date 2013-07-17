@@ -372,8 +372,8 @@ static char* exports[] = {
 	(char*)"exp_getFieldArrayChar", (char*)"function SmartGetFieldArrayChar(objref: " PTR"; path: string; index: integer): integer;",
 	(char*)"exp_freeObject", (char*)"procedure SmartFreeObject(obj: "PTR");",
 	(char*)"exp_stringFromString", (char*)"function SmartStringFromString(jstr: "PTR"; str: String): integer;",
-	(char*)"stringFromBytes", (char*)"function SmartStringFromBytes(bytes: "PTR"; str: String): integer;",
-    (char*)"stringFromChars", (char*)"function SmartStringFromChars(chars: "PTR"; str: String): integer;",
+	(char*)"exp_stringFromBytes", (char*)"function SmartStringFromBytes(bytes: "PTR"; str: String): integer;",
+    (char*)"exp_stringFromChars", (char*)"function SmartStringFromChars(chars: "PTR"; str: String): integer;",
     (char*)"exp_isEqual", (char*)"function SmartIsEqual(obja, objb: "PTR"): boolean;",
     (char*)"exp_isNull", (char*)"function SmartIsNull(obj: "PTR"): boolean;",
 };
