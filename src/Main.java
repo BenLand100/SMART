@@ -866,9 +866,9 @@ public class Main {
 		    for (int i = 0; i < pluginslist.length; i++) {
 			    File pluginsfile = new File(pluginspath + "/" + pluginslist[i].trim());
 			    if (pluginsfile.isFile() && loadPlugin(pluginsfile.getAbsolutePath())) {
-				    debug("Plugin "+pluginslist[i].trim()+" successfully loaded.\n");
+				    debug("Plugin "+pluginslist[i].trim()+" successfully loaded.");
 			    } else {
-				    debug("Plugin "+pluginslist[i].trim()+" failed to load.\n");
+				    debug("Plugin "+pluginslist[i].trim()+" failed to load.");
 			    }
 		    }
             

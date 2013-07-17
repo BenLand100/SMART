@@ -10,4 +10,7 @@ EXPORTS
     Java_smart_Main_loadPlugin=Java_smart_Main_loadPlugin@12
     Java_smart_Main_setNatives=Java_smart_Main_setNatives@28
     Java_smart_Main_initPlugin=Java_smart_Main_initPlugin@12
+    getMousePos
+    setCapture
+    
     

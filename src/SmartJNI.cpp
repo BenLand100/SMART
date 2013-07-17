@@ -95,6 +95,7 @@ jfieldID _point_y;
 #ifdef _WIN32
 HMODULE dllinst;
 
+extern "C" bool DllMain(HINSTANCE, int, void*) __attribute__((stdcall));
 bool DllMain(HINSTANCE instance, int reason, void* checks) {
     switch (reason) {
         case DLL_PROCESS_ATTACH:

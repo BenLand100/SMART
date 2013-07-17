@@ -147,7 +147,7 @@ test-linux64:
 	
 test-windows: 
 	@mkdir -p $(DIST)
-	@$(WIN_GPP) -I $(SRC_DIR) -shared -static-libgcc -static-libstdc++ -o $(DIST)/example-plugin32.dll test-apps/example-plugin.cpp
+	@$(WIN_GPP) -I $(SRC_DIR) -shared -static-libgcc -static-libstdc++ -s -o $(DIST)/example-plugin32.dll test-apps/example-plugin.cpp
 	@$(WIN_GPP) -static-libgcc -static-libstdc++ -o $(DIST)/test-plugin-load32.exe test-apps/test-plugin-load.cpp
 	@$(WIN_GPP) -static-libgcc -static-libstdc++ -o $(DIST)/test-spawn32.exe test-apps/test-spawn.cpp
 	@$(WIN_GPP) -static-libgcc -static-libstdc++ -o $(DIST)/test-eios32.exe test-apps/test-eios.cpp

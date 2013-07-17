@@ -24,6 +24,6 @@
 //the memory locations of the dbg and img arrays. This method is the entry point
 //that SMART will call when your plugin is loaded.
 extern "C" void SMARTPluginInit(SMARTInfo *ptr) {
-    //ptr->setCapture(false);
+    ptr->setCapture(false);
     std::cout << "HELLO WORLD! The image is at " << ptr->img << " and the debug is at " << ptr->dbg << "\n";
 }
