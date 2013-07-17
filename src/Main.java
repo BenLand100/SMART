@@ -795,6 +795,14 @@ public class Main {
         return funid;
     }
     
+    private static native void setupPlugins(int num);
+    
+    private static native boolean loadPlugin(String path);
+    
+    private static native void setNatives(Client client, ByteBuffer img, ByteBuffer dbg, int w, int h);
+    
+    private static native boolean initPlugin(int idx);
+    
     public static void main(String[] exec_args) {
         if (exec_args.length != 9) System.exit(1);
          
@@ -809,17 +817,14 @@ public class Main {
 		
 		String pluginspath = exec_args[7];
 		String pluginsinfo = exec_args[8];
-		
-		if (pluginsinfo.length() > 0) {	
-		    String[] pluginslist = pluginsinfo.split("[,]+");
-			for (int i = 0; i < pluginslist.length; i++) {
-				File pluginsfile = new File(pluginspath + "/" + pluginslist[i].trim());
-				if (pluginsfile.isFile()) {
-					System.load(pluginsfile.getAbsolutePath());
-					debug("Smart_"+pluginslist[i].trim()+" Successfully Loaded!\n");
-				} else {
-					debug("File Missing: Smart_"+pluginslist[i].trim()+" Failed To Load!\n");
-				}
+		String[] pluginslist = pluginsinfo.split("[,]+");
+		setupPlugins(pluginslist.length);
+		for (int i = 0; i < pluginslist.length; i++) {
+			File pluginsfile = new File(pluginspath + "/" + pluginslist[i].trim());
+			if (pluginsfile.isFile() && loadPlugin(pluginsfile.getAbsolutePath())) {
+				debug("Smart_"+pluginslist[i].trim()+" Successfully Loaded!\n");
+			} else {
+				debug("File Missing: Smart_"+pluginslist[i].trim()+" Failed To Load!\n");
 			}
 		}
 		
@@ -868,6 +873,10 @@ public class Main {
             setPaired(0);
             
             client = new Client(img,dbg,width,height,root,params,initseq,useragent,id);
+            setNatives(client,img,dbg,width,height);
+            for (int i = 0; i < pluginslist.length; i++) {
+                initPlugin(i);
+            }
             
             while (client.active) {
                 Socket ctrl = listen.accept();

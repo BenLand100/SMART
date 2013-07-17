@@ -6,3 +6,8 @@ EXPORTS
     Java_smart_Main_freeGlobalRef=Java_smart_Main_freeGlobalRef@12
     Java_smart_Main_pathFromAddress=Java_smart_Main_pathFromAddress@12
     Java_smart_Main_indexFromAddress=Java_smart_Main_indexFromAddress@16
+    Java_smart_Main_setupPlugins=Java_smart_Main_setupPlugins@12
+    Java_smart_Main_loadPlugin=Java_smart_Main_loadPlugin@12
+    Java_smart_Main_setNatives=Java_smart_Main_setNatives@28
+    Java_smart_Main_initPlugin=Java_smart_Main_initPlugin@12
+    

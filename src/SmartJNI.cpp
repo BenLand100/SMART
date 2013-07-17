@@ -28,6 +28,7 @@
     #include <unistd.h>
     #include <string.h>
     #include <sys/types.h>
+    #include <dlfcn.h>
 #else
     #if __SIZEOF_POINTER__ == 4
        #define _WIN32_WINNT 0x0501
@@ -78,5 +79,107 @@ extern "C" JNIEXPORT jint JNICALL Java_smart_Main_indexFromAddress(JNIEnv *env, 
     data += sizeof(jobject); //skip the object reference
     data += strlen(data)+1; //skip the path
     return ((int*)data)[idx];
+}
+
+#include "SMARTPlugin.h"
+
+SMARTInfo info;
+void **plugins;
+int plugin_c,plugin_i;
+JavaVM *vm;
+jobject client;
+jmethodID _client_getMousePos;
+jmethodID _client_setCapture;
+jfieldID _point_x;
+jfieldID _point_y;
+#ifdef _WIN32
+HMODULE dllinst;
+
+bool DllMain(HINSTANCE instance, int reason, void* checks) {
+    switch (reason) {
+        case DLL_PROCESS_ATTACH:
+            dllinst = instance;
+            return true;
+        case DLL_THREAD_ATTACH:
+            return true;
+        case DLL_PROCESS_DETACH:
+            return true;
+        case DLL_THREAD_DETACH:
+            return true;
+    }
+    return false;
+}
+#endif
+
+#define AttachVM(env) JNIEnv *env; vm->AttachCurrentThreadAsDaemon((void**)&env,0);
+
+extern "C" void getMousePos(int &x, int &y) {
+    AttachVM(env);
+    jobject pt = env->CallObjectMethod(client, _client_getMousePos);
+    x = env->GetIntField(pt, _point_x);
+    y = env->GetIntField(pt, _point_y);
+    env->DeleteLocalRef(pt);
+}
+
+extern "C" void setCapture(bool enabled) {
+    AttachVM(env);
+    env->CallVoidMethod(client, _client_setCapture, enabled);
+}
+
+extern "C" JNIEXPORT void JNICALL Java_smart_Main_setupPlugins(JNIEnv *env, jclass cls, jint num) {
+    plugins = new void*[num];
+    for (int i = 0; i < num; i++) plugins[i] = 0;
+    plugin_c = num;
+    plugin_i = 0;
+}
+    
+extern "C" JNIEXPORT jboolean JNICALL Java_smart_Main_loadPlugin(JNIEnv *env, jclass cls, jstring jpath) {
+    const char *path = env->GetStringUTFChars(jpath, 0);
+    #ifdef _WIN32
+    plugins[plugin_i] = LoadLibrary(path);
+    #else
+    plugins[plugin_i] = dlopen(path, RTLD_LAZY);
+    #endif
+    env->ReleaseStringUTFChars(jpath, path);
+    return plugins[plugin_i++] != NULL;
+}
+    
+#ifdef _WIN32
+#define LDPROCADDR(name) GetProcAddress(dllinst,name)
+#else
+#define LDPROCADDR(name) dlsym(RTLD_DEFAULT,name)
+#endif
+extern "C" JNIEXPORT void JNICALL Java_smart_Main_setNatives(JNIEnv *env, jclass cls, jobject _client, jobject img, jobject dbg, jint width, jint height) {
+    info.version = 0x08010000;
+    info.img = env->GetDirectBufferAddress(img);
+    info.dbg = env->GetDirectBufferAddress(dbg);
+    info.width = width;
+    info.height = height;
+    info.getMousePos = (SMARTGetMousePos) LDPROCADDR("getMousePos");
+    info.setCapture = (SMARTSetCapture) LDPROCADDR("setCapture");
+    
+    env->GetJavaVM(&vm);
+    client = env->NewGlobalRef(_client);
+    jclass client_class = env->FindClass("smart/Client");
+    _client_getMousePos = env->GetMethodID(client_class, "getMousePos", "()Ljava/awt/Point;");
+    _client_setCapture = env->GetMethodID(client_class, "setCapture", "(Z)V");
+    jclass point_class = env->FindClass("java/awt/Point");
+    _point_x = env->GetFieldID(point_class, "x", "I");
+    _point_y = env->GetFieldID(point_class, "y", "I");
+}
+    
+extern "C" JNIEXPORT jboolean JNICALL Java_smart_Main_initPlugin(JNIEnv *env, jclass cls, jint i) {
+    if (plugins[i]) {
+        #ifdef _WIN32
+        SMARTPluginInit init = (SMARTPluginInit) GetProcAddress((HMODULE)plugins[i],"SMARTPluginInit");
+        #else
+        SMARTPluginInit init = (SMARTPluginInit) dlsym(plugins[i],"SMARTPluginInit");
+        #endif 
+        if (init) {
+            init(&info);
+            return true;
+        }
+    }
+    return false;
 }
 
