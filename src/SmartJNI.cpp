@@ -90,6 +90,7 @@ JavaVM *vm;
 jobject client;
 jmethodID _client_getMousePos;
 jmethodID _client_setCapture;
+jmethodID _client_isDebugEnabled;
 jfieldID _point_x;
 jfieldID _point_y;
 #ifdef _WIN32
@@ -127,6 +128,11 @@ extern "C" void setCapture(bool enabled) {
     env->CallVoidMethod(client, _client_setCapture, enabled);
 }
 
+extern "C" bool isDebugEnabled() {
+	AttachVM(env);
+	env->CallBooleanMethod(client, _client_isDebugEnabled);
+}
+
 extern "C" JNIEXPORT void JNICALL Java_smart_Main_setupPlugins(JNIEnv *env, jclass cls, jint num) {
     plugins = new void*[num];
     for (int i = 0; i < num; i++) plugins[i] = 0;
@@ -158,12 +164,14 @@ extern "C" JNIEXPORT void JNICALL Java_smart_Main_setNatives(JNIEnv *env, jclass
     info.height = height;
     info.getMousePos = (_SMARTGetMousePos) LDPROCADDR("getMousePos");
     info.setCapture = (_SMARTSetCapture) LDPROCADDR("setCapture");
+	info.isDebugOn = (_SMARTIsDebugEnabled) LDPROCADDR("isDebugEnabled");
     
     env->GetJavaVM(&vm);
     client = env->NewGlobalRef(_client);
     jclass client_class = env->FindClass("smart/Client");
     _client_getMousePos = env->GetMethodID(client_class, "getMousePos", "()Ljava/awt/Point;");
     _client_setCapture = env->GetMethodID(client_class, "setCapture", "(Z)V");
+	_client_isDebugEnabled = env->GetMethodID(client_class, "isDebugEnabled", "()Z");
     jclass point_class = env->FindClass("java/awt/Point");
     _point_x = env->GetFieldID(point_class, "x", "I");
     _point_y = env->GetFieldID(point_class, "y", "I");

@@ -623,6 +623,13 @@ public class Client implements ActionListener, ChangeListener {
             debugbtn.setText("Show Debug");
         }
     }
+	
+	/**
+	 * Called by external plugins for determining whether to render or not.
+	 */
+	public boolean isDebugEnabled() {
+		return debuggfx;
+	}
 
     public void setCapture(boolean on) {
         capture = on;
@@ -741,6 +748,4 @@ public class Client implements ActionListener, ChangeListener {
         }
         return o;
     }
-    
-
 }

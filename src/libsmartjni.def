@@ -12,5 +12,6 @@ EXPORTS
     Java_smart_Main_initPlugin=Java_smart_Main_initPlugin@12
     getMousePos
     setCapture
+	isDebugEnabled
     
     
