@@ -345,14 +345,14 @@ static char* exports[] = {
 	(char*)"exp_getFieldArray3DShort", (char*)"function SmartGetFieldArray3DShort(objref: " PTR"; path: string; x, y, z: integer): integer;",
 	(char*)"exp_getFieldArray3DInt", (char*)"function SmartGetFieldArray3DInt(objref: " PTR"; path: string; x, y, z: integer): integer;",
 	(char*)"exp_getFieldArray3DFloat", (char*)"function SmartGetFieldArray3DFloat(objref: " PTR"; path: string; x, y, z: integer): extended;",
-	(char*)"exp_getFieldArray3DDouble", (char*)"function SmartGetFieldArray3DByte(objref: " PTR"; path: string; x, y, z: integer): extended;",
+	(char*)"exp_getFieldArray3DDouble", (char*)"function SmartGetFieldArray3DDouble(objref: " PTR"; path: string; x, y, z: integer): extended;",
 	(char*)"exp_getFieldArray3DBool", (char*)"function SmartGetFieldArray3DBoolean(objref: " PTR"; path: string; x, y, z: integer): boolean;",
 	(char*)"exp_getFieldArray3DLongH", (char*)"function SmartGetFieldArray3DLongH(objref: " PTR"; path: string; x, y, z: integer): integer;",
 	(char*)"exp_getFieldArray3DLongL", (char*)"function SmartGetFieldArray3DLongL(objref: " PTR"; path: string; x, y, z: integer): integer;",
 	(char*)"exp_getFieldArray2DObject", (char*)"function SmartGetFieldArray2DObject(objref: " PTR"; path: string; x, y: integer): " PTR";",
 	(char*)"exp_getFieldArray2DInt", (char*)"function SmartGetFieldArray2DInt(objref: " PTR"; path: string; x, y: integer): integer;",
 	(char*)"exp_getFieldArray2DDouble", (char*)"function SmartGetFieldArray2DDouble(objref: " PTR"; path: string; x, y: integer): extended;",
-	(char*)"exp_getFieldArray2DFloat", (char*)"function SmartGetFieldArray2DInt(objref: " PTR"; path: string; x, y: integer): extended;",
+	(char*)"exp_getFieldArray2DFloat", (char*)"function SmartGetFieldArray2DFloat(objref: " PTR"; path: string; x, y: integer): extended;",
 	(char*)"exp_getFieldArray2DBool", (char*)"function SmartGetFieldArray2DBoolean(objref: " PTR"; path: string; x, y: integer): boolean;",
 	(char*)"exp_getFieldArray2DLongH", (char*)"function SmartGetFieldArray2DLongH(objref: " PTR"; path: string; x, y: integer): integer;",
 	(char*)"exp_getFieldArray2DLongL", (char*)"function SmartGetFieldArray2DLongL(objref: " PTR"; path: string; x, y: integer): integer;",
@@ -379,4 +379,3 @@ static char* exports[] = {
 };
 
 #endif	/* _LOCAL_H */
-
