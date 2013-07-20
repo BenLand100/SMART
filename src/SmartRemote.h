@@ -345,7 +345,7 @@ static char* exports[] = {
 	(char*)"exp_getFieldArray3DShort", (char*)"function SmartGetFieldArray3DShort(objref: " PTR"; path: string; x, y, z: integer): integer;",
 	(char*)"exp_getFieldArray3DInt", (char*)"function SmartGetFieldArray3DInt(objref: " PTR"; path: string; x, y, z: integer): integer;",
 	(char*)"exp_getFieldArray3DFloat", (char*)"function SmartGetFieldArray3DFloat(objref: " PTR"; path: string; x, y, z: integer): extended;",
-	(char*)"exp_getFieldArray3DDouble", (char*)"function SmartGetFieldArray3DByte(objref: " PTR"; path: string; x, y, z: integer): extended;",
+	(char*)"exp_getFieldArray3DDouble", (char*)"function SmartGetFieldArray3DDouble(objref: " PTR"; path: string; x, y, z: integer): extended;",
 	(char*)"exp_getFieldArray3DBool", (char*)"function SmartGetFieldArray3DBoolean(objref: " PTR"; path: string; x, y, z: integer): boolean;",
 	(char*)"exp_getFieldArray3DLongH", (char*)"function SmartGetFieldArray3DLongH(objref: " PTR"; path: string; x, y, z: integer): integer;",
 	(char*)"exp_getFieldArray3DLongL", (char*)"function SmartGetFieldArray3DLongL(objref: " PTR"; path: string; x, y, z: integer): integer;",
