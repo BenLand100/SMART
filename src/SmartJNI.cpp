@@ -90,6 +90,8 @@ JavaVM *vm;
 jobject client;
 jmethodID _client_getMousePos;
 jmethodID _client_setCapture;
+jmethodID _client_defineNativeButton;
+jmethodID _client_replaceCaptureButtons;
 jfieldID _point_x;
 jfieldID _point_y;
 #ifdef _WIN32
@@ -164,9 +166,16 @@ extern "C" JNIEXPORT void JNICALL Java_smart_Main_setNatives(JNIEnv *env, jclass
     jclass client_class = env->FindClass("smart/Client");
     _client_getMousePos = env->GetMethodID(client_class, "getMousePos", "()Ljava/awt/Point;");
     _client_setCapture = env->GetMethodID(client_class, "setCapture", "(Z)V");
+    _client_defineNativeButton = env->GetMethodID(client_class, "defineNativeButton", "(Ljava/lang/String;ILjava/nio/ByteBuffer;)V");
+    _client_replaceCaptureButtons = env->GetMethodID(client_class, "replaceCaptureButtons", "()V");
     jclass point_class = env->FindClass("java/awt/Point");
     _point_x = env->GetFieldID(point_class, "x", "I");
     _point_y = env->GetFieldID(point_class, "y", "I");
+}
+    
+extern "C" JNIEXPORT void JNICALL Java_smart_Main_nativeButton(JNIEnv *env, jclass cls, jobject callback, jint id, jboolean state) {
+    _SMARTButtonPressed buttonproc = *((_SMARTButtonPressed*)env->GetDirectBufferAddress(callback));
+    buttonproc(id,state);
 }
     
 extern "C" JNIEXPORT jboolean JNICALL Java_smart_Main_initPlugin(JNIEnv *env, jclass cls, jint i) {
@@ -177,7 +186,22 @@ extern "C" JNIEXPORT jboolean JNICALL Java_smart_Main_initPlugin(JNIEnv *env, jc
         _SMARTPluginInit init = (_SMARTPluginInit) dlsym(plugins[i],"SMARTPluginInit");
         #endif 
         if (init) {
-            init(&info);
+            bool replace = false;
+            int buttonc = 0;
+            char **buttonv = NULL;
+            int *buttonid = NULL;
+            _SMARTButtonPressed *proc = new _SMARTButtonPressed;
+            *proc = NULL;
+            init(&info,&replace,&buttonc,&buttonv,&buttonid,proc);
+            if (replace) {
+                env->CallVoidMethod(client,_client_replaceCaptureButtons);
+            }
+            jobject callback = env->NewDirectByteBuffer(proc,sizeof(_SMARTButtonPressed));
+            for (int i = 0; i < buttonc; i++) {
+                std::cout << buttonv[i] << '\n';
+                jstring cap = env->NewStringUTF(buttonv[i]);
+                env->CallVoidMethod(client,_client_defineNativeButton,cap,buttonid[i],callback);
+            }
             return true;
         }
     }

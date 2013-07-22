@@ -20,10 +20,22 @@
 #include "SMARTPlugin.h"
 #include <iostream>
 
-//This example does nothing but turn SMART's internal capture off and write out
-//the memory locations of the dbg and img arrays. This method is the entry point
-//that SMART will call when your plugin is loaded.
-extern "C" void SMARTPluginInit(SMARTInfo *ptr) {
-    ptr->setCapture(false);
+void button_callback(int id, bool state) {
+    std::cout << "Button Pressed! " << id << ' ' << state << '\n';
+}
+
+extern "C" void SMARTPluginInit(SMARTInfo *ptr, bool *replace, int *buttonc, char ***buttonv, int **buttonid, _SMARTButtonPressed *buttonproc) {
     std::cout << "HELLO WORLD! The image is at " << ptr->img << " and the debug is at " << ptr->dbg << "\n";
+    *replace = true;
+    char **caps = new char*[2];
+    caps[0] = "Disable IDs_Enable IDs";
+    caps[1] = "Disable Debug_Enable Debug";
+    int *ids = new int[2];
+    ids[0] = 100;
+    ids[1] = 101;
+    
+    *buttonc = 2;
+    *buttonv = caps;
+    *buttonid = ids;
+    *buttonproc = &button_callback;
 }

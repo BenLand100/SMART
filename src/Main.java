@@ -803,6 +803,8 @@ public class Main {
     
     private static native boolean initPlugin(int idx);
     
+    public static native void nativeButton(ByteBuffer callback, int id, boolean state); 
+    
     public static void main(String[] exec_args) {
         if (exec_args.length != 9) System.exit(1);
          

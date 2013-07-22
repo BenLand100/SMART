@@ -84,7 +84,8 @@ public class Client implements ActionListener, ChangeListener {
     private ClassLoader gameLoader;
     private Applet clientApplet;
     private JFrame clientFrame;
-    BufferedImage buffer;
+    private JPanel south;
+    private BufferedImage buffer;
     private EventNazi nazi;
     private IntBuffer nativeBuff;
     private IntBuffer nativeDebug;
@@ -430,6 +431,54 @@ public class Client implements ActionListener, ChangeListener {
         }
         Main.cleanup();
     }
+    
+    private static class NativeButton {
+        public String true_cap, false_cap;
+        public int id;
+        public ByteBuffer callback;
+        public boolean state = true;
+        
+        public NativeButton(String cap, int id, ByteBuffer callback) {
+            String[] caps = cap.split("_");
+            true_cap = caps[0];
+            false_cap = caps[1];
+            this.id = id;
+            this.callback = callback;
+        }
+        
+        public boolean equals(Object o) {
+            if (o instanceof NativeButton) {
+                NativeButton b = (NativeButton)o;
+                return b.true_cap.equals(true_cap) && b.false_cap.equals(false_cap) && b.id == id && b.callback.equals(callback);
+            }
+            return false;
+        }
+        
+        public int hashCode() {
+            return true_cap.hashCode() ^ false_cap.hashCode() ^ id ^ callback.hashCode() ^ 0xF0F0F0F0;
+        }
+        
+    }
+    
+    private Hashtable<JButton, NativeButton> nativeButtons = new Hashtable<JButton,NativeButton>();
+
+    public void replaceCaptureButtons() {
+        setCapture(false);
+        Main.debug("Removing internal capture buttons");
+        south.remove(capturebtn);
+        south.remove(gfxbtn);
+        south.remove(debugbtn);
+        clientFrame.remove(refreshSlider);
+    }
+
+    public void defineNativeButton(String caption, int id, ByteBuffer callback) {
+        Main.debug("Adding button: " + caption + " " + id);
+        NativeButton n = new NativeButton(caption,id,callback);
+        JButton b = new JButton(n.true_cap);
+        b.addActionListener(this);
+        south.add(b);
+        nativeButtons.put(b,n);
+    }
 
     /**
      * Creates the frame that contains the RuneScape client and grabs the game's
@@ -485,7 +534,7 @@ public class Client implements ActionListener, ChangeListener {
         refreshSlider.addChangeListener(this);
         refresh = 500 / refreshSlider.getValue() + 20;
         clientFrame.add(refreshSlider, BorderLayout.EAST);
-        JPanel south = new JPanel();
+        south = new JPanel();
         south.setBorder(new EmptyBorder(3, 3, 3, 3));
         south.setLayout(new GridLayout());
         clientFrame.add(south, BorderLayout.SOUTH);
@@ -655,6 +704,14 @@ public class Client implements ActionListener, ChangeListener {
             setDebug(!debuggfx);
         } else if (e.getSource() == capturebtn) {
             setCapture(!capture);
+        } else {
+            NativeButton n = nativeButtons.get(e.getSource());
+            if (n != null) {
+                JButton b = (JButton) e.getSource();
+                n.state = !n.state;
+                b.setText(n.state ? n.true_cap : n.false_cap);
+                Main.nativeButton(n.callback,n.id,n.state);
+            }
         }
     }
 
