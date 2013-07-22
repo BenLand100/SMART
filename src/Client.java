@@ -422,8 +422,11 @@ public class Client implements ActionListener, ChangeListener {
             }
             BlockingEventQueue.removeComponent(canvas);
             clientFrame.setVisible(false);
-            clientApplet.stop();
-            clientApplet.destroy();
+            //These are technically to play nice with applets, but the System.exit
+            //in Main.cleanup() (which is to make sure native stuff is cleaned up)
+            //will suffice.
+            //clientApplet.stop();
+            //clientApplet.destroy();
             clientApplet = null;
             clientFrame = null;
         } else {
@@ -478,7 +481,6 @@ public class Client implements ActionListener, ChangeListener {
         JButton b = new JButton(n.true_cap);
         b.addActionListener(this);
         south.add(b);
-        clientFrame.pack();
         nativeButtons.put(b,n);
     }
 

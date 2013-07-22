@@ -178,6 +178,7 @@ extern "C" JNIEXPORT void JNICALL Java_smart_Main_nativeButton(JNIEnv *env, jcla
     buttonproc(id,state);
 }
     
+//this plays fast and loose with some memory, but only a handful of bytes
 extern "C" JNIEXPORT jboolean JNICALL Java_smart_Main_initPlugin(JNIEnv *env, jclass cls, jint i) {
     if (plugins[i]) {
         #ifdef _WIN32
@@ -201,6 +202,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_smart_Main_initPlugin(JNIEnv *env, jc
                 std::cout << buttonv[i] << '\n';
                 jstring cap = env->NewStringUTF(buttonv[i]);
                 env->CallVoidMethod(client,_client_defineNativeButton,cap,buttonid[i],callback);
+                env->DeleteLocalRef(cap);
             }
             return true;
         }

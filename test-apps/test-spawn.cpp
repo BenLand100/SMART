@@ -38,9 +38,9 @@ int main(int argc, char** argv) {
         #endif
     #else
         #if __SIZEOF_POINTER__ == 4
-            HMODULE libsmart = LoadLibrary("./libsmartremote32.dll");
+            HMODULE libsmart = LoadLibrary(".\\libsmartremote32.dll");
         #else
-            HMODULE libsmart = LoadLibrary("./libsmartremote64.dll");
+            HMODULE libsmart = LoadLibrary(".\\libsmartremote64.dll");
         #endif
     #endif
     cout << "Library: " << libsmart << '\n';

@@ -54,9 +54,9 @@ int main(int argc, char** argv) {
         #endif
     #else
         #if __SIZEOF_POINTER__ == 4
-            HMODULE libsmart = LoadLibrary((char*)"./libsmartremote32.dll");
+            HMODULE libsmart = LoadLibrary((char*)".\\libsmartremote32.dll");
         #else
-            HMODULE libsmart = LoadLibrary((char*)"./libsmartremote64.dll");
+            HMODULE libsmart = LoadLibrary((char*)".\\libsmartremote64.dll");
         #endif
     #endif
     cout << "Library: " << libsmart << '\n';
@@ -78,11 +78,14 @@ int main(int argc, char** argv) {
     cout << "ABI: " << version() << " Count: " << (n = count()) << '\n';
     char *def = new char[1024];
     void *addr;
+    bool bad = false;
     for (int i = 0; i < n; i++) {
         info(i,addr,def);
+        if (!addr) bad = true;
         cout << i << ' ' << addr << ' ' << def << '\n';
     }
     delete def;
+    cout << (bad ? "There were problems importing methods" : "Methods imported successfully") << '\n'; 
     return 0;
 }
 

@@ -863,7 +863,7 @@ public class Main {
             setPort(port);
             setPaired(0);
             
-            String[] pluginslist = pluginsinfo.split("[,]+");
+            String[] pluginslist = pluginsinfo.length() > 0 ? pluginsinfo.split("[,]+") : new String[0];
 		    setupPlugins(pluginslist.length);
 		    for (int i = 0; i < pluginslist.length; i++) {
 			    File pluginsfile = new File(pluginspath + "/" + pluginslist[i].trim());

@@ -26,27 +26,6 @@
 #endif
 
 using namespace std;
-
-typedef void* Target; 
-typedef union { 
-	struct { char b, g, r, a; }; 
-	unsigned int color; 
-} rgb;
- 
-typedef Target (*EIOS_RequestTarget)(char *initargs) __attribute__((stdcall)); 
-typedef void (*EIOS_ReleaseTarget)(Target t) __attribute__((stdcall)); 
-typedef void (*EIOS_GetTargetDimensions)(Target t, int* width, int* height) __attribute__((stdcall)); 
-typedef rgb* (*EIOS_GetImageBuffer)(Target t) __attribute__((stdcall)); 
-typedef void (*EIOS_UpdateImageBuffer)(Target t) __attribute__((stdcall)); 
-typedef void (*EIOS_GetMousePosition)(Target t, int* x, int* y) __attribute__((stdcall)); 
-typedef void (*EIOS_MoveMouse)(Target t, int x, int y) __attribute__((stdcall)); 
-typedef void (*EIOS_HoldMouse)(Target t, int x, int y, int button) __attribute__((stdcall)); 
-typedef void (*EIOS_ReleaseMouse)(Target t, int x, int y, int button) __attribute__((stdcall)); 
-typedef bool (*EIOS_IsMouseHeld)(Target t, int button) __attribute__((stdcall)); 
-typedef void (*EIOS_SendString)(Target t, char* str) __attribute__((stdcall)); 
-typedef void (*EIOS_HoldKey)(Target t, int key) __attribute__((stdcall)); 
-typedef void (*EIOS_ReleaseKey)(Target t, int key) __attribute__((stdcall)); 
-typedef bool (*EIOS_IsKeyHeld)(Target t, int key) __attribute__((stdcall)); 
  
 int main(int argc, char** argv) {
     #ifndef _WIN32
@@ -57,9 +36,9 @@ int main(int argc, char** argv) {
         #endif
     #else
         #if __SIZEOF_POINTER__ == 4
-            HMODULE libsmart = LoadLibrary("./libsmartremote32.dll");
+            HMODULE libsmart = LoadLibrary(".\\libsmartremote32.dll");
         #else
-            HMODULE libsmart = LoadLibrary("./libsmartremote64.dll");
+            HMODULE libsmart = LoadLibrary(".\\libsmartremote64.dll");
         #endif
     #endif
     cout << "Library: " << libsmart << '\n';
@@ -69,7 +48,7 @@ int main(int argc, char** argv) {
     #endif
     cout << "Checking for EIOS methods\n";
     
-    #define NumMethods 14
+    #define NumMethods 15
     static char* methods[] = {
         (char*)"EIOS_RequestTarget",
         (char*)"EIOS_ReleaseTarget",
@@ -81,6 +60,7 @@ int main(int argc, char** argv) {
         (char*)"EIOS_HoldMouse",
         (char*)"EIOS_ReleaseMouse",
         (char*)"EIOS_IsMouseHeld",
+        (char*)"EIOS_ScrollMouse",
         (char*)"EIOS_SendString",
         (char*)"EIOS_HoldKey",
         (char*)"EIOS_ReleaseKey",

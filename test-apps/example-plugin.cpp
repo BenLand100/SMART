@@ -28,8 +28,8 @@ extern "C" void SMARTPluginInit(SMARTInfo *ptr, bool *replace, int *buttonc, cha
     std::cout << "HELLO WORLD! The image is at " << ptr->img << " and the debug is at " << ptr->dbg << "\n";
     
     char **caps = new char*[2];
-    caps[0] = "Disable IDs_Enable IDs";
-    caps[1] = "Disable Debug_Enable Debug";
+    caps[0] = (char*)"Disable IDs_Enable IDs";
+    caps[1] = (char*)"Disable Debug_Enable Debug";
     int *ids = new int[2];
     ids[0] = 100;
     ids[1] = 101;
