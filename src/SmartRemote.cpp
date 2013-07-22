@@ -536,6 +536,15 @@ void exp_setCapture(bool enabled) {
     }
 }
 
+void exp_setNativeBtn(int plugid, int btnid, bool state) {
+    if (local) {
+        ((int*)(local->data->args))[0] = plugid;
+        ((int*)(local->data->args))[1] = btnid;
+        ((int*)(local->data->args))[2] = state;
+        callClient(local,setNativeBtn);
+    }
+}
+
 void exp_setGraphics(bool enabled) {
     if (local) {
         *(bool*)(local->data->args) = enabled;

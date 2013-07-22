@@ -166,7 +166,7 @@ extern "C" JNIEXPORT void JNICALL Java_smart_Main_setNatives(JNIEnv *env, jclass
     jclass client_class = env->FindClass("smart/Client");
     _client_getMousePos = env->GetMethodID(client_class, "getMousePos", "()Ljava/awt/Point;");
     _client_setCapture = env->GetMethodID(client_class, "setCapture", "(Z)V");
-    _client_defineNativeButton = env->GetMethodID(client_class, "defineNativeButton", "(Ljava/lang/String;ILjava/nio/ByteBuffer;)V");
+    _client_defineNativeButton = env->GetMethodID(client_class, "defineNativeButton", "(Ljava/lang/String;IILjava/nio/ByteBuffer;)V");
     _client_replaceCaptureButtons = env->GetMethodID(client_class, "replaceCaptureButtons", "()V");
     jclass point_class = env->FindClass("java/awt/Point");
     _point_x = env->GetFieldID(point_class, "x", "I");
@@ -198,10 +198,9 @@ extern "C" JNIEXPORT jboolean JNICALL Java_smart_Main_initPlugin(JNIEnv *env, jc
                 env->CallVoidMethod(client,_client_replaceCaptureButtons);
             }
             jobject callback = env->NewDirectByteBuffer(proc,sizeof(_SMARTButtonPressed));
-            for (int i = 0; i < buttonc; i++) {
-                std::cout << buttonv[i] << '\n';
-                jstring cap = env->NewStringUTF(buttonv[i]);
-                env->CallVoidMethod(client,_client_defineNativeButton,cap,buttonid[i],callback);
+            for (int j = 0; j < buttonc; j++) {
+                jstring cap = env->NewStringUTF(buttonv[j]);
+                env->CallVoidMethod(client,_client_defineNativeButton,cap,buttonid[j],i,callback);
                 env->DeleteLocalRef(cap);
             }
             return true;

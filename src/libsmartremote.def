@@ -25,6 +25,7 @@ EXPORTS
     exp_setTransparentColor
     exp_setGraphics
     exp_setCapture
+    exp_setNativeBtn
     exp_setRefresh
     exp_windMouse
     exp_setEnabled

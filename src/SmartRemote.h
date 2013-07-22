@@ -83,8 +83,9 @@ typedef struct {
 #define releaseKey          FirstFunc+21
 #define isKeyDown           FirstFunc+22
 #define setCapture          FirstFunc+23
+#define setNativeBtn        FirstFunc+24
 
-#define ReflectionFuncs			 FirstFunc+24
+#define ReflectionFuncs			 FirstFunc+25
 #define getFieldObject           ReflectionFuncs+0
 #define isPathValid              ReflectionFuncs+1
 #define getFieldBoolean          ReflectionFuncs+2
@@ -235,6 +236,7 @@ extern "C" void exp_holdKey(int code);
 extern "C" void exp_releaseKey(int code);
 extern "C" bool exp_isKeyDown(int code);
 extern "C" void exp_setCapture(bool enabled);
+extern "C" void exp_setNativeBtn(int plugid, int btnid, bool state);
 
 extern "C" void* exp_getFieldObject(void* obj, char* path);
 extern "C" bool exp_isPathValid(void* obj, char* path);
@@ -295,7 +297,7 @@ extern "C" bool exp_isEqual(void* a, void* b);
 #endif
 
 //Exports for Local
-#define NumExports 79
+#define NumExports 80
 static char* exports[] = {
     (char*)"exp_clientID", (char*)"function SmartClientID(idx: integer): integer;",
     (char*)"exp_getClients", (char*)"function SmartGetClients(only_unpaired: boolean): integer;",
@@ -329,6 +331,7 @@ static char* exports[] = {
     (char*)"exp_releaseKey", (char*)"procedure SmartReleaseKey(Code: Integer);",
     (char*)"exp_isKeyDown", (char*)"function SmartIsKeyDown(Code: Integer): Boolean;",
     (char*)"exp_setCapture", (char*)"procedure SmartSetCapture(enabled: boolean);",
+    (char*)"exp_setNativeBtn", (char*)"procedure SmartSetNativeButton(plugid,btnid: integer; state: boolean);",
     (char*)"exp_getFieldObject", (char*)"function SmartGetFieldObject(objref: "PTR"; path: string): "PTR";",
     (char*)"exp_isPathValid", (char*)"function SmartIsPathValid(objref: "PTR"; path: string): boolean;",
     (char*)"exp_getFieldBoolean", (char*)"function SmartGetFieldBoolean(objref: "PTR"; path: string): boolean;",

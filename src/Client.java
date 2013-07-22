@@ -436,33 +436,46 @@ public class Client implements ActionListener, ChangeListener {
     }
     
     private static class NativeButton {
-        public String true_cap, false_cap;
-        public int id;
-        public ByteBuffer callback;
-        public boolean state = true;
+        public final String true_cap, false_cap;
+        public final int btnid,plugid;
+        public final ByteBuffer callback;
+        public final JButton javabtn;
+        private boolean state = true;
         
-        public NativeButton(String cap, int id, ByteBuffer callback) {
+        public NativeButton(String cap, int btnid, int plugid, ByteBuffer callback) {
             String[] caps = cap.split("_");
             true_cap = caps[0];
             false_cap = caps[1];
-            this.id = id;
+            this.btnid = btnid;
+            this.plugid = plugid;
             this.callback = callback;
+            javabtn = new JButton(true_cap);
         }
         
         public boolean equals(Object o) {
             if (o instanceof NativeButton) {
                 NativeButton b = (NativeButton)o;
-                return b.true_cap.equals(true_cap) && b.false_cap.equals(false_cap) && b.id == id && b.callback.equals(callback);
+                return b.true_cap.equals(true_cap) && b.false_cap.equals(false_cap) && b.plugid == plugid && b.btnid == btnid && b.callback.equals(callback);
             }
             return false;
         }
         
         public int hashCode() {
-            return true_cap.hashCode() ^ false_cap.hashCode() ^ id ^ callback.hashCode() ^ 0xF0F0F0F0;
+            return true_cap.hashCode() ^ false_cap.hashCode() ^ btnid ^ plugid ^ callback.hashCode();
+        }
+        
+        public void setState(boolean state) {
+            this.state = state;
+            javabtn.setText(state ? true_cap : false_cap);
+        }
+        
+        public boolean getState() {
+            return state;
         }
         
     }
     
+    private Hashtable<Point, NativeButton> plugButtons = new Hashtable<Point,NativeButton>();
     private Hashtable<JButton, NativeButton> nativeButtons = new Hashtable<JButton,NativeButton>();
 
     public void replaceCaptureButtons() {
@@ -475,13 +488,13 @@ public class Client implements ActionListener, ChangeListener {
         clientFrame.pack();
     }
 
-    public void defineNativeButton(String caption, int id, ByteBuffer callback) {
-        Main.debug("Adding button: " + caption + " " + id);
-        NativeButton n = new NativeButton(caption,id,callback);
-        JButton b = new JButton(n.true_cap);
-        b.addActionListener(this);
-        south.add(b);
-        nativeButtons.put(b,n);
+    public void defineNativeButton(String caption, int btnid, int plugid, ByteBuffer callback) {
+        Main.debug("Adding button: " + caption + " " + btnid + " " + plugid);
+        NativeButton n = new NativeButton(caption,btnid,plugid,callback);
+        n.javabtn.addActionListener(this);
+        south.add(n.javabtn);
+        nativeButtons.put(n.javabtn,n);
+        plugButtons.put(new Point(plugid,btnid),n);
     }
 
     /**
@@ -666,7 +679,7 @@ public class Client implements ActionListener, ChangeListener {
     }
 
     /**
-     * Enables or disables debug rendering over the client.
+     * Enables or disables internal debug rendering over the client.
      */
     public void setDebug(boolean on) {
         debuggfx = on;
@@ -677,6 +690,9 @@ public class Client implements ActionListener, ChangeListener {
         }
     }
 
+    /**
+     * Turns SMART's internal image capture on or off.
+     */
     public void setCapture(boolean on) {
         capture = on;
         if (capture) {
@@ -687,6 +703,19 @@ public class Client implements ActionListener, ChangeListener {
             debugbtn.setEnabled(false);
             gfxbtn.setEnabled(false);
             capturebtn.setText("Enable Capture");
+        }
+    }
+
+    /**
+     * Handles state changing of plugin defined buttons.
+     */
+    public void setNativeButton(int plugid, int btnid, boolean state) {
+        NativeButton n = plugButtons.get(new Point(plugid,btnid));
+        if (n != null) {
+            Main.debug("Native button " + plugid + ":" + btnid + " = " + state);
+            n.setState(state);
+        } else {
+            Main.debug("Native button " + plugid + ":" + btnid + " not found");
         }
     }
 
@@ -711,10 +740,7 @@ public class Client implements ActionListener, ChangeListener {
         } else {
             NativeButton n = nativeButtons.get(e.getSource());
             if (n != null) {
-                JButton b = (JButton) e.getSource();
-                n.state = !n.state;
-                b.setText(n.state ? n.true_cap : n.false_cap);
-                Main.nativeButton(n.callback,n.id,n.state);
+                setNativeButton(n.plugid,n.btnid,!n.getState());
             }
         }
     }

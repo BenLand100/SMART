@@ -64,8 +64,9 @@ public class Main {
     private static final int releaseKey =         FirstFunc+21;
     private static final int isKeyDown =          FirstFunc+22;
     private static final int setCapture =         FirstFunc+23;
+    private static final int setNativeBtn =       FirstFunc+24;
     
-    private static final int ReflectionFuncs =			FirstFunc+24;
+    private static final int ReflectionFuncs =			FirstFunc+25;
     private static final int getFieldObject =           ReflectionFuncs+0;
     private static final int isPathValid =              ReflectionFuncs+1;
     private static final int getFieldBoolean =          ReflectionFuncs+2;
@@ -250,6 +251,9 @@ public class Main {
                 break;
             case setCapture:
                 client.setCapture(args.getInt(0*4)!=0);
+                break;
+            case setNativeBtn:
+                client.setNativeButton(args.getInt(0*4),args.getInt(1*4),args.getInt(2*4)!=0);
                 break;
             case getFieldObject: {
                 Object o = getGlobalRef(args);
