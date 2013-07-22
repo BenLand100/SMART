@@ -47,7 +47,10 @@ typedef struct {
     #include <netdb.h> 
 #else
     #if __SIZEOF_POINTER__ == 4
-       #define _WIN32_WINNT 0x0501
+        //some versions of mingw are missing this
+        #ifndef _WIN32_WINNT
+        #define _WIN32_WINNT 0x0501
+        #endif
     #endif
     #include <windows.h>
 #endif
