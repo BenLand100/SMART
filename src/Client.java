@@ -526,6 +526,7 @@ public class Client implements ActionListener, ChangeListener {
                 destroy();
             }
         });
+        clientFrame.setFocusTraversalKeysEnabled(false);
         clientFrame.addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {

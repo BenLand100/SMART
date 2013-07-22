@@ -344,7 +344,7 @@ public class EventNazi {
                     case 3: rightDown = false; break;
                 }
             } else {
-                looseFocus(false);
+                loseFocus(false);
             }
             return end;
         }
@@ -389,7 +389,7 @@ public class EventNazi {
                     case 3: rightDown = false; break;
                 }
             } else {
-                looseFocus(false);
+                loseFocus(false);
             }
             return end;
         }
@@ -591,8 +591,9 @@ public class EventNazi {
     
     /**
      * Sends an event that emulates a user alt+tabbing out of RuneScape.
+     * tabbed = true will send a tab key, so avoid that.
      */
-    private synchronized void looseFocus(boolean tabbed) {
+    private synchronized void loseFocus(boolean tabbed) {
         if (focused) {
             if (tabbed) {
                 BlockingEventQueue.sendUnblocked(new KeyEvent(comp, KeyEvent.KEY_PRESSED,System.currentTimeMillis(),KeyEvent.ALT_DOWN_MASK,KeyEvent.VK_ALT,KeyEvent.CHAR_UNDEFINED,KeyEvent.KEY_LOCATION_LEFT));
@@ -652,12 +653,10 @@ public class EventNazi {
         } else if (focused && pos == null && mousein) {
             moveMouse(-10,-10);
         }
-        if (focused) {
-            //Its impossible for the comp to have focus, you clicked elsewhere
-            //in order to stop blocking...
-            //Don't forget to clear native focus also...
-            //KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
-            looseFocus(true);
+        if (focused) { 
+            //how to handle this? probably safe to just pass the lose focus event
+            //anything else is INCREDIBLY annoying since RS destroys the canvas so often
+            loseFocus(false);
         }
         nazies.remove(comp);
         comp = null;
