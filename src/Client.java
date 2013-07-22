@@ -469,6 +469,7 @@ public class Client implements ActionListener, ChangeListener {
         south.remove(gfxbtn);
         south.remove(debugbtn);
         clientFrame.remove(refreshSlider);
+        clientFrame.pack();
     }
 
     public void defineNativeButton(String caption, int id, ByteBuffer callback) {
@@ -477,6 +478,7 @@ public class Client implements ActionListener, ChangeListener {
         JButton b = new JButton(n.true_cap);
         b.addActionListener(this);
         south.add(b);
+        clientFrame.pack();
         nativeButtons.put(b,n);
     }
 

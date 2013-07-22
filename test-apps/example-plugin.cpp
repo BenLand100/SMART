@@ -26,7 +26,7 @@ void button_callback(int id, bool state) {
 
 extern "C" void SMARTPluginInit(SMARTInfo *ptr, bool *replace, int *buttonc, char ***buttonv, int **buttonid, _SMARTButtonPressed *buttonproc) {
     std::cout << "HELLO WORLD! The image is at " << ptr->img << " and the debug is at " << ptr->dbg << "\n";
-    *replace = true;
+    
     char **caps = new char*[2];
     caps[0] = "Disable IDs_Enable IDs";
     caps[1] = "Disable Debug_Enable Debug";
@@ -34,6 +34,7 @@ extern "C" void SMARTPluginInit(SMARTInfo *ptr, bool *replace, int *buttonc, cha
     ids[0] = 100;
     ids[1] = 101;
     
+    *replace = false;
     *buttonc = 2;
     *buttonv = caps;
     *buttonid = ids;
