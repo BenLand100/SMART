@@ -467,6 +467,7 @@ public class Client implements ActionListener, ChangeListener {
         public void setState(boolean state) {
             this.state = state;
             javabtn.setText(state ? true_cap : false_cap);
+            Main.nativeButton(callback,btnid,state);
         }
         
         public boolean getState() {
