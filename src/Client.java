@@ -42,7 +42,7 @@ import java.applet.Applet;
  */
 public class Client implements ActionListener, ChangeListener {
     
-    public static final String VERSION = "8.1rev2";
+    public static final String VERSION = "8.2";
     public static final String TITLE = "SMARTv" + VERSION + " - SMART Minimizing Autoing Resource Thing - By BenLand100";
     public static final String USER_AGENT; //default for an (old) firefox version is set below
     static {
@@ -616,8 +616,6 @@ public class Client implements ActionListener, ChangeListener {
         HashMap<String, String> paramMap = new HashMap<String, String>();
         paramMap.put("width", parseArg(search(jsInfoPage, widthRegex, 1)));
         paramMap.put("height", parseArg(search(jsInfoPage, heightRegex, 1)));
-
-
         Matcher matcher = Pattern.compile("<param name\\=([^ ]*) value\\=([^>]*)>").matcher(jsInfoPage);
         while (matcher.find()) {
             paramMap.put(parseArg(matcher.group(1)), parseArg(matcher.group(2)));
