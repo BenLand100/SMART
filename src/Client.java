@@ -612,7 +612,7 @@ public class Client implements ActionListener, ChangeListener {
 		//This useragent it for the java plugin, probably shouldn't mess with it
 		clientConnection.addRequestProperty("User-Agent", "Mozilla/4.0 (" + System.getProperty("os.name") + " " + System.getProperty("os.version") + ") Java/" + System.getProperty("java.version"));
         thisLoader = AppletClassLoader.newInstance(new URL[] { clientConnection.getJarFileURL() });
-        clientApplet = (Applet) (thisLoader.loadClass(parseArg(search(jsInfoPage, codeRegex, 1)).split("\\.")[0]).newInstance());
+        clientApplet = (Applet) (thisLoader.loadClass(parseArg(search(jsInfoPage, codeRegex, 1)).replaceAll(".class$", "")).newInstance());
         HashMap<String, String> paramMap = new HashMap<String, String>();
         paramMap.put("width", parseArg(search(jsInfoPage, widthRegex, 1)));
         paramMap.put("height", parseArg(search(jsInfoPage, heightRegex, 1)));
