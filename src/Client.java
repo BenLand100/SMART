@@ -98,10 +98,10 @@ public class Client implements ActionListener, ChangeListener {
     public int transColor = 0;
     public boolean renderWhileBlocking = true;
     public boolean minimized = false;
-    private final String codeRegex = "code\\=([^ ]*) ";
-    private final String widthRegex = "width\\=([^ ]*) ";
-    private final String heightRegex = "height\\=([^ ]*) ";
-    private final String archiveRegex = "archive\\=([^ ]*) ";
+    private final String codeRegex = "code\\=([^ >]*)";
+    private final String widthRegex = "width\\=([^ >]*)";
+    private final String heightRegex = "height\\=([^ >]*)";
+    private final String archiveRegex = "archive\\=([^ >]*)";
     private JButton blockingbtn;
     private JButton gfxbtn;
     private JButton debugbtn;
@@ -616,8 +616,9 @@ public class Client implements ActionListener, ChangeListener {
         HashMap<String, String> paramMap = new HashMap<String, String>();
         paramMap.put("width", parseArg(search(jsInfoPage, widthRegex, 1)));
         paramMap.put("height", parseArg(search(jsInfoPage, heightRegex, 1)));
-        Matcher matcher = Pattern.compile("<param name\\=([^ ]*) value\\=([^>]*)>").matcher(jsInfoPage);
+        Matcher matcher = Pattern.compile("<param name\\=([^ ]*) [^>]*value\\=([^>]*?)/?>").matcher(jsInfoPage);
         while (matcher.find()) {
+            Main.debug(parseArg(matcher.group(1)) + " -> " + parseArg(matcher.group(2)));
             paramMap.put(parseArg(matcher.group(1)), parseArg(matcher.group(2)));
         }
         ClientStub stub = new ClientStub(root +  parseArg(search(jsInfoPage, archiveRegex, 1)), root, paramMap);
