@@ -1,5 +1,5 @@
 /**
- *  Copyright 2012 by Benjamin J. Land (a.k.a. BenLand100)
+ *  Copyright 2006-2013 by Benjamin J. Land (a.k.a. BenLand100)
  *
  *  This file is part of the SMART Minimizing Autoing Resource Thing (SMART)
  *
@@ -16,7 +16,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with SMART. If not, see <http://www.gnu.org/licenses/>.
  */
-
+ 
 package smart;
 
 import java.awt.AWTEvent;

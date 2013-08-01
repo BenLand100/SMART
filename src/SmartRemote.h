@@ -1,7 +1,7 @@
 /**
- *  Copyright 2012 by Benjamin J. Land (a.k.a. BenLand100)
+ *  Copyright 2006-2013 by Benjamin J. Land (a.k.a. BenLand100)
  *
- *  This file is part of the SMART
+ *  This file is part of the SMART Minimizing Autoing Resource Thing (SMART)
  *
  *  SMART is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by

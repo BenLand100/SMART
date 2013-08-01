@@ -1,5 +1,5 @@
 /**
- *  Copyright 2012 by Benjamin J. Land (a.k.a. BenLand100)
+ *  Copyright 2006-2013 by Benjamin J. Land (a.k.a. BenLand100)
  *
  *  This file is part of the SMART Minimizing Autoing Resource Thing (SMART)
  *
@@ -435,6 +435,11 @@ public class Client implements ActionListener, ChangeListener {
         Main.cleanup();
     }
     
+    /**
+     * NativeButton represents a button defined by a SMART plugin to appear on 
+     * the main SMART window. It contains state information, a native callback,
+     * and other necessary information.
+     */
     private static class NativeButton {
         public final String true_cap, false_cap;
         public final int btnid,plugid;
@@ -476,9 +481,14 @@ public class Client implements ActionListener, ChangeListener {
         
     }
     
+    //Used for mapping native and java buttons
     private Hashtable<Point, NativeButton> plugButtons = new Hashtable<Point,NativeButton>();
     private Hashtable<JButton, NativeButton> nativeButtons = new Hashtable<JButton,NativeButton>();
-
+    
+    /**
+     * Removes SMART's internal capture buttons from the window when using some 
+     * external capture method.
+     */
     public void replaceCaptureButtons() {
         setCapture(false);
         Main.debug("Removing internal capture buttons");
@@ -489,6 +499,10 @@ public class Client implements ActionListener, ChangeListener {
         clientFrame.pack();
     }
 
+    /**
+     * Eventually invoked by a native plugin that wants to put a button on the 
+     * window. See Main.java and SmartJNI.cpp
+     */
     public void defineNativeButton(String caption, int btnid, int plugid, ByteBuffer callback) {
         Main.debug("Adding button: " + caption + " " + btnid + " " + plugid);
         NativeButton n = new NativeButton(caption,btnid,plugid,callback);
@@ -760,6 +774,9 @@ public class Client implements ActionListener, ChangeListener {
         refresh = 500 / x + 20;
     }
     
+    /**
+     * Controls SMART's event blocking on the client applet.
+     */
     public void setEnabled(boolean enabled) {
         if (blocking) {
             stopBlocking();

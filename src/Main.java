@@ -1,7 +1,7 @@
 /**
- *  Copyright 2012 by Benjamin J. Land (a.k.a. BenLand100)
+ *  Copyright 2006-2013 by Benjamin J. Land (a.k.a. BenLand100)
  *
- *  This file is part of the SMART
+ *  This file is part of the SMART Minimizing Autoing Resource Thing (SMART)
  *
  *  SMART is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -35,9 +35,15 @@ char args[4096];
 **/
 
 
+/**
+ * Entry point / static class for v8.0+ which is launched as a jar. Contains all
+ * native method definitions and interaction with the remote controller.
+ */
 public class Main {
 
     public static final int sys_ptr_size = System.getProperty("os.arch").contains("x86") ? 4 : 8;
+
+    //N.B. These must be the same as SmartRemote.h
 
     private static final int FirstFunc =          1;
     private static final int getRefresh =         FirstFunc+0;
@@ -124,53 +130,95 @@ public class Main {
     private static ByteBuffer args;
     private static Client client;
     
+    //Sets the port in the SHM (see shm structure in SmartRemote.h)
     public static void setPort(int port) {
         mem.putInt(0*4,port);
     }
     
+    //Sets the ID in the SHM (see shm structure in SmartRemote.h)
     public static void setID(int id) {
         mem.putInt(1*4,id);
     }
     
+    //Returns the paired state of the SHM (see shm structure in SmartRemote.h)
     public static int getPaired() {
         return mem.getInt(4*4);
     }
     
+    //Sets the paired state of the SHM (see shm structure in SmartRemote.h)
     public static void setPaired(int tid) {
         mem.putInt(4*4,tid);
     }
     
+    //Sets the image offset in SHM (see shm structure in SmartRemote.h)
     public static void setImgOff(int off) {
         mem.putInt(5*4,off);
     }
     
+    //Sets the debug image offset in the SHM (see shm structure in SmartRemote.h)
     public static void setDbgOff(int off) {
         mem.putInt(6*4,off);
     }
     
+    //Sets the dimensions of the client in the SHM
+    //(see shm structure in SmartRemote.h)
     public static void setDims(int width, int height) {
         mem.putInt(2*4,width);
         mem.putInt(3*4,height);
     }
     
+    /**
+     * Returns the java object stored as a reference in org.
+     */
     public static native Object getGlobalRef(ByteBuffer org);
     
+    /**
+     * Stores a reference to a java object in dest.
+     */
     public static native void putGlobalRef(Object obj, ByteBuffer dest);
     
+    /**
+     * Releases the stored reference so the object may again be gc'd.
+     */
     public static native void freeGlobalRef(ByteBuffer dest);
     
+    /**
+     * Used by reflection methods where the path to reflect is stored after
+     * the object reference at org. Returns the path.
+     */
     public static native String pathFromAddress(ByteBuffer org);
     
-    public static native int indexFromAddress(ByteBuffer org, int idx);
+    /**
+     * Used by reflection methods to retrieve the array index of dimension dim 
+     * which are all stored after the path which is after the object reference
+     * stored at org. 
+     */
+    public static native int indexFromAddress(ByteBuffer org, int dim);
     
+    /**
+     * Native method to check the status of the thread with the given TID.
+     */
     public static native boolean checkAlive(int tid);
     
+    /**
+     * Native method to return the PID of the process.
+     */
     public static native int getPID();
     
+    /**
+     * Used throughout SMART for pretty remote debug referencing the ID of the 
+     * client in question.
+     */
     public static void debug(Object wat) {
         System.out.println("SMART["+id+"]: " + wat);
     }
     
+    /**
+     * Handles the collection of arguments from the shared memory once the 
+     * socket requests a function be invoked. Also invokes the function and 
+     * stores the result, if any. See SmartRemote.cpp for the other end of the
+     * communication.
+     */
     private static int handle(int funid) {
         //debug("FunID: " + funid);
         switch (funid) {
@@ -799,16 +847,36 @@ public class Main {
         return funid;
     }
     
+    /**
+     * Informs the native code to expect num plugins.
+     */
     private static native void setupPlugins(int num);
     
+    /**
+     * Called for each plugin to be loaded, in order. This actually loads the 
+     * library, but does not initialize it.
+     */
     private static native boolean loadPlugin(String path);
     
+    /**
+     * Gives the native code access to all important SMART data.
+     */
     private static native void setNatives(Client client, ByteBuffer img, ByteBuffer dbg, int w, int h);
     
+    /**
+     * Calls the init procedure of the idx'th plugin.
+     */
     private static native boolean initPlugin(int idx);
     
+    /**
+     * Invokes the callback method for button id with the given state reported.
+     */
     public static native void nativeButton(ByteBuffer callback, int id, boolean state); 
     
+    /**
+     * Entry point for SMART v8.0+ which accepts command line arguments to 
+     * launch a SMART client and setup the shared memory / socket communication.
+     */
     public static void main(String[] exec_args) {
         if (exec_args.length != 9) System.exit(1);
          
@@ -914,6 +982,9 @@ public class Main {
         }
     }
     
+    /**
+     * Why bother cleaning up when you can just screw it all and exit?
+     */
     public static void cleanup() {
         System.exit(0);
     }
