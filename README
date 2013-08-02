@@ -1,20 +1,19 @@
 SMART was created by BenLand100 a very long time ago. It is currently hosted
 on github at https://github.com/BenLand100/SMART and is mostly used by the
 SRL community at http://villavu.com/ where it is a key component in their 
-attempts to cheat at RuneScape. SMART is released under the GPLv3 and at this
-time generally gets about 40,000 uses each day. For questions, suggestions,
-comments, etc., try one of the two links given earlier.
+attempts to cheat at RuneScape. SMART (v5.0+) is released under the GPLv3 and 
+has netted over 10 million launches over the past three years (v6.3+). For 
+questions, suggestions, comments, etc., try one of the two links given earlier.
 
 To Build SMART, use the instructions given in the Makefile by running `make`
 in the root directory (the directory this file is in). Currently SMART has 
 build targets for Linux and Windows and is mostly architecture independent.
 
-SMART was recently (v7.1) moved out of the process of the controller and 
-implements a shared memory / socket IPC framework. In v8.0 SMART was overhauled
-to remove most native requirements and become more java-centric.
-
 SMART comes with some examples of use and various language bindings in the
-test-apps folder, use `make test` in the root folder to build them into 
-the dist directory where they can be run properly.
+test-apps folder, use `make test-*` targets in the to build the various apps.
+Running `make` will give a list of test targets.
+
+About SMART: http://bland.no-ip.org/index.php?title=SMART
+Usage Tracker: http://bland.no-ip.org/smart.php
 
 ~Benjamin J. Land a.k.a. BenLand100
