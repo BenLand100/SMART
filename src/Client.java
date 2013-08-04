@@ -632,7 +632,7 @@ public class Client implements ActionListener, ChangeListener {
         paramMap.put("height", parseArg(search(jsInfoPage, heightRegex, 1)));
         Matcher matcher = Pattern.compile("<param name\\=([^ ]*) [^>]*value\\=([^>]*?)/?>").matcher(jsInfoPage);
         while (matcher.find()) {
-            Main.debug(parseArg(matcher.group(1)) + " -> " + parseArg(matcher.group(2)));
+            //Main.debug(parseArg(matcher.group(1)) + " -> " + parseArg(matcher.group(2)));
             paramMap.put(parseArg(matcher.group(1)), parseArg(matcher.group(2)));
         }
         ClientStub stub = new ClientStub(root +  parseArg(search(jsInfoPage, archiveRegex, 1)), root, paramMap);
