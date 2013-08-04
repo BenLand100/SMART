@@ -19,6 +19,11 @@
  *  along with SMART. If not, see <http://www.gnu.org/licenses/>.
 """
 
+"""
+NOTE: this file is a bit oudated. I may get around to updating it later, but for
+now it will remain as a general guide to whoever wants to mess with python.
+"""
+
 from ctypes import *
 import platform, sys
 
