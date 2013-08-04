@@ -153,7 +153,7 @@ void cleanupSHM() {
     char buff[512];
     int count = exp_getClients(false);
     for (int i = 0; i < count; ++i) {
-        sprintf(buff,"SMART.%i",exp_getPID(i));
+        sprintf(buff,"SMART.%i",exp_getAvailablePID(i));
         remove(buff);
     }
 }
@@ -489,7 +489,7 @@ Target exp_pairClient(int pid) {
  * Releases this reference to the target.
  */
 int exp_getClientPID(Target t) {
-    return t ? t->id : t;
+    return t ? t->data->id : 0;
 }
 
 /**
