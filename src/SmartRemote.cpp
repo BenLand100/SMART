@@ -295,7 +295,7 @@ SMARTClient* pairClient(int id) {
  * Creates a remote SMART client and pairs to it
  * FIXME javaargs not handled for linux
  */
-SMARTClient* spawnClient(char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char* javaargs, char* plugins) {
+SMARTClient* spawnClient(char *java_exec, char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char* javaargs, char* plugins) {
     cleanupSHM();
     SMARTClient *client;
     if (!remote_path || !root || !params) return 0;
@@ -319,7 +319,7 @@ SMARTClient* spawnClient(char* remote_path, char *root, char *params, int width,
     memset(&info, 0, sizeof(SHELLEXECUTEINFO));
     info.cbSize = sizeof(SHELLEXECUTEINFO); 
     info.fMask = SEE_MASK_NOCLOSEPROCESS;
-    info.lpFile = "java.exe";
+    info.lpFile = java_exec;
     info.lpParameters = args;
     info.nShow = SW_SHOWNORMAL;
     ShellExecuteEx(&info);
@@ -351,7 +351,7 @@ SMARTClient* spawnClient(char* remote_path, char *root, char *params, int width,
         callClient(client,Ping);
         return client;
     } else {
-        execlp("java","java",bootclasspath,"smart.Main",library,root,params,_width,_height,initseq,useragent, remote_path, plugins, NULL);
+        execlp(java_exec,java_exec,bootclasspath,"smart.Main",library,root,params,_width,_height,initseq,useragent, remote_path, plugins, NULL);
         debug << "Process terminating. If nothing happened, make sure java is on your path and that SMART is installed correctly.\n";
         exit(1);
     }
@@ -473,8 +473,8 @@ bool exp_killClient(int pid) {
  * Creates a remote SMART client and pairs to it. Returns the target to be used
  * in target-specific methods, or NULL on failure.
  */
-Target exp_spawnClient(char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char* javaargs, char* plugins) {
-    return spawnClient(remote_path,root,params,width,height,initseq,useragent,javaargs,plugins);
+Target exp_spawnClient(char* java_exec, char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char* javaargs, char* plugins) {
+    return spawnClient(java_exec, remote_path,root,params,width,height,initseq,useragent,javaargs,plugins);
 }
 
 /**
@@ -1208,61 +1208,10 @@ int exp_stringFromBytes(Target t, void* obj, char* delphistr) {
     } else return -1;
 }
 
-SMARTClient* spawnFromString(char* initarg) {
-    int len = strlen(initarg);
-    char *path,*root,*params,*initseq,*useragent,*javaargs,*plugins;
-    int width,height;
-    char *buffer = new char[len+1];
-    int ida=0,idb=0,idx;
-    while (ida < len && (buffer[idb++]=initarg[ida++]) != ','); buffer[idb-1]=0;
-    if (initarg[ida++] != '"') return NULL;
-    int version = atoi(&buffer[0]);
-    if (version == 0) {
-        path = &buffer[idb];
-        while (ida < len && (buffer[idb++]=initarg[ida++]) != '"'); buffer[idb-1]=0;
-        if (initarg[ida++] != ',') return NULL;
-        if (initarg[ida++] != '"') return NULL;
-        root = &buffer[idb];
-        while (ida < len && (buffer[idb++]=initarg[ida++]) != '"'); buffer[idb-1]=0;
-        if (initarg[ida++] != ',') return NULL;
-        if (initarg[ida++] != '"') return NULL;
-        params = &buffer[idb];
-        while (ida < len && (buffer[idb++]=initarg[ida++]) != '"'); buffer[idb-1]=0;
-        if (initarg[ida++] != ',') return NULL;
-        idx = idb;
-        while (ida < len && (buffer[idb++]=initarg[ida++]) != ','); buffer[idb-1]=0;
-        if (initarg[ida-1] != ',') return NULL;
-        width = atoi(&buffer[idx]);
-        idx = idb;
-        while (ida < len && (buffer[idb++]=initarg[ida++]) != ','); buffer[idb-1]=0;
-        if (initarg[ida-1] != ',') return NULL;
-        height = atoi(&buffer[idx]);
-        if (initarg[ida++] != '"') return NULL;
-        initseq = &buffer[idb];
-        while (ida < len && (buffer[idb++]=initarg[ida++]) != '"'); buffer[idb-1]=0;
-        if (initarg[ida++] != ',') return NULL;
-        if (initarg[ida++] != '"') return NULL;
-        useragent = &buffer[idb];
-        while (ida < len && (buffer[idb++]=initarg[ida++]) != '"'); buffer[idb-1]=0;
-        if (initarg[ida++] != ',') return NULL;
-        if (initarg[ida++] != '"') return NULL;
-        javaargs = &buffer[idb];
-        while (ida < len && (buffer[idb++]=initarg[ida++]) != '"'); buffer[idb-1]=0;
-        if (initarg[ida++] != ',') return NULL;
-        if (initarg[ida++] != '"') return NULL;
-        plugins = &buffer[idb];
-        while (ida < len && (buffer[idb++]=initarg[ida++]) != 0); buffer[idb-1]=0;
-        if (initarg[ida++] != 0) return NULL;
-        return spawnClient(path,root,params,width,height,initseq,useragent,javaargs,plugins);
-    }
-    return NULL;
-}
-
 Target EIOS_RequestTarget(char *initargs) {
     debug << "EIOS Requesting Target\n";
     if (initargs != 0 && strlen(initargs) > 0) {
-        SMARTClient *client = spawnFromString(initargs); //This seems silly, could use exp_SpawnClient instead
-        if (!client) client = pairClient(atoi(initargs));
+        SMARTClient *client = pairClient(atoi(initargs));
         debug << "Target Identifier: " << client << '\n';
         return client;
     }

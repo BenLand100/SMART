@@ -27,10 +27,11 @@
 
 using namespace std;
 
-typedef void (*SpawnClient)(char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char* javaargs, char* plugins);
+typedef void (*SpawnClient)(char* java_exec, char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char* javaargs, char* plugins);
 
 int main(int argc, char** argv) {
     #ifndef _WIN32
+        #define JAVA_EXEC "java"
         #if __SIZEOF_POINTER__ == 4
             #define PLUGIN "./example-plugin32.so"
             void* libsmart = dlopen("./libsmartremote32.so",RTLD_LAZY);
@@ -39,6 +40,7 @@ int main(int argc, char** argv) {
             void* libsmart = dlopen("./libsmartremote64.so",RTLD_LAZY);
         #endif
     #else
+        #define JAVA_EXEC "javaw.exe"
         #if __SIZEOF_POINTER__ == 4
             #define PLUGIN "./example-plugin32.dll"
             HMODULE libsmart = LoadLibrary("./libsmartremote32.dll");
@@ -59,7 +61,7 @@ int main(int argc, char** argv) {
         SpawnClient spawn = (SpawnClient)GetProcAddress(libsmart, "exp_spawnClient");
     #endif
     
-    spawn((char*)".",(char*)"http://world37.runescape.com/",(char*)",f681985954784915908",765,553,(char*)"s",NULL,NULL,(char*)PLUGIN);
+    spawn((char*)JAVA_EXEC,(char*)".",(char*)"http://world37.runescape.com/",(char*)",f681985954784915908",765,553,(char*)"s",NULL,NULL,(char*)PLUGIN);
 
     return 0;
 }
