@@ -420,7 +420,7 @@ int getClients(bool only_unpaired, int **_clients) {
         count++;
         if (_clients) {
             *_clients = (int*)realloc(*_clients,count*sizeof(int));
-            (*_clients)[count-1] = atoi(name);
+            (*_clients)[count-1] = pid;
         }
         UnmapViewOfFile(temp);
         CloseHandle(memmap);
@@ -448,7 +448,7 @@ int exp_getClients(bool only_unpaired) {
 /**
  * Returns the PID of the client at index idx (after calling exp_getClients())
  */
-int exp_getPID(int idx) {
+int exp_getAvailablePID(int idx) {
     if (idx < clients.count && idx >= 0) {
         debug << "Returning client index " << idx << " with PID=" << clients.ids[idx] << '\n';
         return clients.ids[idx];
@@ -483,6 +483,13 @@ Target exp_spawnClient(char* remote_path, char *root, char *params, int width, i
  */
 Target exp_pairClient(int pid) {
     return pairClient(pid);
+}
+
+/**
+ * Releases this reference to the target.
+ */
+int exp_getClientPID(Target t) {
+    return t ? t->id : t;
 }
 
 /**

@@ -18,10 +18,11 @@ EXPORTS
     EIOS_ReleaseKey=EIOS_ReleaseKey@8
     EIOS_IsKeyHeld=EIOS_IsKeyHeld@8
     exp_getClients
-    exp_getPID
+    exp_getAvailablePID
     exp_pairClient
     exp_killClient
     exp_spawnClient
+    exp_getClientPID
     exp_freeClient
     exp_clickMouse
     exp_clickMousePlus

@@ -205,10 +205,11 @@ extern "C" void EIOS_ReleaseKey(Target t, int key) __attribute__((stdcall));
 extern "C" bool EIOS_IsKeyHeld(Target t, int key) __attribute__((stdcall)); 
 
 extern "C" int exp_getClients(bool only_unpaired);
-extern "C" int exp_getPID(int idx);
+extern "C" int exp_getAvailablePID(int idx);
 extern "C" bool exp_killClient(int pid);
 extern "C" Target exp_spawnClient(char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char* javaargs, char* plugins);
 extern "C" Target exp_pairClient(int pid);
+extern "C" int exp_getClientPID(Target t);
 extern "C" void exp_freeClient(Target t);
 
 extern "C" void* exp_getImageArray(Target t);
@@ -298,14 +299,15 @@ extern "C" bool exp_isEqual(Target t, void* a, void* b);
 #endif
 
 //Exports for Local
-#define NumExports 80
+#define NumExports 81
 static char* exports[] = {
     (char*)"exp_getClients", (char*)"function SmartGetClients(only_unpaired: boolean): integer;",
-    (char*)"exp_getPID", (char*)"function SmartGetPID(idx: integer): integer;",
+    (char*)"exp_getAvailablePID", (char*)"function SmartGetAvailablePID(idx: integer): integer;",
     (char*)"exp_killClient", (char*)"function SmartKillClient(pid: integer): boolean;",
     (char*)"exp_pairClient", (char*)"function SmartPairClient(pid: integer): "PTR";",
     (char*)"exp_spawnClient",(char*)"function SmartSpawnClient(remote_path, root, params: string; width, height: integer; initseq, useragent, javaargs, Plugins: string): "PTR";",
     (char*)"exp_freeClient", (char*)"procedure SmartFreeClient(target: "PTR");",
+    (char*)"exp_getClientPID", (char*)"function SmartGetClientPID(target: "PTR"): integer;",
     (char*)"exp_getImageArray", (char*)"function SmartImageArray(target: "PTR"): "PTR";",
     (char*)"exp_getDebugArray", (char*)"function SmartDebugArray(target: "PTR"): "PTR";",
     (char*)"exp_getRefresh", (char*)"function SmartGetRefresh(target: "PTR"): integer;",
@@ -343,37 +345,37 @@ static char* exports[] = {
     (char*)"exp_getFieldFloat", (char*)"function SmartGetFieldFloat(target: "PTR"; objref: "PTR"; path: string): extended;",
     (char*)"exp_getFieldDouble", (char*)"function SmartGetFieldDouble(target: "PTR"; objref: "PTR"; path: string): extended;",
     (char*)"exp_getFieldByte", (char*)"function SmartGetFieldByte(target: "PTR"; objref: "PTR"; path: string): integer;",
-    (char*)"exp_getFieldArray3DObject", (char*)"function SmartGetFieldArray3DObject(target: "PTR"; objref: " PTR"; path: string; x, y, z: integer): " PTR";",
-    (char*)"exp_getFieldArray3DByte", (char*)"function SmartGetFieldArray3DByte(target: "PTR"; objref: " PTR"; path: string; x, y, z: integer): integer;",
-    (char*)"exp_getFieldArray3DChar", (char*)"function SmartGetFieldArray3DChar(target: "PTR"; objref: " PTR"; path: string; x, y, z: integer): integer;",
-    (char*)"exp_getFieldArray3DShort", (char*)"function SmartGetFieldArray3DShort(target: "PTR"; objref: " PTR"; path: string; x, y, z: integer): integer;",
-    (char*)"exp_getFieldArray3DInt", (char*)"function SmartGetFieldArray3DInt(target: "PTR"; objref: " PTR"; path: string; x, y, z: integer): integer;",
-    (char*)"exp_getFieldArray3DFloat", (char*)"function SmartGetFieldArray3DFloat(target: "PTR"; objref: " PTR"; path: string; x, y, z: integer): extended;",
-    (char*)"exp_getFieldArray3DDouble", (char*)"function SmartGetFieldArray3DDouble(target: "PTR"; objref: " PTR"; path: string; x, y, z: integer): extended;",
-    (char*)"exp_getFieldArray3DBool", (char*)"function SmartGetFieldArray3DBoolean(target: "PTR"; objref: " PTR"; path: string; x, y, z: integer): boolean;",
-    (char*)"exp_getFieldArray3DLongH", (char*)"function SmartGetFieldArray3DLongH(target: "PTR"; objref: " PTR"; path: string; x, y, z: integer): integer;",
-    (char*)"exp_getFieldArray3DLongL", (char*)"function SmartGetFieldArray3DLongL(target: "PTR"; objref: " PTR"; path: string; x, y, z: integer): integer;",
-    (char*)"exp_getFieldArray2DObject", (char*)"function SmartGetFieldArray2DObject(target: "PTR"; objref: " PTR"; path: string; x, y: integer): " PTR";",
-    (char*)"exp_getFieldArray2DInt", (char*)"function SmartGetFieldArray2DInt(target: "PTR"; objref: " PTR"; path: string; x, y: integer): integer;",
-    (char*)"exp_getFieldArray2DDouble", (char*)"function SmartGetFieldArray2DDouble(target: "PTR"; objref: " PTR"; path: string; x, y: integer): extended;",
-    (char*)"exp_getFieldArray2DFloat", (char*)"function SmartGetFieldArray2DFloat(target: "PTR"; objref: " PTR"; path: string; x, y: integer): extended;",
-    (char*)"exp_getFieldArray2DBool", (char*)"function SmartGetFieldArray2DBoolean(target: "PTR"; objref: " PTR"; path: string; x, y: integer): boolean;",
-    (char*)"exp_getFieldArray2DLongH", (char*)"function SmartGetFieldArray2DLongH(target: "PTR"; objref: " PTR"; path: string; x, y: integer): integer;",
-    (char*)"exp_getFieldArray2DLongL", (char*)"function SmartGetFieldArray2DLongL(target: "PTR"; objref: " PTR"; path: string; x, y: integer): integer;",
-    (char*)"exp_getFieldArray2DByte", (char*)"function SmartGetFieldArray2DByte(target: "PTR"; objref: " PTR"; path: string; x, y: integer): integer;",
-    (char*)"exp_getFieldArray2DChar", (char*)"function SmartGetFieldArray2DChar(target: "PTR"; objref: " PTR"; path: string; x, y: integer): integer;",
-    (char*)"exp_getFieldArray2DShort", (char*)"function SmartGetFieldArray2DShort(target: "PTR"; objref: " PTR"; path: string; x, y: integer): integer;",
-    (char*)"exp_getFieldArraySize", (char*)"function SmartGetFieldArraySize(target: "PTR"; objref: " PTR"; path: string; dim: integer): integer;",
-    (char*)"exp_getFieldArrayObject", (char*)"function SmartGetFieldArrayObject(target: "PTR"; objref: " PTR"; path: string; index: integer): " PTR";",
-    (char*)"exp_getFieldArrayInt", (char*)"function SmartGetFieldArrayInt(target: "PTR"; objref: " PTR"; path: string; index: integer): integer;",
-    (char*)"exp_getFieldArrayFloat", (char*)"function SmartGetFieldArrayFloat(target: "PTR"; objref: " PTR"; path: string; index: integer): extended;",
-    (char*)"exp_getFieldArrayDouble", (char*)"function SmartGetFieldArrayDouble(target: "PTR"; objref: " PTR"; path: string; index: integer): extended;",
-    (char*)"exp_getFieldArrayBool", (char*)"function SmartGetFieldArrayBool(target: "PTR"; objref: " PTR"; path: string; index: integer): boolean;",
-    (char*)"exp_getFieldArrayLongH", (char*)"function SmartGetFieldArrayLongH(target: "PTR"; objref: " PTR"; path: string; index: integer): integer;",
-    (char*)"exp_getFieldArrayLongL", (char*)"function SmartGetFieldArrayLongL(target: "PTR"; objref: " PTR"; path: string; index: integer): integer;",
-    (char*)"exp_getFieldArrayByte", (char*)"function SmartGetFieldArrayByte(target: "PTR"; objref: " PTR"; path: string; index: integer): integer;",
-    (char*)"exp_getFieldArrayShort", (char*)"function SmartGetFieldArrayShort(target: "PTR"; objref: " PTR"; path: string; index: integer): integer;",
-    (char*)"exp_getFieldArrayChar", (char*)"function SmartGetFieldArrayChar(target: "PTR"; objref: " PTR"; path: string; index: integer): integer;",
+    (char*)"exp_getFieldArray3DObject", (char*)"function SmartGetFieldArray3DObject(target: "PTR"; objref: "PTR"; path: string; x, y, z: integer): "PTR";",
+    (char*)"exp_getFieldArray3DByte", (char*)"function SmartGetFieldArray3DByte(target: "PTR"; objref: "PTR"; path: string; x, y, z: integer): integer;",
+    (char*)"exp_getFieldArray3DChar", (char*)"function SmartGetFieldArray3DChar(target: "PTR"; objref: "PTR"; path: string; x, y, z: integer): integer;",
+    (char*)"exp_getFieldArray3DShort", (char*)"function SmartGetFieldArray3DShort(target: "PTR"; objref: "PTR"; path: string; x, y, z: integer): integer;",
+    (char*)"exp_getFieldArray3DInt", (char*)"function SmartGetFieldArray3DInt(target: "PTR"; objref: "PTR"; path: string; x, y, z: integer): integer;",
+    (char*)"exp_getFieldArray3DFloat", (char*)"function SmartGetFieldArray3DFloat(target: "PTR"; objref: "PTR"; path: string; x, y, z: integer): extended;",
+    (char*)"exp_getFieldArray3DDouble", (char*)"function SmartGetFieldArray3DDouble(target: "PTR"; objref: "PTR"; path: string; x, y, z: integer): extended;",
+    (char*)"exp_getFieldArray3DBool", (char*)"function SmartGetFieldArray3DBoolean(target: "PTR"; objref: "PTR"; path: string; x, y, z: integer): boolean;",
+    (char*)"exp_getFieldArray3DLongH", (char*)"function SmartGetFieldArray3DLongH(target: "PTR"; objref: "PTR"; path: string; x, y, z: integer): integer;",
+    (char*)"exp_getFieldArray3DLongL", (char*)"function SmartGetFieldArray3DLongL(target: "PTR"; objref: "PTR"; path: string; x, y, z: integer): integer;",
+    (char*)"exp_getFieldArray2DObject", (char*)"function SmartGetFieldArray2DObject(target: "PTR"; objref: "PTR"; path: string; x, y: integer): "PTR";",
+    (char*)"exp_getFieldArray2DInt", (char*)"function SmartGetFieldArray2DInt(target: "PTR"; objref: "PTR"; path: string; x, y: integer): integer;",
+    (char*)"exp_getFieldArray2DDouble", (char*)"function SmartGetFieldArray2DDouble(target: "PTR"; objref: "PTR"; path: string; x, y: integer): extended;",
+    (char*)"exp_getFieldArray2DFloat", (char*)"function SmartGetFieldArray2DFloat(target: "PTR"; objref: "PTR"; path: string; x, y: integer): extended;",
+    (char*)"exp_getFieldArray2DBool", (char*)"function SmartGetFieldArray2DBoolean(target: "PTR"; objref: "PTR"; path: string; x, y: integer): boolean;",
+    (char*)"exp_getFieldArray2DLongH", (char*)"function SmartGetFieldArray2DLongH(target: "PTR"; objref: "PTR"; path: string; x, y: integer): integer;",
+    (char*)"exp_getFieldArray2DLongL", (char*)"function SmartGetFieldArray2DLongL(target: "PTR"; objref: "PTR"; path: string; x, y: integer): integer;",
+    (char*)"exp_getFieldArray2DByte", (char*)"function SmartGetFieldArray2DByte(target: "PTR"; objref: "PTR"; path: string; x, y: integer): integer;",
+    (char*)"exp_getFieldArray2DChar", (char*)"function SmartGetFieldArray2DChar(target: "PTR"; objref: "PTR"; path: string; x, y: integer): integer;",
+    (char*)"exp_getFieldArray2DShort", (char*)"function SmartGetFieldArray2DShort(target: "PTR"; objref: "PTR"; path: string; x, y: integer): integer;",
+    (char*)"exp_getFieldArraySize", (char*)"function SmartGetFieldArraySize(target: "PTR"; objref: "PTR"; path: string; dim: integer): integer;",
+    (char*)"exp_getFieldArrayObject", (char*)"function SmartGetFieldArrayObject(target: "PTR"; objref: "PTR"; path: string; index: integer): "PTR";",
+    (char*)"exp_getFieldArrayInt", (char*)"function SmartGetFieldArrayInt(target: "PTR"; objref: "PTR"; path: string; index: integer): integer;",
+    (char*)"exp_getFieldArrayFloat", (char*)"function SmartGetFieldArrayFloat(target: "PTR"; objref: "PTR"; path: string; index: integer): extended;",
+    (char*)"exp_getFieldArrayDouble", (char*)"function SmartGetFieldArrayDouble(target: "PTR"; objref: "PTR"; path: string; index: integer): extended;",
+    (char*)"exp_getFieldArrayBool", (char*)"function SmartGetFieldArrayBool(target: "PTR"; objref: "PTR"; path: string; index: integer): boolean;",
+    (char*)"exp_getFieldArrayLongH", (char*)"function SmartGetFieldArrayLongH(target: "PTR"; objref: "PTR"; path: string; index: integer): integer;",
+    (char*)"exp_getFieldArrayLongL", (char*)"function SmartGetFieldArrayLongL(target: "PTR"; objref: "PTR"; path: string; index: integer): integer;",
+    (char*)"exp_getFieldArrayByte", (char*)"function SmartGetFieldArrayByte(target: "PTR"; objref: "PTR"; path: string; index: integer): integer;",
+    (char*)"exp_getFieldArrayShort", (char*)"function SmartGetFieldArrayShort(target: "PTR"; objref: "PTR"; path: string; index: integer): integer;",
+    (char*)"exp_getFieldArrayChar", (char*)"function SmartGetFieldArrayChar(target: "PTR"; objref: "PTR"; path: string; index: integer): integer;",
     (char*)"exp_freeObject", (char*)"procedure SmartFreeObject(target: "PTR"; obj: "PTR");",
     (char*)"exp_stringFromString", (char*)"function SmartStringFromString(target: "PTR"; jstr: "PTR"; str: String): integer;",
     (char*)"exp_stringFromBytes", (char*)"function SmartStringFromBytes(target: "PTR"; bytes: "PTR"; str: String): integer;",
