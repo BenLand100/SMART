@@ -107,7 +107,7 @@ public class Client implements ActionListener, ChangeListener {
     private JButton debugbtn;
     private JButton capturebtn;
     private JSlider refreshSlider;
-    private Canvas canvas;
+    private Component canvas;
     private String initseq = null;
     private String useragent = null;
     private int ID;
@@ -143,7 +143,6 @@ public class Client implements ActionListener, ChangeListener {
             initFrame();
             setRefresh(60);
             active = true;
-            clientFrame.setVisible(true);
         } catch (Exception e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(null, "Error starting SMART, ensure the target page has an applet declaration", "SMART", JOptionPane.ERROR_MESSAGE);
@@ -193,6 +192,33 @@ public class Client implements ActionListener, ChangeListener {
             Main.debug("Init Sequence Dispatched");
         }
         blitThread.start();
+    }
+    
+    public void target(Component it) {
+        boolean iam = blocking;
+        if (iam) {
+            stopBlocking();
+        }
+        BlockingEventQueue.removeComponent(canvas);
+        if (canvas == null) iam = true;
+        canvas = it;
+        BlockingEventQueue.addComponent(it, new EventRedirect() {
+            @Override
+            public void dispatched(AWTEvent e) {
+                clientFrame.requestFocusInWindow(); //any event should cause a refocus
+            }
+        });
+        BlockingEventQueue.ensureBlocking();
+        BlockingEventQueue.setBlocking(it, iam);
+        if (iam) {
+            startBlocking();
+            clientFrame.requestFocusInWindow();
+        }
+        if (initseq != null) {
+            nazi.sendKeys(initseq,90,60);
+            initseq = null;
+            Main.debug("Init Sequence Dispatched");
+        }
     }
 
     //Convenience method for Native code see Main.java
@@ -309,7 +335,7 @@ public class Client implements ActionListener, ChangeListener {
     private Thread createBlitThread() {
         try {
             canvas.setBackground(new Color(0xFE, 0xFE, 0xFE));
-            final Graphics canvasGraphics = canvas.getCanvasGraphics();
+            final Graphics canvasGraphics = ((Canvas)canvas).getCanvasGraphics();
             Main.debug("Replacing Canvas Drawing Surface");
             Field rasterField = BufferedImage.class.getDeclaredField("raster");
             rasterField.setAccessible(true);
@@ -330,7 +356,7 @@ public class Client implements ActionListener, ChangeListener {
                         while (active) {
                             if (capture && blocking) {
                                 Main.debug("Internal color data capture enabled.");
-                                canvas.setBuffer(buffer);
+                                ((Canvas)canvas).setBuffer(buffer);
                                 sleep(refresh);
                                 while (capture && blocking) {
                                     sleep(refresh);
@@ -355,10 +381,10 @@ public class Client implements ActionListener, ChangeListener {
                                         canvasGraphics.drawImage(debug,0,0,null);
                                     }
                                 }
-                                canvas.setBuffer(null);
+                                ((Canvas)canvas).setBuffer(null);
                             } else {
                                 Main.debug("Internal color data capture disabled.");
-                                canvas.setBuffer(null);
+                                ((Canvas)canvas).setBuffer(null);
                                 while (!capture || !blocking) {
                                     sleep(refresh);
                                 }
@@ -586,21 +612,30 @@ public class Client implements ActionListener, ChangeListener {
         Main.debug("Client INIT");
         clientApplet.init();
         Main.debug("Client START");
+        clientFrame.setVisible(true);
         clientApplet.start();
         Main.debug("Client WAITING");
         try {
-            while (clientApplet.getComponentCount() < 1) {
-                Thread.sleep(100);
+            for (int i = 0; i < 10 && clientApplet.getComponentCount() < 1; i++) {
+                Thread.sleep(200);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        gameLoader = clientApplet.getComponent(0).getClass().getClassLoader();
-        clients.put(gameLoader.toString(), this);
-        Main.debug("Client Fully Initialized");
+        if (clientApplet.getComponentCount() < 1) {
+            Main.debug("No Canvas detected. Either RS has changed or using nonstandard applet.");
+            Main.debug("Attempting to block applet.");
+            gameLoader = clientApplet.getClass().getClassLoader();
+            target(clientApplet);
+            replaceCaptureButtons();
+        } else {
+            gameLoader = clientApplet.getComponent(0).getClass().getClassLoader();
+            clients.put(gameLoader.toString(), this);
+        }
         clientFrame.pack();
         clientFrame.setResizable(false);
         clientFrame.setLocationRelativeTo(null);
+        Main.debug("Client Fully Initialized");
     }
     
     /**
