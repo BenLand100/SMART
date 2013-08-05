@@ -617,8 +617,12 @@ public class Client implements ActionListener, ChangeListener {
         String jsInfoPage = downloadHTML(root + params);
         jsInfoPage = jsInfoPage.substring(Math.max(jsInfoPage.indexOf("<applet"), jsInfoPage.indexOf("write('<app")), jsInfoPage.indexOf("</applet>"));
         Main.debug("Applet Loader Parsed");
-        Main.debug("Using jar: " + root + parseArg(search(jsInfoPage, archiveRegex, 1)));
-        JarURLConnection clientConnection = (JarURLConnection) new URL("jar:" + root + parseArg(search(jsInfoPage, archiveRegex, 1)) + "!/").openConnection();
+        String archive = parseArg(search(jsInfoPage, archiveRegex, 1));
+        if (!archive.startsWith("http://")) {
+            archive = root + archive;
+        }
+        Main.debug("Using jar: " + archive);
+        JarURLConnection clientConnection = (JarURLConnection) new URL("jar:" + archive + "!/").openConnection();
         //This might need some work, I didn't write it and I'm not sure how accurate it is
 		clientConnection.addRequestProperty("Protocol", "HTTP/1.1");
 		clientConnection.addRequestProperty("Connection", "keep-alive");
@@ -632,7 +636,7 @@ public class Client implements ActionListener, ChangeListener {
         paramMap.put("height", parseArg(search(jsInfoPage, heightRegex, 1)));
         Matcher matcher = Pattern.compile("<param name\\=([^ ]*) [^>]*value\\=([^>]*?)/?>").matcher(jsInfoPage);
         while (matcher.find()) {
-            //Main.debug(parseArg(matcher.group(1)) + " -> " + parseArg(matcher.group(2)));
+            Main.debug(parseArg(matcher.group(1)) + " -> " + parseArg(matcher.group(2)));
             paramMap.put(parseArg(matcher.group(1)), parseArg(matcher.group(2)));
         }
         ClientStub stub = new ClientStub(root +  parseArg(search(jsInfoPage, archiveRegex, 1)), root, paramMap);
