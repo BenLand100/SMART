@@ -134,8 +134,9 @@ typedef struct {
 #define stringFromBytes          ReflectionFuncs+44
 #define isNull                   ReflectionFuncs+45
 #define isEqual                  ReflectionFuncs+46
+#define getFieldObjectType       ReflectionFuncs+47
 
-#define ExtraFuncs          ReflectionFuncs+47
+#define ExtraFuncs          ReflectionFuncs+48
 #define Ping                ExtraFuncs+0
 #define Die                 ExtraFuncs+1
 
@@ -284,6 +285,7 @@ extern "C" int exp_getFieldArrayLongL(Target t, void* obj, char* path, int index
 extern "C" int exp_getFieldArrayByte(Target t, void* obj, char* path, int index);
 extern "C" int exp_getFieldArrayShort(Target t, void* obj, char* path, int index);
 extern "C" int exp_getFieldArrayChar(Target t, void* obj, char* path, int index);
+extern "C" int exp_getFieldObjectType(Target t, void* obj, char* path, char* delphistr);
 
 extern "C" void exp_freeObject(Target t, void* obj);
 extern "C" int exp_stringFromString(Target t, void* obj, char* delphistr);
