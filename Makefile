@@ -16,8 +16,8 @@
 #   along with SMART. If not, see <http://www.gnu.org/licenses/>.
 
 #these compilers work with crossdev on gentoo
-WIN_GPP=g++
-WIN64_GPP=g++
+WIN_GPP=i686-pc-mingw32-g++
+WIN64_GPP=x86_64-w64-mingw32-g++
 LIN_GPP=i686-pc-linux-gnu-g++
 LIN64_GPP=x86_64-pc-linux-gnu-g++
 JAVAC=javac
@@ -276,5 +276,4 @@ $(WIN64_BUILD_DIR)/SmartJNI.o: $(SRC_DIR)/SmartJNI.cpp $(JNI_CPPHEADERFILES)
 	@echo "Creating JAR Archive..."
 	@mkdir -p $(DIST)
 	@$(JAR) cfe $(DIST)/$(JAVA_NAME) smart.Main -C $(JAVA_BUILD_DIR) .
-
 
