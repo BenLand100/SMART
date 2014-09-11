@@ -120,8 +120,9 @@ public class Main {
     private static final int stringFromBytes =          ReflectionFuncs+44;
     private static final int isNull =                   ReflectionFuncs+45;
     private static final int isEqual =                  ReflectionFuncs+46;
+	private static final int getFieldObjectType =		ReflectionFuncs+47;
 
-    private static final int ExtraFuncs =         ReflectionFuncs+47;
+    private static final int ExtraFuncs =         ReflectionFuncs+48;
     private static final int Ping =               ExtraFuncs+0;
     private static final int Die =                ExtraFuncs+1;
 
@@ -780,6 +781,21 @@ public class Main {
                     args.putInt(0,-1);
                 }
             } break;
+			
+			case getFieldObjectType: {
+				Object o  = getGlobalRef(args);
+				String path = pathFromAddress(args);
+				try {
+					Object n = client.findObjectFromPath(o,path);
+					byte[] bytes = o.getClass().getName().getBytes();
+                    args.rewind();
+                    args.put(bytes);
+                    args.put((byte)0);
+                    args.rewind();
+				} catch (Exception e) {
+					args.put(0, (byte)0);
+				}
+			} break;
             
             case freeObject: {
                 freeGlobalRef(args);
