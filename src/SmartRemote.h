@@ -297,7 +297,7 @@ extern "C" bool exp_isEqual(Target t, void* a, void* b);
 #define PTR "PtrUInt"
 
 //Exports for Local
-#define NumExports 81
+#define NumExports 82
 static char* exports[] = {
     (char*)"exp_getClients", (char*)"function SmartGetClients(only_unpaired: boolean): integer;",
     (char*)"exp_getAvailablePID", (char*)"function SmartGetAvailablePID(idx: integer): integer;",
