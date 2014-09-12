@@ -134,8 +134,9 @@ typedef struct {
 #define stringFromBytes          ReflectionFuncs+44
 #define isNull                   ReflectionFuncs+45
 #define isEqual                  ReflectionFuncs+46
+#define getFieldObjectType       ReflectionFuncs+47
 
-#define ExtraFuncs          ReflectionFuncs+47
+#define ExtraFuncs          ReflectionFuncs+48
 #define Ping                ExtraFuncs+0
 #define Die                 ExtraFuncs+1
 
@@ -284,6 +285,7 @@ extern "C" int exp_getFieldArrayLongL(Target t, void* obj, char* path, int index
 extern "C" int exp_getFieldArrayByte(Target t, void* obj, char* path, int index);
 extern "C" int exp_getFieldArrayShort(Target t, void* obj, char* path, int index);
 extern "C" int exp_getFieldArrayChar(Target t, void* obj, char* path, int index);
+extern "C" int exp_getFieldObjectType(Target t, void* obj, char* path, char* delphistr);
 
 extern "C" void exp_freeObject(Target t, void* obj);
 extern "C" int exp_stringFromString(Target t, void* obj, char* delphistr);
@@ -292,14 +294,10 @@ extern "C" int exp_stringFromBytes(Target t, void* obj, char* delphistr);
 extern "C" bool exp_isNull(Target t, void* obj);
 extern "C" bool exp_isEqual(Target t, void* a, void* b);
 
-#if __SIZEOF_POINTER__ == 4
-    #define PTR "integer"
-#else
-    #define PTR "int64"
-#endif
+#define PTR "PtrUInt"
 
 //Exports for Local
-#define NumExports 81
+#define NumExports 82
 static char* exports[] = {
     (char*)"exp_getClients", (char*)"function SmartGetClients(only_unpaired: boolean): integer;",
     (char*)"exp_getAvailablePID", (char*)"function SmartGetAvailablePID(idx: integer): integer;",
@@ -376,6 +374,7 @@ static char* exports[] = {
     (char*)"exp_getFieldArrayByte", (char*)"function SmartGetFieldArrayByte(target: "PTR"; objref: "PTR"; path: string; index: integer): integer;",
     (char*)"exp_getFieldArrayShort", (char*)"function SmartGetFieldArrayShort(target: "PTR"; objref: "PTR"; path: string; index: integer): integer;",
     (char*)"exp_getFieldArrayChar", (char*)"function SmartGetFieldArrayChar(target: "PTR"; objref: "PTR"; path: string; index: integer): integer;",
+    (char*)"exp_getFieldObjectType", (char*)"function SmartGetFieldObjectType(target: "PTR"; objref: "PTR"; path: string; str: String): integer;",
     (char*)"exp_freeObject", (char*)"procedure SmartFreeObject(target: "PTR"; obj: "PTR");",
     (char*)"exp_stringFromString", (char*)"function SmartStringFromString(target: "PTR"; jstr: "PTR"; str: String): integer;",
     (char*)"exp_stringFromBytes", (char*)"function SmartStringFromBytes(target: "PTR"; bytes: "PTR"; str: String): integer;",

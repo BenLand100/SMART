@@ -1181,6 +1181,16 @@ bool exp_isEqual(Target t, void* a, void* b) {
     } else return false;
 }
 
+int exp_getFieldObjectType(Target t, void* obj, char* path, char* delphistr) {
+    if (t) {
+        ((void**)t->data->args)[0] = obj;
+        strcpy((char*)t->data->args+sizeof(void*),path);
+        callClient(t,getFieldObjectType);
+        if (delphistr) strcpy(delphistr, (char*)t->data->args);
+        return strlen((char*)t->data->args);
+    } else return -1;
+}
+
 int exp_stringFromString(Target t, void* obj, char* delphistr) {
     if (t) {
         ((void**)t->data->args)[0] = obj;
@@ -1374,7 +1384,9 @@ int GetFunctionInfo(int index, void*& address, char*& def) {
         address = (void*)GetProcAddress(dllinst, exports[index*2]);
         strcpy(def, exports[index*2+1]);
         return index;
-    }
+    } else {
+        debug << "dafuq: " << index << '\n';		
+	}
     return -1;
 }
 

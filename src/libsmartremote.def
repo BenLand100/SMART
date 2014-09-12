@@ -92,6 +92,7 @@ EXPORTS
     exp_getFieldArrayByte
     exp_getFieldArrayShort
     exp_getFieldArrayChar
+    exp_getFieldObjectType
     exp_freeObject
     exp_stringFromString
     exp_stringFromChars
