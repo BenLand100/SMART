@@ -1384,7 +1384,9 @@ int GetFunctionInfo(int index, void*& address, char*& def) {
         address = (void*)GetProcAddress(dllinst, exports[index*2]);
         strcpy(def, exports[index*2+1]);
         return index;
-    }
+    } else {
+        debug << "dafuq: " << index << '\n';		
+	}
     return -1;
 }
 
