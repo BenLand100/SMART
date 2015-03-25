@@ -292,11 +292,7 @@ extern "C" int exp_stringFromBytes(Target t, void* obj, char* delphistr);
 extern "C" bool exp_isNull(Target t, void* obj);
 extern "C" bool exp_isEqual(Target t, void* a, void* b);
 
-#if __SIZEOF_POINTER__ == 4
-    #define PTR "integer"
-#else
-    #define PTR "int64"
-#endif
+#define PTR "PtrUInt"
 
 //Exports for Local
 #define NumExports 81
