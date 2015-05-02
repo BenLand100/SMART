@@ -80,6 +80,7 @@ public class Client implements ActionListener, ChangeListener {
 
     private int width;
     private int height;
+    private int manifestHash;
     private URLClassLoader thisLoader;
     private ClassLoader gameLoader;
     private Applet clientApplet;
@@ -587,8 +588,9 @@ public class Client implements ActionListener, ChangeListener {
                 }
             }
         });
+        clientFrame.getToolkit().setDynamicLayout(true);
         clientFrame.setLayout(new BorderLayout());
-        clientFrame.add(clientApplet);
+        clientFrame.add(clientApplet, BorderLayout.CENTER);
         refreshSlider = new JSlider(JSlider.VERTICAL, 1, 100, 96);
         refreshSlider.addChangeListener(this);
         refresh = 500 / refreshSlider.getValue() + 20;
@@ -612,7 +614,6 @@ public class Client implements ActionListener, ChangeListener {
         Main.debug("Client INIT");
         clientApplet.init();
         Main.debug("Client START");
-        clientFrame.setVisible(true);
         clientApplet.start();
         Main.debug("Client WAITING");
         try {
@@ -634,6 +635,7 @@ public class Client implements ActionListener, ChangeListener {
         }
         clientFrame.pack();
         clientFrame.setResizable(false);
+        clientFrame.setVisible(true);
         clientFrame.setLocationRelativeTo(null);
         Main.debug("Client Fully Initialized");
     }
@@ -656,6 +658,8 @@ public class Client implements ActionListener, ChangeListener {
         if (!archive.startsWith("http://")) archive = root + archive;
         Main.debug("Using jar: " + archive);
         JarURLConnection clientConnection = (JarURLConnection) new URL("jar:" + archive + "!/").openConnection();
+        //Store the manifest hash here           
+        manifestHash = clientConnection.getManifest().hashCode();
         //This might need some work, I didn't write it and I'm not sure how accurate it is
 		clientConnection.addRequestProperty("Protocol", "HTTP/1.1");
 		clientConnection.addRequestProperty("Connection", "keep-alive");
@@ -827,6 +831,13 @@ public class Client implements ActionListener, ChangeListener {
      */
     public int getRefresh() {
         return refreshSlider.getValue();
+    }
+    
+    /**
+     * Returns the hashCode value of the loaded jar(it is set on client init)
+     */
+    public int getManifestHash() {
+        return manifestHash;
     }
     
     /**
