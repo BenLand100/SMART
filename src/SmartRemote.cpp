@@ -307,10 +307,10 @@ SMARTClient* spawnClient(char *java_exec, char* remote_path, char *root, char *p
     if (!useragent) useragent = &empty;
     if (!javaargs) javaargs = &empty;
 	if (!plugins) plugins = &empty;
+    #ifdef _WIN32
     char bootclasspath[512];
     sprintf(bootclasspath,"-Xbootclasspath/p:\"%s/%s\"",remote_path,"smart.jar");
     char library[512];
-    #ifdef _WIN32
     sprintf(library,"%s/libsmartjni%s.dll",remote_path,bits);
     int len = strlen(javaargs)+strlen(bootclasspath)+strlen(library)+strlen(root)+strlen(params)+strlen(_width)+strlen(_height)+strlen(initseq)+strlen(useragent)+strlen(remote_path)+strlen(plugins)+7*3+50; //A little extra
     char *args = new char[len];
@@ -339,6 +339,9 @@ SMARTClient* spawnClient(char *java_exec, char* remote_path, char *root, char *p
     callClient(client,Ping);
     return client;
     #else
+    char bootclasspath[512];
+    sprintf(bootclasspath,"-Xbootclasspath/p:%s/%s",remote_path,"smart.jar"); //linux supports spaces in path fine, fails with quotes
+    char library[512];
     #ifdef __APPLE__
     sprintf(library,"%s/libsmartjni%s.dylib",remote_path,bits);
     #else
