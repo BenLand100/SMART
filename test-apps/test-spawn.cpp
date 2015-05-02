@@ -56,18 +56,8 @@ int main(int argc, char** argv) {
     #else
         SpawnClient spawn = (SpawnClient)GetProcAddress(libsmart, "exp_spawnClient");
     #endif
-    cout << "Start" << endl;
     
-    spawn((char*)JAVA_EXEC,(char*)".",(char*)"http://world37.runescape.com/",(char*)",f681985954784915908",800,600,NULL,NULL,NULL,NULL);
-
-    int i = 0;
-    while (i < 30) {
-        cout << "HASH: " << endl;
-        Sleep(1000);
-        i++;
-    }
-
-    cin >> i;
+    spawn((char*)JAVA_EXEC,(char*)".",(char*)"http://world4.runescape.com/",(char*)",f2926274358760108644,iDBXPZaBPotHnzeZldoHBT7Srpf7IzVIXsJezvAA",800,600,NULL,NULL,NULL,NULL);
 
     return 0;
 }
