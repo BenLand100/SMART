@@ -42,7 +42,7 @@ import java.applet.Applet;
  */
 public class Client implements ActionListener, ChangeListener {
     
-    public static final String VERSION = "8.3";
+    public static final String VERSION = "(dev)";
     public static final String TITLE = "SMARTv" + VERSION + " - SMART Minimizing Autoing Resource Thing - By BenLand100";
     public static final String USER_AGENT; //default for an (old) firefox version is set below
     static {
