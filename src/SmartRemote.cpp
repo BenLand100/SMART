@@ -308,7 +308,7 @@ SMARTClient* spawnClient(char *java_exec, char* remote_path, char *root, char *p
     if (!javaargs) javaargs = &empty;
 	if (!plugins) plugins = &empty;
     char bootclasspath[512];
-    sprintf(bootclasspath,"-Xbootclasspath/p:%s/%s",remote_path,"smart.jar");
+    sprintf(bootclasspath,"-Xbootclasspath/p:\"%s/%s\"",remote_path,"smart.jar");
     char library[512];
     #ifdef _WIN32
     sprintf(library,"%s/libsmartjni%s.dll",remote_path,bits);
@@ -339,7 +339,11 @@ SMARTClient* spawnClient(char *java_exec, char* remote_path, char *root, char *p
     callClient(client,Ping);
     return client;
     #else
+    #ifdef __APPLE__
+    sprintf(library,"%s/libsmartjni%s.dylib",remote_path,bits);
+    #else
     sprintf(library,"%s/libsmartjni%s.so",remote_path,bits);
+    #endif
     int v = fork();
     if (v) {
         int count = 0;
@@ -512,6 +516,13 @@ void* exp_getDebugArray(Target t) {
 int exp_getRefresh(Target t) {
     if (t) {
         callClient(t,getRefresh);
+        return *(int*)(t->data->args);
+    } return -1;
+}
+
+int exp_getManifestHash(Target t) {
+    if (t) {
+        callClient(t,getManifestHash);
         return *(int*)(t->data->args);
     } return -1;
 }

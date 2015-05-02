@@ -36,8 +36,10 @@
     #include <windows.h>
 #endif
 
-extern "C" JNIEXPORT jboolean JNICALL Java_smart_Main_checkAlive(JNIEnv *env, jclass cls, jint tid) {    
-    #ifndef _WIN32
+extern "C" JNIEXPORT jboolean JNICALL Java_smart_Main_checkAlive(JNIEnv *env, jclass cls, jint tid) {
+    #ifdef __APPLE__
+        return syscall(SYS_kill,tid,0) ? JNI_FALSE : JNI_TRUE; //Added by Brandon for OS X.
+    #elif !defined(_WIN32)
         return syscall(SYS_tkill,tid,0) ? JNI_FALSE : JNI_TRUE;
     #else
         HANDLE thread = OpenThread(SYNCHRONIZE,FALSE,tid);

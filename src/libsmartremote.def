@@ -30,6 +30,7 @@ EXPORTS
     exp_getImageArray
     exp_getMousePos
     exp_getRefresh
+    exp_getManifestHash
     exp_holdKey
     exp_holdMouse
     exp_holdMousePlus

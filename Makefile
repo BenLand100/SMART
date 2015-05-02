@@ -16,7 +16,7 @@
 #   along with SMART. If not, see <http://www.gnu.org/licenses/>.
 
 #these compilers work with crossdev on gentoo
-WIN_GPP=i686-pc-mingw32-g++
+WIN_GPP=i686-w64-mingw32-g++
 WIN64_GPP=x86_64-w64-mingw32-g++
 LIN_GPP=i686-pc-linux-gnu-g++
 LIN64_GPP=x86_64-pc-linux-gnu-g++
@@ -152,19 +152,19 @@ test-linux64:
 test-windows: 
 	@mkdir -p $(DIST)
 	@$(WIN_GPP) -I $(SRC_DIR) -shared -static-libgcc -static-libstdc++ -s -o $(DIST)/example-plugin32.dll test-apps/example-plugin.cpp
-	@$(WIN_GPP) -static-libgcc -static-libstdc++ -o $(DIST)/test-plugin-load32.exe test-apps/test-plugin-load.cpp
-	@$(WIN_GPP) -static-libgcc -static-libstdc++ -o $(DIST)/test-spawn32.exe test-apps/test-spawn.cpp
-	@$(WIN_GPP) -static-libgcc -static-libstdc++ -o $(DIST)/test-eios32.exe test-apps/test-eios.cpp
-	@$(WIN_GPP) -static-libgcc -static-libstdc++ -o $(DIST)/test-exports32.exe test-apps/test-exports.cpp
+	@$(WIN_GPP) -static -static-libgcc -static-libstdc++ -o $(DIST)/test-plugin-load32.exe test-apps/test-plugin-load.cpp
+	@$(WIN_GPP) -static -static-libgcc -static-libstdc++ -o $(DIST)/test-spawn32.exe test-apps/test-spawn.cpp
+	@$(WIN_GPP) -static -static-libgcc -static-libstdc++ -o $(DIST)/test-eios32.exe test-apps/test-eios.cpp
+	@$(WIN_GPP) -static -static-libgcc -static-libstdc++ -o $(DIST)/test-exports32.exe test-apps/test-exports.cpp
 	@echo "Finished building Windows 32bit test files"
 	
 test-windows64:
 	@mkdir -p $(DIST)
 	@$(WIN64_GPP) -I $(SRC_DIR) -shared -static-libgcc -static-libstdc++ -s -o $(DIST)/example-plugin64.dll test-apps/example-plugin.cpp
-	@$(WIN64_GPP) -static-libgcc -static-libstdc++ -o $(DIST)/test-plugin-load64.exe test-apps/test-plugin-load.cpp
-	@$(WIN64_GPP) -static-libgcc -static-libstdc++ -o $(DIST)/test-spawn64.exe test-apps/test-spawn.cpp
-	@$(WIN64_GPP) -static-libgcc -static-libstdc++ -o $(DIST)/test-eios64.exe test-apps/test-eios.cpp
-	@$(WIN64_GPP) -static-libgcc -static-libstdc++ -o $(DIST)/test-exports64.exe test-apps/test-exports.cpp
+	@$(WIN64_GPP) -static -static-libgcc -static-libstdc++ -o $(DIST)/test-plugin-load64.exe test-apps/test-plugin-load.cpp
+	@$(WIN64_GPP) -static -static-libgcc -static-libstdc++ -o $(DIST)/test-spawn64.exe test-apps/test-spawn.cpp
+	@$(WIN64_GPP) -static -static-libgcc -static-libstdc++ -o $(DIST)/test-eios64.exe test-apps/test-eios.cpp
+	@$(WIN64_GPP) -static -static-libgcc -static-libstdc++ -o $(DIST)/test-exports64.exe test-apps/test-exports.cpp
 	@echo "Finished building Windows 64bit test files"
 	
 test-python:
@@ -227,12 +227,12 @@ $(LIN64_BUILD_DIR)/SmartJNI.o: $(SRC_DIR)/SmartJNI.cpp $(JNI_CPPHEADERFILES)
 $(DIST)/$(WIN_NAME): $(WINOBJFILES)
 	@echo "Linking Windows Remote object files..."
 	@mkdir -p $(DIST)
-	@$(WIN_GPP) -Wl,$(SRC_DIR)/libsmartremote.def -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(WIN_NAME) $(WINOBJFILES) -lws2_32
+	@$(WIN_GPP) -Wl,$(SRC_DIR)/libsmartremote.def -static -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(WIN_NAME) $(WINOBJFILES) -lws2_32
 	
 $(DIST)/$(JNI_WIN_NAME): $(JNI_WINOBJFILES)
 	@echo "Linking Windows JNI object files..."
 	@mkdir -p $(DIST)
-	@$(WIN_GPP) -Wl,$(SRC_DIR)/libsmartjni.def -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(JNI_WIN_NAME) $(JNI_WINOBJFILES)
+	@$(WIN_GPP) -Wl,$(SRC_DIR)/libsmartjni.def -static -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(JNI_WIN_NAME) $(JNI_WINOBJFILES)
 
 $(WIN_BUILD_DIR)/SmartRemote.o: $(SRC_DIR)/SmartRemote.cpp $(CPPHEADERFILES)
 	@echo "Compiling SmartRemote.cpp"
@@ -249,12 +249,12 @@ $(WIN_BUILD_DIR)/SmartJNI.o: $(SRC_DIR)/SmartJNI.cpp $(JNI_CPPHEADERFILES)
 $(DIST)/$(WIN64_NAME): $(WIN64OBJFILES)
 	@echo "Linking Windows64 Remote object files..."
 	@mkdir -p $(DIST)
-	@$(WIN64_GPP) -Wl,$(SRC_DIR)/libsmartremote.def -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(WIN64_NAME) $(WIN64OBJFILES) -lws2_32
+	@$(WIN64_GPP) -Wl,$(SRC_DIR)/libsmartremote.def -static -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(WIN64_NAME) $(WIN64OBJFILES) -lws2_32
 
 $(DIST)/$(JNI_WIN64_NAME): $(JNI_WIN64OBJFILES)
 	@echo "Linking Windows64 JNI object files..."
 	@mkdir -p $(DIST)
-	@$(WIN64_GPP) -Wl,$(SRC_DIR)/libsmartjni.def -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(JNI_WIN64_NAME) $(JNI_WIN64OBJFILES)
+	@$(WIN64_GPP) -Wl,$(SRC_DIR)/libsmartjni.def -static -static-libgcc -static-libstdc++ -mwindows -shared -s -o $(DIST)/$(JNI_WIN64_NAME) $(JNI_WIN64OBJFILES)
 
 $(WIN64_BUILD_DIR)/SmartRemote.o: $(SRC_DIR)/SmartRemote.cpp $(CPPHEADERFILES)
 	@echo "Compiling SmartRemote.cpp"
