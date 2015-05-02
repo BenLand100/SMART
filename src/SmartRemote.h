@@ -331,7 +331,7 @@ static char* exports[] = {
     (char*)"exp_isKeyDown", (char*)"function SmartIsKeyDown(target: PtrUInt; Code: Integer): Boolean;",
     (char*)"exp_setCapture", (char*)"procedure SmartSetCapture(target: PtrUInt; enabled: boolean);",
     (char*)"exp_setNativeBtn", (char*)"procedure SmartSetNativeButton(target: PtrUInt; plugid,btnid: integer; state: boolean);",
-    (char*)"exp_getManifestHash", (char*)"procedure SmartGetManifestHash(target: PtrUInt): integer;",
+    (char*)"exp_getManifestHash", (char*)"function SmartGetManifestHash(target: PtrUInt): integer;",
     (char*)"exp_getFieldObject", (char*)"function SmartGetFieldObject(target: PtrUInt; objref: PtrUInt; path: string): PtrUInt;",
     (char*)"exp_isPathValid", (char*)"function SmartIsPathValid(target: PtrUInt; objref: PtrUInt; path: string): boolean;",
     (char*)"exp_getFieldBoolean", (char*)"function SmartGetFieldBoolean(target: PtrUInt; objref: PtrUInt; path: string): boolean;",
