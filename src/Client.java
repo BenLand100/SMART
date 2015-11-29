@@ -42,7 +42,7 @@ import java.applet.Applet;
  */
 public class Client implements ActionListener, ChangeListener {
     
-    public static final String VERSION = "(dev)";
+    public static final String VERSION = "8.4";
     public static final String TITLE = "SMARTv" + VERSION + " - SMART Minimizing Autoing Resource Thing - By BenLand100";
     public static final String USER_AGENT; //default for an (old) firefox version is set below
     static {
@@ -128,7 +128,7 @@ public class Client implements ActionListener, ChangeListener {
                 this.useragent = useragent;
                 Main.debug("Using User-Agent: " + useragent);
             }
-            String response = downloadHTML("http://blanddns.no-ip.org:81/smart.php?version="+URLEncoder.encode(VERSION));
+            String response = downloadHTML("http://benland.us/smart.php?version="+URLEncoder.encode(VERSION));
             Main.debug("Registration Response: " + ((response == null) ? "Unsuccessful" : response.replaceAll("\n|\r","")));
             width = w;
             height = h;
