@@ -13,7 +13,7 @@ SMART comes with some examples of use and various language bindings in the
 test-apps folder, use `make test-*` targets in the to build the various apps.
 Running `make` will give a list of test targets.
 
-About SMART: http://bland.no-ip.org/index.php?title=SMART
-Usage Tracker: http://bland.no-ip.org/smart.php
+About SMART: http://benland.us/index.php?title=SMART
+Usage Tracker: http://benland.us/smart.php
 
 ~Benjamin J. Land a.k.a. BenLand100
