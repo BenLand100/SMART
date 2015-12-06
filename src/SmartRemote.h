@@ -208,7 +208,7 @@ extern "C" bool EIOS_IsKeyHeld(Target t, int key) __attribute__((stdcall));
 extern "C" int exp_getClients(bool only_unpaired);
 extern "C" int exp_getAvailablePID(int idx);
 extern "C" bool exp_killClient(int pid);
-extern "C" Target exp_spawnClient(char* java_exec, char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char* javaargs, char* plugins);
+extern "C" Target exp_spawnClient(char* java_exec, char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char* javaargs, char* plugins, char* filepath);
 extern "C" Target exp_pairClient(int pid);
 extern "C" int exp_getClientPID(Target t);
 extern "C" void exp_freeClient(Target t);
@@ -301,7 +301,7 @@ static char* exports[] = {
     (char*)"exp_getAvailablePID", (char*)"function SmartGetAvailablePID(idx: integer): integer;",
     (char*)"exp_killClient", (char*)"function SmartKillClient(pid: integer): boolean;",
     (char*)"exp_pairClient", (char*)"function SmartPairClient(pid: integer): PtrUInt;",
-    (char*)"exp_spawnClient",(char*)"function SmartSpawnClient(java_exec, remote_path, root, params: string; width, height: integer; initseq, useragent, javaargs, Plugins: string): PtrUInt;",
+    (char*)"exp_spawnClient",(char*)"function SmartSpawnClient(java_exec, remote_path, root, params: string; width, height: integer; initseq, useragent, javaargs, Plugins: string; filepath: string): PtrUInt;",
     (char*)"exp_freeClient", (char*)"procedure SmartFreeClient(target: PtrUInt);",
     (char*)"exp_getClientPID", (char*)"function SmartGetClientPID(target: PtrUInt): integer;",
     (char*)"exp_getImageArray", (char*)"function SmartImageArray(target: PtrUInt): PtrUInt;",
