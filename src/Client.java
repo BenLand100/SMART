@@ -819,10 +819,10 @@ public class Client implements ActionListener, ChangeListener {
      * Controls SMART's event blocking on the client applet.
      */
     public void setEnabled(boolean enabled) {
-        if (blocking) {
-            stopBlocking();
-        } else {
+        if (enabled) {
             startBlocking();
+        } else {
+            stopBlocking();
         }
     }
     
