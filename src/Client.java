@@ -611,6 +611,10 @@ public class Client implements ActionListener, ChangeListener {
         debugbtn = new JButton("Show Debug");
         debugbtn.addActionListener(this);
         south.add(debugbtn);
+        clientFrame.pack();
+        clientFrame.setResizable(false);
+        clientFrame.setLocationRelativeTo(null);
+        clientFrame.setVisible(true);
         Main.debug("Client INIT");
         clientApplet.init();
         Main.debug("Client START");
@@ -633,10 +637,6 @@ public class Client implements ActionListener, ChangeListener {
             gameLoader = clientApplet.getComponent(0).getClass().getClassLoader();
             clients.put(gameLoader.toString(), this);
         }
-        clientFrame.pack();
-        clientFrame.setResizable(false);
-        clientFrame.setVisible(true);
-        clientFrame.setLocationRelativeTo(null);
         Main.debug("Client Fully Initialized");
     }
     
