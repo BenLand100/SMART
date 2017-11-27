@@ -42,7 +42,7 @@ import java.applet.Applet;
  */
 public class Client implements ActionListener, ChangeListener {
     
-    public static final String VERSION = "8.5";
+    public static final String VERSION = "8.6";
     public static final String TITLE = "SMARTv" + VERSION + " - SMART Minimizing Autoing Resource Thing - By BenLand100";
     public static final String USER_AGENT; //default for an (old) firefox version is set below
     static {
@@ -671,12 +671,19 @@ public class Client implements ActionListener, ChangeListener {
         HashMap<String, String> paramMap = new HashMap<String, String>();
         paramMap.put("width", parseArg(search(jsInfoPage, widthRegex, 1)));
         paramMap.put("height", parseArg(search(jsInfoPage, heightRegex, 1)));
-        Matcher matcher = Pattern.compile("<param name\\=([^ ]*) [^>]*value\\=([^>]*?)/?>").matcher(jsInfoPage);
+        Matcher matcher = Pattern.compile("<param\\s*name\\s*\\=\\s*\"?([^ \"]*)\"?[^>]*value\\s*\\=\\s*\"?([^>]*?)\"?\\s*/?\\s*>").matcher(jsInfoPage);
         while (matcher.find()) {
-            //Main.debug(parseArg(matcher.group(1)) + " -> " + parseArg(matcher.group(2)));
-            paramMap.put(parseArg(matcher.group(1)), parseArg(matcher.group(2)));
+            String key = parseArg(matcher.group(1));
+            String value = parseArg(matcher.group(2));
+            //Main.debug(key+" -> "+value);
+            if (key.equals("smart-true-root")) {
+                root = value; //option tooverride root for local applet definitions using root="file:/path/to/" params="file.applet"
+                Main.debug("Redefining root to be " + root);
+            } else {
+                paramMap.put(key, value);
+            }
         }
-        ClientStub stub = new ClientStub(root +  parseArg(search(jsInfoPage, archiveRegex, 1)), root, paramMap);
+        ClientStub stub = new ClientStub(root, root, paramMap);
         clientApplet.setStub(stub);
         clientApplet.setPreferredSize(new Dimension(width, height));
         stub.active = true;
