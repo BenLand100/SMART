@@ -295,7 +295,7 @@ SMARTClient* pairClient(int id) {
  * Creates a remote SMART client and pairs to it
  * FIXME javaargs not handled for linux
  */
-SMARTClient* spawnClient(char *java_exec, char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char* javaargs, char* plugins) {
+SMARTClient* spawnClient(char *java_exec, char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char* javaargs, char* plugins, char* filepath) {
     cleanupSHM();
     SMARTClient *client;
     if (!remote_path || !root || !params) return 0;
@@ -312,9 +312,9 @@ SMARTClient* spawnClient(char *java_exec, char* remote_path, char *root, char *p
     sprintf(bootclasspath,"-Xbootclasspath/p:\"%s/%s\"",remote_path,"smart.jar");
     char library[512];
     sprintf(library,"%s/libsmartjni%s.dll",remote_path,bits);
-    int len = strlen(javaargs)+strlen(bootclasspath)+strlen(library)+strlen(root)+strlen(params)+strlen(_width)+strlen(_height)+strlen(initseq)+strlen(useragent)+strlen(remote_path)+strlen(plugins)+7*3+50; //A little extra
+    int len = strlen(javaargs)+strlen(bootclasspath)+strlen(library)+strlen(root)+strlen(params)+strlen(_width)+strlen(_height)+strlen(initseq)+strlen(useragent)+strlen(remote_path)+strlen(plugins)+strlen(filepath)+7*3+50; //A little extra
     char *args = new char[len];
-    sprintf(args,"%s %s smart.Main \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\"",javaargs,bootclasspath,library,root,params,_width,_height,initseq,useragent, remote_path, plugins);
+    sprintf(args,"%s %s smart.Main \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\"",javaargs,bootclasspath,library,root,params,_width,_height,initseq,useragent, remote_path, plugins, filepath);
 	SHELLEXECUTEINFO info;
     memset(&info, 0, sizeof(SHELLEXECUTEINFO));
     info.cbSize = sizeof(SHELLEXECUTEINFO); 
@@ -358,7 +358,7 @@ SMARTClient* spawnClient(char *java_exec, char* remote_path, char *root, char *p
         callClient(client,Ping);
         return client;
     } else {
-        execlp(java_exec,java_exec,bootclasspath,"smart.Main",library,root,params,_width,_height,initseq,useragent, remote_path, plugins, NULL);
+        execlp(java_exec,java_exec,bootclasspath,"smart.Main",library,root,params,_width,_height,initseq,useragent, remote_path, plugins, filepath, NULL);
         debug << "Process terminating. If nothing happened, make sure java is on your path and that SMART is installed correctly.\n";
         exit(1);
     }
@@ -480,8 +480,8 @@ bool exp_killClient(int pid) {
  * Creates a remote SMART client and pairs to it. Returns the target to be used
  * in target-specific methods, or NULL on failure.
  */
-Target exp_spawnClient(char* java_exec, char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char* javaargs, char* plugins) {
-    return spawnClient(java_exec, remote_path,root,params,width,height,initseq,useragent,javaargs,plugins);
+Target exp_spawnClient(char* java_exec, char* remote_path, char *root, char *params, int width, int height, char *initseq, char *useragent, char* javaargs, char* plugins, char* filepath) {
+    return spawnClient(java_exec, remote_path,root,params,width,height,initseq,useragent,javaargs,plugins,filepath);
 }
 
 /**

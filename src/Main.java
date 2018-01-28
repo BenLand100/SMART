@@ -882,8 +882,6 @@ public class Main {
      * launch a SMART client and setup the shared memory / socket communication.
      */
     public static void main(String[] exec_args) {
-        if (exec_args.length != 9) System.exit(1);
-         
         String path = new File(exec_args[0]).getAbsolutePath();
         System.load(path);
         String root = exec_args[1];
@@ -893,8 +891,10 @@ public class Main {
         String initseq = exec_args[5];
         String useragent = exec_args[6];
 		
-		String pluginspath = exec_args[7];
-		String pluginsinfo = exec_args[8];
+	String pluginspath = exec_args[7];
+	String pluginsinfo = exec_args[8];
+	
+	String filepath = exec_args[9];
         
         int nVars = 7;
         int argsSpace = 4096;
@@ -907,7 +907,7 @@ public class Main {
         try {
             id = getPID();
             debug("Starting remote " + id);
-            File f = new File("SMART."+id);
+            File f = new File(filepath+"SMART."+id);
             if (f.exists()) f.delete();
             f.createNewFile();
             f.deleteOnExit();
