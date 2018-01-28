@@ -208,13 +208,13 @@ public class EventNazi {
         while ((dist = Math.hypot(xs - xe,ys - ye)) >= 1) {
             wind = Math.min(wind, dist);
             if (dist >= targetArea) {
-                windX = windX / sqrt3 + (Math.random() * (wind * 2D + 1D) - wind) / sqrt5;
-                windY = windY / sqrt3 + (Math.random() * (wind * 2D + 1D) - wind) / sqrt5;
+                windX = windX / sqrt3 + (2D*Math.random()-1D)*wind/sqrt5;
+                windY = windY / sqrt3 + (2D*Math.random()-1D)*wind/sqrt5;
             } else {
                 windX /= sqrt3;
                 windY /= sqrt3;
                 if (maxStep < 3) {
-                    maxStep = Math.random() * 3 + 3D;
+                    maxStep = Math.random() * 3D + 3D;
                 } else {
                     maxStep /= sqrt5;
                 }
