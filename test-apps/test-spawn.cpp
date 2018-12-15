@@ -57,7 +57,7 @@ int main(int argc, char** argv) {
         SpawnClient spawn = (SpawnClient)GetProcAddress(libsmart, "exp_spawnClient");
     #endif
     
-    spawn((char*)JAVA_EXEC,(char*)".",(char*)"http://world4.runescape.com/",(char*)",f2926274358760108644,iDBXPZaBPotHnzeZldoHBT7Srpf7IzVIXsJezvAA",800,600,NULL,NULL,NULL,NULL);
+    spawn((char*)JAVA_EXEC,(char*)".",(char*)"http://world4.runescape.com/",(char*)",f2926274358760108644,iDBXPZaBPotHnzeZldoHBT7Srpf7IzVIXsJezvAA",800,600,NULL,NULL,(char*)"-Xmx4096m",NULL);
 
     return 0;
 }

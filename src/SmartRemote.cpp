@@ -310,11 +310,9 @@ SMARTClient* spawnClient(char *java_exec, char* remote_path, char *root, char *p
     #ifdef _WIN32
     char bootclasspath[512];
     sprintf(bootclasspath,"-Xbootclasspath/p:\"%s/%s\"",remote_path,"smart.jar");
-    char library[512];
-    sprintf(library,"%s/libsmartjni%s.dll",remote_path,bits);
-    int len = strlen(javaargs)+strlen(bootclasspath)+strlen(library)+strlen(root)+strlen(params)+strlen(_width)+strlen(_height)+strlen(initseq)+strlen(useragent)+strlen(remote_path)+strlen(plugins)+7*3+50; //A little extra
+    int len = strlen(javaargs)+strlen(bootclasspath)+strlen(remote_path)+strlen(root)+strlen(params)+strlen(_width)+strlen(_height)+strlen(initseq)+strlen(useragent)+strlen(remote_path)+strlen(plugins)+7*3+50; //A little extra
     char *args = new char[len];
-    sprintf(args,"%s %s smart.Main \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\"",javaargs,bootclasspath,library,root,params,_width,_height,initseq,useragent, remote_path, plugins);
+    sprintf(args,"%s %s smart.Main \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\"",javaargs,bootclasspath,remote_path,root,params,_width,_height,initseq,useragent, remote_path, plugins);
 	SHELLEXECUTEINFO info;
     memset(&info, 0, sizeof(SHELLEXECUTEINFO));
     info.cbSize = sizeof(SHELLEXECUTEINFO); 
@@ -341,12 +339,6 @@ SMARTClient* spawnClient(char *java_exec, char* remote_path, char *root, char *p
     #else
     char bootclasspath[512];
     sprintf(bootclasspath,"-Xbootclasspath/p:%s/%s",remote_path,"smart.jar"); //linux supports spaces in path fine, fails with quotes
-    char library[512];
-    #ifdef __APPLE__
-    sprintf(library,"%s/libsmartjni%s.dylib",remote_path,bits);
-    #else
-    sprintf(library,"%s/libsmartjni%s.so",remote_path,bits);
-    #endif
     int v = fork();
     if (v) {
         int count = 0;
@@ -358,7 +350,7 @@ SMARTClient* spawnClient(char *java_exec, char* remote_path, char *root, char *p
         callClient(client,Ping);
         return client;
     } else {
-        execlp(java_exec,java_exec,bootclasspath,"smart.Main",library,root,params,_width,_height,initseq,useragent, remote_path, plugins, NULL);
+        execlp(java_exec,java_exec,bootclasspath,"smart.Main",remote_path,root,params,_width,_height,initseq,useragent, remote_path, plugins, NULL);
         debug << "Process terminating. If nothing happened, make sure java is on your path and that SMART is installed correctly.\n";
         exit(1);
     }

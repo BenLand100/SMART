@@ -883,8 +883,11 @@ public class Main {
      */
     public static void main(String[] exec_args) {
         if (exec_args.length != 9) System.exit(1);
-         
-        String path = new File(exec_args[0]).getAbsolutePath();
+        
+        String libext = System.mapLibraryName("F");
+        libext = libext.substring(libext.lastIndexOf('.')+1);
+        
+        String path = new File(exec_args[0]+"/libsmartjni"+System.getProperty("sun.arch.data.model")+"."+libext).getAbsolutePath();
         System.load(path);
         String root = exec_args[1];
         String params = exec_args[2];
