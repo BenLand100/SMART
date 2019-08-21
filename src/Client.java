@@ -31,7 +31,6 @@ import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
-import sun.applet.AppletClassLoader;
 import java.applet.Applet;
 
 /**
@@ -666,7 +665,7 @@ public class Client implements ActionListener, ChangeListener {
 		clientConnection.addRequestProperty("Keep-Alive", "200");
 		//This useragent it for the java plugin, probably shouldn't mess with it
 		clientConnection.addRequestProperty("User-Agent", "Mozilla/4.0 (" + System.getProperty("os.name") + " " + System.getProperty("os.version") + ") Java/" + System.getProperty("java.version"));
-        thisLoader = AppletClassLoader.newInstance(new URL[] { clientConnection.getJarFileURL() });
+        thisLoader = new URLClassLoader(new URL[] { clientConnection.getJarFileURL() });
         clientApplet = (Applet) (thisLoader.loadClass(parseArg(search(jsInfoPage, codeRegex, 1)).replaceAll(".class$", "")).newInstance());
         HashMap<String, String> paramMap = new HashMap<String, String>();
         paramMap.put("width", parseArg(search(jsInfoPage, widthRegex, 1)));

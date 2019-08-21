@@ -308,11 +308,13 @@ SMARTClient* spawnClient(char *java_exec, char* remote_path, char *root, char *p
     if (!javaargs) javaargs = &empty;
 	if (!plugins) plugins = &empty;
     #ifdef _WIN32
+    char smartjarpath[256];
     char bootclasspath[512];
-    sprintf(bootclasspath,"-Xbootclasspath/p:\"%s/%s\"",remote_path,"smart.jar");
+    sprintf(smartjarpath,"%s/%s",remote_path,"smart.jar");
+    sprintf(bootclasspath,"-java.desktop=\"%s\"",smartjarpath);
     int len = strlen(javaargs)+strlen(bootclasspath)+strlen(remote_path)+strlen(root)+strlen(params)+strlen(_width)+strlen(_height)+strlen(initseq)+strlen(useragent)+strlen(remote_path)+strlen(plugins)+7*3+50; //A little extra
     char *args = new char[len];
-    sprintf(args,"%s %s smart.Main \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\"",javaargs,bootclasspath,remote_path,root,params,_width,_height,initseq,useragent, remote_path, plugins);
+    sprintf(args,"%s --patch-module %s -jar %s \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\"",javaargs,bootclasspath,smartjarpath,remote_path,root,params,_width,_height,initseq,useragent, remote_path, plugins);
 	SHELLEXECUTEINFO info;
     memset(&info, 0, sizeof(SHELLEXECUTEINFO));
     info.cbSize = sizeof(SHELLEXECUTEINFO); 
@@ -337,8 +339,10 @@ SMARTClient* spawnClient(char *java_exec, char* remote_path, char *root, char *p
     callClient(client,Ping);
     return client;
     #else
+    char smartjarpath[256];
     char bootclasspath[512];
-    sprintf(bootclasspath,"-Xbootclasspath/p:%s/%s",remote_path,"smart.jar"); //linux supports spaces in path fine, fails with quotes
+    sprintf(smartjarpath,"%s/%s",remote_path,"smart.jar");
+    sprintf(bootclasspath,"java.desktop=%s",smartjarpath); //linux supports spaces in path fine, fails with quotes
     int v = fork();
     if (v) {
         int count = 0;
@@ -350,7 +354,7 @@ SMARTClient* spawnClient(char *java_exec, char* remote_path, char *root, char *p
         callClient(client,Ping);
         return client;
     } else {
-        execlp(java_exec,java_exec,bootclasspath,"smart.Main",remote_path,root,params,_width,_height,initseq,useragent, remote_path, plugins, NULL);
+        execlp(java_exec,java_exec,"--patch-module",bootclasspath,"-jar",smartjarpath,remote_path,root,params,_width,_height,initseq,useragent, remote_path, plugins, NULL);
         debug << "Process terminating. If nothing happened, make sure java is on your path and that SMART is installed correctly.\n";
         exit(1);
     }
@@ -430,7 +434,8 @@ int getClients(bool only_unpaired, int **_clients) {
         }
     }
     #endif
-    debug << "Located " << count << " clients\n";
+
+    printf("Located %d clients\n", count);
     return count;
 }
 

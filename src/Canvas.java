@@ -82,7 +82,7 @@ public class Canvas extends Component implements Accessible {
     @Override
     void setGraphicsConfiguration(GraphicsConfiguration gc) {
         synchronized(getTreeLock()) {
-            CanvasPeer peer = (CanvasPeer)getPeer();
+            CanvasPeer peer = (CanvasPeer)this.peer;
             if (peer != null) {
                 gc = peer.getAppropriateGraphicsConfiguration(gc);
             }
@@ -99,7 +99,7 @@ public class Canvas extends Component implements Accessible {
     public void addNotify() {
         synchronized (getTreeLock()) {
             if (peer == null)
-                peer = getToolkit().createCanvas(this);
+                peer = getComponentFactory().createCanvas(this);
             super.addNotify();
         }
     }
