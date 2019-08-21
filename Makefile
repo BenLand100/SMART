@@ -19,7 +19,7 @@
 WIN_GPP=i686-w64-mingw32-g++
 WIN64_GPP=x86_64-w64-mingw32-g++
 LIN_GPP=i686-pc-linux-gnu-g++
-LIN64_GPP=g++
+LIN64_GPP=x86_64-pc-linux-gnu-g++
 JAVAC=javac
 JAR=jar
 
