@@ -454,7 +454,7 @@ int exp_getClients(bool only_unpaired) {
  */
 int exp_getAvailablePID(int idx) {
     if (idx < clients.count && idx >= 0) {
-        debug << "Returning client index " << idx << " with PID=" << clients.ids[idx] << '\n';
+        printf("Returning client index %d with PID=%d\n", idx, clients.ids[idx]);
         return clients.ids[idx];
     }
     return 0;
