@@ -476,7 +476,6 @@ int getClients(bool only_unpaired, int **_clients) {
         }
     }
     #endif
-
     printf("Located %d clients\n", count);
     return count;
 }
