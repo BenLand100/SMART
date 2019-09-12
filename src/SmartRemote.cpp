@@ -311,10 +311,10 @@ SMARTClient* spawnClient(char *java_exec, char* remote_path, char *root, char *p
     char smartjarpath[256];
     char bootclasspath[512];
     sprintf(smartjarpath,"%s/%s",remote_path,"smart.jar");
-    sprintf(bootclasspath,"-java.desktop=\"%s\"",smartjarpath);
+	sprintf(bootclasspath,"-Xbootclasspath/p:\"%s\"",smartjarpath);
     int len = strlen(javaargs)+strlen(bootclasspath)+strlen(remote_path)+strlen(root)+strlen(params)+strlen(_width)+strlen(_height)+strlen(initseq)+strlen(useragent)+strlen(remote_path)+strlen(plugins)+7*3+50; //A little extra
     char *args = new char[len];
-    sprintf(args,"%s --patch-module %s -jar %s \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\"",javaargs,bootclasspath,smartjarpath,remote_path,root,params,_width,_height,initseq,useragent, remote_path, plugins);
+    sprintf(args,"%s %s -jar %s \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\"",javaargs,bootclasspath,smartjarpath,remote_path,root,params,_width,_height,initseq,useragent, remote_path, plugins);
 	SHELLEXECUTEINFO info;
     memset(&info, 0, sizeof(SHELLEXECUTEINFO));
     info.cbSize = sizeof(SHELLEXECUTEINFO); 
@@ -328,25 +328,78 @@ SMARTClient* spawnClient(char *java_exec, char* remote_path, char *root, char *p
         debug << "Failed to spawn process. Make sure java.exe is on your path and that SMART is installed correctly.\n";
         return NULL;
     }
+	
     int pid = GetProcessId(info.hProcess);
-    CloseHandle(info.hProcess);
+	int status = 0;
     int count = 0;
+	bool attemptedJava12Spawn = false;
     do {
+		if (GetExitCodeProcess(info.hProcess, &status)) {
+			if (status != STILL_ACTIVE && status != 0 && !attemptedJava12Spawn) {
+				count = 0;
+				status = 0;
+				attemptedJava12Spawn = true;
+				
+				memset(&bootclasspath[0], 0, sizeof(bootclasspath));
+				sprintf(bootclasspath,"--patch-module -java.desktop=\"%s\"",smartjarpath);
+				len = strlen(javaargs)+strlen(bootclasspath)+strlen(remote_path)+strlen(root)+strlen(params)+strlen(_width)+strlen(_height)+strlen(initseq)+strlen(useragent)+strlen(remote_path)+strlen(plugins)+7*3+50; //A little extra
+				args = new char[len];
+				sprintf(args,"%s %s -jar %s \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\" \"%s\"",javaargs,bootclasspath,smartjarpath,remote_path,root,params,_width,_height,initseq,useragent, remote_path, plugins);
+				SHELLEXECUTEINFO info;
+				memset(&info, 0, sizeof(SHELLEXECUTEINFO));
+				info.cbSize = sizeof(SHELLEXECUTEINFO);
+				info.fMask = SEE_MASK_NOCLOSEPROCESS;
+				info.lpFile = java_exec;
+				info.lpParameters = args;
+				info.nShow = SW_SHOWNORMAL;
+				ShellExecuteEx(&info);
+				delete args;
+				if (!info.hProcess) {
+					debug << "Failed to spawn process. Make sure java.exe is on your path and that SMART is installed correctly.\n";
+					return NULL;
+				}
+				
+				pid = GetProcessId(info.hProcess);
+				CloseHandle(info.hProcess);
+			}
+		}
+		
         Sleep(1000);
         count++;
     } while  (!(client=pairClient(pid))&&count<10);
+	CloseHandle(info.hProcess);
+	
     if (count >= 10) return NULL;
     callClient(client,Ping);
     return client;
     #else
     char smartjarpath[256];
-    char bootclasspath[512];
     sprintf(smartjarpath,"%s/%s",remote_path,"smart.jar");
-    sprintf(bootclasspath,"java.desktop=%s",smartjarpath); //linux supports spaces in path fine, fails with quotes
     int v = fork();
     if (v) {
+		int status = 0;
         int count = 0;
+		bool attemptedJava12Spawn = false;
         do {
+			if (waitpid(v, &status, WNOHANG) == v && !attemptedJava12Spawn) {
+				count = 0;
+				status = 0;
+				attemptedJava12Spawn = true;
+				
+				v = fork();
+				if (v) {
+					continue;
+				}
+				
+				//Java 12..
+				char bootclasspath[512];
+				sprintf(bootclasspath,"java.desktop=%s",smartjarpath); //linux supports spaces in path fine, fails with quotes
+				execlp(java_exec,java_exec,"--patch-module",bootclasspath,"-jar",smartjarpath,remote_path,root,params,_width,_height,initseq,useragent, remote_path, plugins, NULL);
+				
+				debug << "Process terminating. If nothing happened, make sure java is on your path and that SMART is installed correctly.\n";
+				exit(1);
+			}
+			
             sleep(1);
             count++;
         } while  (!(client=pairClient(v)) && count<10);
@@ -354,7 +407,11 @@ SMARTClient* spawnClient(char *java_exec, char* remote_path, char *root, char *p
         callClient(client,Ping);
         return client;
     } else {
-        execlp(java_exec,java_exec,"--patch-module",bootclasspath,"-jar",smartjarpath,remote_path,root,params,_width,_height,initseq,useragent, remote_path, plugins, NULL);
+		//Java 8..
+		char bootclasspath[512];
+		sprintf(bootclasspath,"-Xbootclasspath/p:%s",smartjarpath); //linux supports spaces in path fine, fails with quotes
+		execlp(java_exec,java_exec,bootclasspath,"-jar",smartjarpath,remote_path,root,params,_width,_height,initseq,useragent, remote_path, plugins, NULL);
+		
         debug << "Process terminating. If nothing happened, make sure java is on your path and that SMART is installed correctly.\n";
         exit(1);
     }

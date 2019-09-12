@@ -84,7 +84,7 @@ int main(int argc, char** argv) {
         if (!addr) bad = true;
         cout << i << ' ' << addr << ' ' << def << '\n';
     }
-    delete def;
+    delete[] def;
     cout << (bad ? "There were problems importing methods" : "Methods imported successfully") << '\n'; 
     return 0;
 }

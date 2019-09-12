@@ -16,16 +16,17 @@
  *  You should have received a copy of the GNU General Public License
  *  along with SMART. If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 //Hopefully Oracle will play nice if I keep their copyright.
 /*
  * Copyright (c) 1995, 2010, Oracle and/or its affiliates. All rights reserved.
  * ORACLE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  *
  */
- 
+
 package java.awt;
 
+import sun.awt.ComponentFactory;
 import java.awt.image.BufferStrategy;
 import java.awt.peer.CanvasPeer;
 import java.awt.image.BufferedImage;
@@ -34,14 +35,14 @@ import smart.Client;
 
 /**
  *
- * Dirty little hack that makes a new Canvas class right where I want it.
- * Uses the code from Oracle's API with some additions. 
+ * Dirty little hack that makes a new Canvas class right where I want it. Uses
+ * the code from Oracle's API with some additions.
  *
  * @author Benjamin J. Land
  */
 public class Canvas extends Component implements Accessible {
 
-	@Override
+    @Override
     public void setVisible(boolean visible) {
         Client.canvasNotify(this);
         super.setVisible(visible);
@@ -50,24 +51,23 @@ public class Canvas extends Component implements Accessible {
     private static final String base = "canvas";
     private static int nameCounter = 0;
     private BufferedImage buffer = null;
-    
+
     public BufferedImage getBuffer() {
         return buffer;
     }
-    
+
     public void setBuffer(BufferedImage buffer) {
         this.buffer = buffer;
     }
-    
+
     @Override
     public Graphics getGraphics() {
-        return buffer == null ?  super.getGraphics() : buffer.getGraphics();
+        return buffer == null ? super.getGraphics() : buffer.getGraphics();
     }
-    
+
     public Graphics getCanvasGraphics() {
         return super.getGraphics();
     }
-    
 
     private static final long serialVersionUID = -2284879212465893870L;
 
@@ -81,8 +81,8 @@ public class Canvas extends Component implements Accessible {
 
     @Override
     void setGraphicsConfiguration(GraphicsConfiguration gc) {
-        synchronized(getTreeLock()) {
-            CanvasPeer peer = (CanvasPeer)this.peer;
+        synchronized (getTreeLock()) {
+            CanvasPeer peer = (CanvasPeer) this.peer;
             if (peer != null) {
                 gc = peer.getAppropriateGraphicsConfiguration(gc);
             }
@@ -95,11 +95,19 @@ public class Canvas extends Component implements Accessible {
             return base + nameCounter++;
         }
     }
-    
+
     public void addNotify() {
         synchronized (getTreeLock()) {
-            if (peer == null)
-                peer = getComponentFactory().createCanvas(this);
+            if (peer == null) {
+                // Equivalent to `peer = getComponentFactory().createCanvas(this);` in JDK-12.
+                // However, the below works on JDK-8+ and both 8 and 12 do the below.
+                final Toolkit toolkit = getToolkit();
+                if (toolkit instanceof ComponentFactory) {
+                    peer = ((ComponentFactory) toolkit).createCanvas(this);
+                } else {
+                    throw new AWTError("UI components are unsupported by: " + toolkit);
+                }
+            }
             super.addNotify();
         }
     }
@@ -121,8 +129,7 @@ public class Canvas extends Component implements Accessible {
         super.createBufferStrategy(numBuffers);
     }
 
-    public void createBufferStrategy(int numBuffers,
-        BufferCapabilities caps) throws AWTException {
+    public void createBufferStrategy(int numBuffers, BufferCapabilities caps) throws AWTException {
         super.createBufferStrategy(numBuffers, caps);
     }
 
