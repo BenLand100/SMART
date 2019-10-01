@@ -272,7 +272,7 @@ $(WIN64_BUILD_DIR)/SmartJNI.o: $(SRC_DIR)/SmartJNI.cpp $(JNI_CPPHEADERFILES)
  $(JAVACLASSES): $(JAVASOURCES)
 	@echo "Compiling Java Classes..."
 	@mkdir -p $(JAVA_BUILD_DIR)
-	@$(JAVAC) --patch-module java.desktop=src -classpath $(JAVA_BUILD_DIR) -sourcepath $(SRC_DIR) -d $(JAVA_BUILD_DIR) $(JAVASOURCES)
+	@$(JAVAC) -classpath $(JAVA_BUILD_DIR) -sourcepath $(SRC_DIR) -d $(JAVA_BUILD_DIR) $(JAVASOURCES)
 	@echo "Creating JAR Archive..."
 	@mkdir -p $(DIST)
 	@$(JAR) cfe $(DIST)/$(JAVA_NAME) smart.Main -C $(JAVA_BUILD_DIR) .
