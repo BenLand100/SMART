@@ -41,7 +41,7 @@ import java.applet.Applet;
  */
 public class Client implements ActionListener, ChangeListener {
     
-    public static final String VERSION = "9.0";
+    public static final String VERSION = "9.1";
     public static final String TITLE = "SMARTv" + VERSION + " - SMART Minimizing Autoing Resource Thing - By BenLand100";
     public static final String USER_AGENT; //default for an (old) firefox version is set below
     static {
@@ -651,42 +651,72 @@ public class Client implements ActionListener, ChangeListener {
      */
     private void initApplet(String root, String params) throws Exception {
         String jsInfoPage = downloadHTML(root + params);
-        jsInfoPage = jsInfoPage.substring(Math.max(jsInfoPage.indexOf("<applet"), jsInfoPage.indexOf("write('<app")), jsInfoPage.indexOf("</applet>"));
-        Main.debug("Applet Loader Parsed");
-        String archive = parseArg(search(jsInfoPage, archiveRegex, 1));
-        if (!archive.startsWith("http://")) archive = root + archive;
-        Main.debug("Using jar: " + archive);
-        JarURLConnection clientConnection = (JarURLConnection) new URL("jar:" + archive + "!/").openConnection();
-        //Store the manifest hash here           
-        manifestHash = clientConnection.getManifest().hashCode();
-        //This might need some work, I didn't write it and I'm not sure how accurate it is
-		clientConnection.addRequestProperty("Protocol", "HTTP/1.1");
-		clientConnection.addRequestProperty("Connection", "keep-alive");
-		clientConnection.addRequestProperty("Keep-Alive", "200");
-		//This useragent it for the java plugin, probably shouldn't mess with it
-		clientConnection.addRequestProperty("User-Agent", "Mozilla/4.0 (" + System.getProperty("os.name") + " " + System.getProperty("os.version") + ") Java/" + System.getProperty("java.version"));
-        thisLoader = new URLClassLoader(new URL[] { clientConnection.getJarFileURL() });
-        clientApplet = (Applet) (thisLoader.loadClass(parseArg(search(jsInfoPage, codeRegex, 1)).replaceAll(".class$", "")).newInstance());
-        HashMap<String, String> paramMap = new HashMap<String, String>();
-        paramMap.put("width", parseArg(search(jsInfoPage, widthRegex, 1)));
-        paramMap.put("height", parseArg(search(jsInfoPage, heightRegex, 1)));
-        Matcher matcher = Pattern.compile("<param\\s*name\\s*\\=\\s*\"?([^ \"]*)\"?[^>]*value\\s*\\=\\s*\"?([^>]*?)\"?\\s*/?\\s*>").matcher(jsInfoPage);
-        while (matcher.find()) {
-            String key = parseArg(matcher.group(1));
-            String value = parseArg(matcher.group(2));
-            //Main.debug(key+" -> "+value);
-            if (key.equals("smart-true-root")) {
-                root = value; //option tooverride root for local applet definitions using root="file:/path/to/" params="file.applet"
-                Main.debug("Redefining root to be " + root);
-            } else {
-                paramMap.put(key, value);
+        
+        if (jsInfoPage.contains("<applet")) {
+            jsInfoPage = jsInfoPage.substring(Math.max(jsInfoPage.indexOf("<applet"), jsInfoPage.indexOf("write('<app")), jsInfoPage.indexOf("</applet>"));
+            Main.debug("Applet Loader Parsed");
+            String archive = parseArg(search(jsInfoPage, archiveRegex, 1));
+            if (!archive.startsWith("http://")) archive = root + archive;
+            Main.debug("Using jar: " + archive);
+            JarURLConnection clientConnection = (JarURLConnection) new URL("jar:" + archive + "!/").openConnection();
+            //Store the manifest hash here           
+            manifestHash = clientConnection.getManifest().hashCode();
+            //This might need some work, I didn't write it and I'm not sure how accurate it is
+	        clientConnection.addRequestProperty("Protocol", "HTTP/1.1");
+	        clientConnection.addRequestProperty("Connection", "keep-alive");
+	        clientConnection.addRequestProperty("Keep-Alive", "200");
+	        //This useragent it for the java plugin, probably shouldn't mess with it
+	        clientConnection.addRequestProperty("User-Agent", "Mozilla/4.0 (" + System.getProperty("os.name") + " " + System.getProperty("os.version") + ") Java/" + System.getProperty("java.version"));
+            thisLoader = new URLClassLoader(new URL[] { clientConnection.getJarFileURL() });
+            clientApplet = (Applet) (thisLoader.loadClass(parseArg(search(jsInfoPage, codeRegex, 1)).replaceAll(".class$", "")).newInstance());
+            HashMap<String, String> paramMap = new HashMap<String, String>();
+            paramMap.put("width", parseArg(search(jsInfoPage, widthRegex, 1)));
+            paramMap.put("height", parseArg(search(jsInfoPage, heightRegex, 1)));
+            Matcher matcher = Pattern.compile("<param\\s*name\\s*\\=\\s*\"?([^ \"]*)\"?[^>]*value\\s*\\=\\s*\"?([^>]*?)\"?\\s*/?\\s*>").matcher(jsInfoPage);
+            while (matcher.find()) {
+                String key = parseArg(matcher.group(1));
+                String value = parseArg(matcher.group(2));
+                //Main.debug(key+" -> "+value);
+                if (key.equals("smart-true-root")) {
+                    root = value; //option to override root for local applet definitions using root="file:/path/to/" params="file.applet"
+                    Main.debug("Redefining root to be " + root);
+                } else {
+                    paramMap.put(key, value);
+                }
             }
+            ClientStub stub = new ClientStub(root, root, paramMap);
+            clientApplet.setStub(stub);
+            clientApplet.setPreferredSize(new Dimension(width, height));
+            stub.active = true;
+            Main.debug("Applet Parameters Forwarded");
+        } else {
+            String lines[] = jsInfoPage.replaceAll("param=|msg=", "").split("\r|\n|\r\n");
+            Main.debug("jav_config.ws Page Parsed");
+            HashMap<String, String> paramMap = new HashMap<String, String>();
+            for (String line : lines) {
+                if (line.length() > 0) {
+                    int idx = line.indexOf("=");
+                    String key = line.substring(0, idx);
+                    String value = line.substring(idx + 1);
+                    if (key.equals("smart-true-root")) {
+                        root = value; //option to override root for local applet definitions using root="file:/path/to/" params="file.applet"
+                        Main.debug("Redefining root to be " + root);
+                    } else {
+                        paramMap.put(key, value);
+                    }
+                }
+            }
+
+            String jarLocation = paramMap.get("codebase") + paramMap.get("initial_jar");
+            Main.debug("Using jar: " + jarLocation);
+            thisLoader = new URLClassLoader(new URL[]{new URL(jarLocation)});
+            clientApplet = (Applet) thisLoader.loadClass(paramMap.get("initial_class").replace(".class", "")).newInstance();
+            ClientStub stub = new ClientStub(root, root, paramMap);
+            clientApplet.setStub(stub);
+            clientApplet.setPreferredSize(new Dimension(width, height));
+            stub.active = true;
+            Main.debug("jav_config.ws Parameters Forwarded");
         }
-        ClientStub stub = new ClientStub(root, root, paramMap);
-        clientApplet.setStub(stub);
-        clientApplet.setPreferredSize(new Dimension(width, height));
-        stub.active = true;
-        Main.debug("Applet Parameters Forwarded");
     }
 
     /**
