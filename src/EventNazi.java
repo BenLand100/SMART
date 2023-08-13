@@ -185,6 +185,7 @@ public class EventNazi {
      * Internal mouse movement algorithm. Do not use this without credit to either
      * Benjamin J. Land or BenLand100. This is synchronized to prevent multiple
      * motions and bannage.
+     * https://ben.land/post/2021/04/25/windmouse-human-mouse-movement/
      * @param xs The x start
      * @param ys The y start
      * @param xe The x destination
